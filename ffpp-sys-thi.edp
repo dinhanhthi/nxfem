@@ -1,0 +1,122 @@
+/*
+Quick test for simple system of equations, before applying in matlab
+we will solve equations of w and v first and then solve u
+Proposed by Thi:
+---- domain
+Omg=[0,1]x[0,1], r=sqrt((x-.5)^2+(y-.5)^2)
+---- exact solutions: see in the code
+---- equation of tw (w=alpha*tw)
+-nabla(alpha nabla tw) = -8 \Omega
+[tw]=[alpha nabla_n tw]=0 \Gamma
+tw=twex \partial\Omega
+---- equation of v
+-nabla(beta nabla v) + v*g(u) = -4-vex*g(uex) \Omega
+v = nabla_n v = 0 \Gamma
+v=vex \partial\Omega
+---- u
+u = 1/alpha*(w-beta*u)
+STATUS: doesn't work!
+*/
+
+int n=180;
+int nn=80;
+real r0 = 0.3; // interface
+
+border b5(t=0,2*pi){ x=0.5+r0*cos(t); y=0.5+r0*sin(t);label=5;}
+border b1(t=0,1){ x=t; y=0.;label=1;}
+border b2(t=0,1){ x=1; y=t;label=2;}
+border b3(t=0,1){ x=1-t; y=1.;label=3;}
+border b4(t=0,1){ x=0; y=1-t;label=4;}
+mesh Th = buildmesh(b5(n)+b1(nn)+b2(nn)+b3(nn)+b4(nn));
+
+// plot(b5(50)+b1(30)+b2(30)+b3(30)+b4(30),wait=1);
+// plot(Th,wait=1);
+
+fespace Vh(Th,P1);
+fespace Wh(Th,P0);
+Vh u,v,tw,w,vold,vv;
+
+real lam=1e3; // penalty
+
+macro dn(u) (N.x*dx(u)+N.y*dy(u)) //  def the normal derivative 
+macro g(u) (u) // fonction f non lineaire dans (3) et (4)
+
+Vh phi = sqrt((x-0.5)^2+(y-0.5)^2)-r0;
+real alp1 = 1.; // alpha 1
+real alp2 = 10.; // alpha 2
+real bet1 = 5.; // beta 1
+real bet2 = 0.; //beta 2 (should't change!!)
+
+int nbtriangles = Th.nt;
+int nbvertices = Th.nv;
+
+// exact solutions
+Vh uex = (phi<=0)*( 1/alp1 * ((x-0.5)^2+(y-0.5)^2) ) // r^2/alp1 (Omg1)
+      + (phi>0)*( 1/alp2*((x-0.5)^2+(y-0.5)^2) - r0^2/alp2 + r0^2/alp1 ); //r^2/alp2 - r0^2/alp2 + r0^2/alp1 (Omg2)
+
+Vh vex = (1/bet1)*(phi<=0)*((x-0.5)^2+(y-0.5)^2-r0^2) // 1/bet1 * (r^2-r0^2) (Omg1)
+            + (phi>0)*bet2; // 0 (Omg2)
+
+// Vh wex = (phi<=0)*( 2*((x-0.5)^2+(y-0.5)^2) - r0^2 ) // 2r^2-r0^2 (Omg1)
+//       + (phi>0)*( (x-0.5)^2+(y-0.5)^2 - r0^2 + alp2*r0^2/alp1 ); // r^2 - r0^2 + alp2/alp1 * r0^2 (Omg2)
+
+Vh twex = (phi<=0)*(1/alp1*(2*((x-0.5)^2+(y-0.5)^2) - r0^2)) // 1/alpha1*(2r^2-r0^2) (Omg1)
+      + (phi>0)*( 1/alp2*((x-0.5)^2+(y-0.5)^2 - r0^2) + r0^2/alp1 ); // 1/alpha2*(r^2 - r0^2) + 1/alp1 * r0^2 (Omg2)
+
+Vh wex = (phi<=0)*(alp1*twex) + (phi>0)*(alp2*twex);
+
+Vh fw = -8.; // rhs of equation of w (and tw)
+Vh fv = -4. - vex*g(uex); // rhs of equation of v
+
+// Resolution du probleme de tw
+// tw = 1/alpha * w
+problem pbtw(tw,vv,solver=UMFPACK) = 
+                  int2d(Th,levelset=phi)(alp1*(dx(tw)*dx(vv)+dy(tw)*dy(vv)))
+                + int2d(Th,levelset=-phi)(alp2*(dx(tw)*dx(vv)+dy(tw)*dy(vv)))
+                - int2d(Th,levelset=phi)(fw*vv)
+                - int2d(Th,levelset=-phi)(fw*vv)
+                + on(1,2,3,4,tw=twex)
+				;
+
+// // Resolution du probleme de w
+// problem pbw(w,vv,solver=UMFPACK) = 
+//                   int2d(Th,levelset=phi)(dx(w)*dx(vv)+dy(w)*dy(vv))
+//                 + int2d(Th,levelset=-phi)(dx(w)*dx(vv)+dy(w)*dy(vv))
+//                 - int2d(Th,levelset=phi)(fw*vv)
+//                 - int2d(Th,levelset=-phi)(fw*vv)
+//                 + on(1,2,3,4,w=wex)
+// 				;
+
+// Resolution du probleme de v
+problem pbv(v,vv,solver=UMFPACK) = 
+                  int2d(Th,levelset=phi)(bet1*(dx(v)*dx(vv)+dy(v)*dy(vv))) 
+                + int2d(Th,levelset=-phi)(bet2*(dx(v)*dx(vv)+dy(v)*dy(vv))) 
+                // - int2d(Th,levelset=phi)(v*g(w/alp1-bet1/alp1*vold)*vv)
+                // - int2d(Th,levelset=-phi)(v*g(w/alp2-bet2/alp2*vold)*vv)
+                - int2d(Th,levelset=phi)(v*(w/alp1-bet1/alp1*vold)*vv)
+                - int2d(Th,levelset=-phi)(v*(w/alp2-bet2/alp2*vold)*vv) 
+                - int2d(Th,levelset=phi)(fv*vv)
+                - int2d(Th,levelset=-phi)(fv*vv)
+                + on(1,2,3,4,v=0.)
+                ;
+
+pbtw; // solve tw
+w = (phi<=0)*(alp1*tw) + (phi>0)*(alp2*tw); // w
+plot(wex,wait=1,fill=1,value=1,cmm="wex",dim=3);  // wex
+plot(w,wait=1,value=1,fill=1, cmm="w",dim=3); // w
+
+vold = 0.; // initial value of v
+int imax=15; // number of iterative steps
+for(int i=0;i<imax;i++){
+  pbv; // solve v
+  vold = v;
+}
+
+// u = 1/alpha * (w-beta*v)
+u = (phi<=0)*( 1/alp1*(w-bet1*v) ) // Omg1
+  + (phi>0)*( 1/alp2*(w-bet2*v) ); // Omg2
+
+plot(vex,wait=1,fill=1,value=1,cmm="vex",dim=3); // vex   
+plot(v,wait=1,value=1,fill=1, cmm="v",dim=3); // v
+plot(Th,uex,wait=1,fill=1,value=1,cmm="uex",dim=3);  // uex
+plot(u,wait=1,value=1,fill=1, cmm="u",dim=3); // u
