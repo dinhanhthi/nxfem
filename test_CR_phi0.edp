@@ -1,0 +1,91 @@
+// Testing ||f-f_h||_L2(Omg) in order to compare with function 
+//		getNormL2fhf.m in matlab
+// Model: model_levelset_vortex.m
+
+verbosity = 0;
+// int[int] nSeg = [17, 67, 117, 167, 217, 267, 317];
+// int nSegSize = nSeg.n;
+int nSegSize = 4;
+int n; // number of segment at each time step
+mesh Th;
+string meshName;
+bool regularMesh = false;
+bool saveMesh = false;
+
+
+real[int] normPhiOnGh0(nSegSize); // ||phi^0||_L2(Gh)
+real[int] normPhiphihOnOmg(nSegSize); // ||phi_h^0 - phi^0||_L2(Omg)
+real[int] hTmax(nSegSize); // h
+real[int] CRphiOnGh0(nSegSize); // convergence rate
+real[int] CRphiphiOnOmg(nSegSize);
+
+
+// Domain [0,1] x [0,1]
+border C1(t=0,1){x=t;y=0;}; // bottom
+border C2(t=0,1){x=1;y=t;}; // right
+border C3(t=1,0){x=t;y=1;}; // top
+border C4(t=1,0){x=0;y=t;}; // left
+
+
+// phi
+real xi = 0.15;
+func phi = sqrt( (x-0.5)^2 + (y-0.75)^2 ) - xi;
+
+
+for (int i=0; i<nSegSize; i++){
+	n = 2^(i+3);
+	
+
+	// MESH
+	if (regularMesh==true){
+		Th = square(n,n); // [0,1] x [0,1]
+		meshName = "Th_regular" + i + ".msh";
+	}else{
+		Th = buildmesh(C1(n) + C2(n) + C3(n) + C4(n));
+		meshName = "Th_irregular" + i + ".msh";
+	}
+	
+	// plot(Th, wait=1);
+	
+	if(saveMesh == true){
+		savemesh(Th,meshName);
+	}
+
+
+	// FE space
+	fespace Vh(Th,P1);
+	Vh h = hTriangle;
+	hTmax(i) = h[].max; // h
+
+
+	// phi
+	Vh phih = phi; // phih is a projection of phi to Vh
+	// plot(phih, fill=1, wait=1, value=1);
+
+	
+	// Norms
+	normPhiOnGh0(i) = sqrt(int1d(Th,levelset=phih)(phi^2));
+	normPhiphihOnOmg(i) = sqrt(int2d(Th)((phih-phi)^2));
+	
+	
+	// convergence rate
+	if (i != 0){
+		CRphiOnGh0(i) = log(normPhiOnGh0(i-1)/normPhiOnGh0(i)) / log(hTmax(i-1)/hTmax(i));
+		CRphiphiOnOmg(i) = log(normPhiphihOnOmg(i-1)/normPhiphihOnOmg(i)) / log(hTmax(i-1)/hTmax(i));
+	}else{
+		CRphiOnGh0(i) = 0;
+		CRphiphiOnOmg(i) = 0;
+	}
+	
+	
+	// DISPLAY
+	// cout << "h(" << i << ") = " << hTmax(i) << endl;
+	
+	// cout << "normPhiOnGhO(" << i << ") = " << normPhiOnGh0(i) << endl;
+	// cout << "normPhiphihOnOmg(" << i << ") = " << normPhiphihOnOmg(i) << endl << endl;
+	
+	cout << "cr_phiOnGh0(" << i << ") = " << CRphiOnGh0(i) << endl;
+	cout << "cr_phiphiOnOmg(" << i << ") = " << CRphiphiOnOmg(i) << endl;
+}
+
+

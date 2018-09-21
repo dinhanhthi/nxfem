@@ -6,62 +6,23 @@
 % =========================================================
 
 
-%% ========================================================
-% FIXED PARAMERTERS
-% shouldn't change
-% =========================================================
-% pa = all parameters
+
+%% add path of functions
+addpath(genpath('func')); % add all necessary functions
+
+
+
+%% Fixed parameters
 pa.degP1D = 3; % Gaussian quadrature points in 1D (for polinomial functions)
 pa.degP2D = 4; % Gaussian quadrature points in 2D (for polinomial functions)
 pa.degN = 8; % Gaussian quadrature points in 2D (for non-polynomial functions)
-% degree-#OfPoints : 1-1, 2-3, 3-4, 4-6, 5-7, 6-12,
-%                    7-13, 8-16, 9-19, 10-25, 11-27, 12-33
+% degree-#OfPoints : 1-1, 2-3, 3-4, 4-6, 5-7, 6-12, 7-13, 8-16, 9-19, 10-25, 11-27, 12-33
 pa.tol = eps(1e3); % tolerance, 1e-14
 
 
-%% ========================================================
-% INPUT REGION
-% =========================================================
-% available models: sinha, barrau (3 cases) + some test cases
-% see section MODELS below
+
+%% model 
 mdl = 1; 
-findCR = 1; % wanna find convergence rate? 1 or 0
-useFilesNotPlot = 0; % 1=export figures to files (and without plotting them)
-pa.smallCut = 1; % ignore small-support basis (1=ignore,0=no)
-pa.tH = 100; % to find the small support using (20) or (21) in arnold 2008
-
-%------------------------------------
-% PARAMETERS
-%------------------------------------
-pa.lamH = 1e4; % penalty coefficient
-
-
-%% ------------------------------------
-% GHOST PENALTY
-%------------------------------------
-pa.useGP = 1; % wanna use ghost penalty term?
-pa.gam1 = 1e-9; % parameter for 1st term
-pa.gam2 = 1e-9; % parameter for 2nd term
-
-%------------------------------------
-% SETTINGS
-%------------------------------------
-if findCR==1 % wanna  find the convergence rate
-    nStep = 4; % number of interations
-    pa.reguMesh = 0; % use regular mesh or not?
-    wannaPlot = 0; % DON'T CHANGE!
-    useDOF = 0; % use dofs to find convergence rate? (default = h)
-else % should be used only for plotting
-    nStep = 1; % shouldn't change
-    pa.reguMesh = 0; % use regular mesh or not?
-    nSeg = 51; % ONLY FOR nStep=1;
-    wannaPlot = 1; % wanna plot or not? (JUST FOR nStep=1)
-    % Go to the end of this file to change what you wanna plot
-end
-
-%% ------------------------------------
-% MODELS
-%------------------------------------
 switch mdl
     case 1 % sinha (cf. model_sinha.m)
         model=model_sinha; % file sinha.m
@@ -94,6 +55,39 @@ switch mdl
         pa.xi=0.3;
 end
 GeoDom = model.domain(); % domain
+
+
+
+%% setting
+findCR = 1; % wanna find convergence rate? 1 or 0
+useFilesNotPlot = 0; % 1=export figures to files (and without plotting them)
+pa.smallCut = 1; % ignore small-support basis (1=ignore,0=no)
+pa.tH = 100; % to find the small support using (20) or (21) in arnold 2008
+pa.lamH = 1e4; % penalty coefficient
+
+
+
+%% ghost penalty
+pa.useGP = 1; % wanna use ghost penalty term?
+pa.gam1 = 1e-9; % parameter for 1st term
+pa.gam2 = 1e-9; % parameter for 2nd term
+
+
+
+%% more settings
+if findCR==1 % wanna  find the convergence rate
+    nStep = 4; % number of interations
+    pa.reguMesh = 0; % use regular mesh or not?
+    wannaPlot = 0; % DON'T CHANGE!
+    useDOF = 0; % use dofs to find convergence rate? (default = h)
+else % should be used only for plotting
+    nStep = 1; % shouldn't change
+    pa.reguMesh = 0; % use regular mesh or not?
+    nSeg = 51; % ONLY FOR nStep=1;
+    wannaPlot = 1; % wanna plot or not? (JUST FOR nStep=1)
+    % Go to the end of this file to change what you wanna plot
+end
+
 
 
 %% ========================================================

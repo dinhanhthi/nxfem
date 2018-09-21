@@ -1,0 +1,135 @@
+// ============ INFORMATION =================
+// Try to solve vortex problem by using freefem++
+// % Given in section 4.1 (page 5)
+// % Omg = [0,1]x[0,1]
+// % Interface: circle center (0.5;0.75) with radius 0.15
+// % velocity vv = (u v)
+// %   u = 2sin(2pi*y)sin^2(pi*x)cos(pi*t)
+// %   v = -2sin(2pi*x)sin^2(pi*y)cos(pi*t)
+// % Equation: \pattial_t phi + vv\dot \nabla phi = 0
+
+// cf. main_levelset_simple.m and model_levelset_vortex
+
+// ============ REMARKS =================
+// - func velo returns real but uh = velo(x, y) is in Vh w.r.t x,y
+// - figures waiting but the loops have already excuted
+// - circle doesn't go back to the first place (it's worse than std FEM 
+//    in matlab)
+
+
+verbosity = 0;
+
+
+// ============ SETTINGS =================
+int nSegSize = 1;
+int n; // number of segment at each time step
+real[int] rerrPhiOnGamh(nSegSize); // ||phi^0||_L2(Gh)
+real[int] rerrPhiPhihOnOmg(nSegSize); // ||phi_h^0 - phi^0||_L2(Omg)
+real[int] rhTmax(nSegSize); // h
+real[int] CRphiOnGh0(nSegSize); // convergence rate
+real[int] CRphiphiOnOmg(nSegSize);
+
+
+// ============ Domain =================
+border C1(t=0,1){x=t;y=0;}; // bottom
+border C2(t=0,1){x=1;y=t;}; // right
+border C3(t=1,0){x=t;y=1;}; // top
+border C4(t=1,0){x=0;y=t;}; // left
+
+
+
+// ============ phi =================
+real xi = 0.15;
+func phi = sqrt( (x-0.5)^2 + (y-0.75)^2 ) - xi;
+
+
+// ============ velocity =================
+func real velo(real x, real y, real t, int coor){
+  real val;
+  if (coor == 1){
+    val = 2 * sin(2*pi*y) * (sin(pi*x))^2 * cos(pi*t);
+  } else {
+    val = -2 * sin(2*pi*x) * (sin(pi*y))^2 * cos(pi*t);
+  }
+  return val;
+}
+
+
+// ============ time coef =================
+real dt = 0.01;
+real t = 0; // initial t
+real Tmax = 1;
+int nLoop = Tmax/dt;
+
+
+// ============ LOOPS =================
+for (int i=0; i<nSegSize; i++){
+  // n = 2^(i+3);
+  // n = 2^8; // ok
+  n = 2^6;
+
+
+  // ============ Mesh =================
+  // regular mesh
+  // mesh Th = square(n,n); // [0,1] x [0,1]
+  // irregular mesh
+  mesh Th = buildmesh(C1(n) + C2(n) + C3(n) + C4(n));
+
+
+  // ============ FE space =================
+  fespace Vh(Th,P1);
+  Vh h = hTriangle;
+  rhTmax(i) = h[].max;
+  Vh phiOld, phih = phi;
+  Vh uh, vh; // velocity
+
+
+  // ============ initial =================
+  uh = velo(x,y,t,1); // u^0
+  vh = velo(x,y,t,2);
+  // plot(phih, cmm=" t = " + t, wait=0, fill=1, value=1); // plot phi^0
+
+
+  // ============ solving & plotting =================
+  for (int i=0; i< nLoop; i++){
+  // while (t < Tmax){ // cannot use this because t is not really = Tmax
+    phiOld = phih; // phi^n
+
+    t += dt;
+
+    phih = convect([uh, vh], -dt, phiOld); // phi^{n+1} from phi^n, u^n
+    plot(phih, cmm=" t = " + t, wait=0, fill=1, value=1);
+
+    uh = velo(x,y,t,1); // u^{n+1}
+    vh = velo(x,y,t,2);
+    // real uNorm = max(uh[].max, vh[].max);
+    // cout << "CFL = " << uNorm * dt / hTmax << endl;
+  }
+
+
+
+  // ============ Errors =================
+  rerrPhiOnGamh(i) = sqrt(int1d(Th,levelset=phih)(phi^2));
+  rerrPhiPhihOnOmg(i) = sqrt(int2d(Th)((phih-phi)^2));
+
+
+  // ============ CR =================
+  if (i != 0){
+		// CRphiOnGh0(i) = log(rerrPhiOnGamh(i-1)/rerrPhiOnGamh(i)) / log(rhTmax(i-1)/rhTmax(i));
+		CRphiphiOnOmg(i) = log(rerrPhiPhihOnOmg(i-1)/rerrPhiPhihOnOmg(i)) / log(rhTmax(i-1)/rhTmax(i));
+	}else{
+		// CRphiOnGh0(i) = 0;
+		CRphiphiOnOmg(i) = 0;
+	}
+
+
+  // ============ display =================
+  // cout << "h(" << i << ") = " << rhTmax(i) << endl;
+	
+	cout << "rerrPhiOnGamh(" << i << ") = " << rerrPhiOnGamh(i) << endl;
+	cout << "rerrPhiPhihOnOmg(" << i << ") = " << rerrPhiPhihOnOmg(i) << endl << endl;
+	
+	// cout << "cr_phiOnGh0(" << i << ") = " << CRphiOnGh0(i) << endl;
+	// cout << "cr_phiphiOnOmg(" << i << ") = " << CRphiphiOnOmg(i) << endl;
+  cout << endl << endl;
+}

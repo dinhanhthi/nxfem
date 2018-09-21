@@ -29,7 +29,7 @@
 %       r^2/alpha2 - r0^2/alpha2 + r0^2/alpha1  if r>r0
 %=========================================================================
 
-
+addpath(genpath('func')); % add all necessary functions
 
 %% =======================================================================
 % PARAMETERS
@@ -51,7 +51,7 @@ model = model_sys_linda; % choose model. cf. file model_sys_linda.m
 %-------------------------------------------------------------------------
 % Settings
 %-------------------------------------------------------------------------
-wannaPlot = 1; % wanna plot?
+wannaPlot = 0; % wanna plot?
 
 %-------------------------------------------------------------------------
 % Deleting small cut
@@ -76,7 +76,7 @@ pa.gam2 = 1e-6 ; % parameter for 2nd term
 % Mesh settings
 %-------------------------------------------------------------------------
 pa.reguMesh = 0; % use regular mesh or not?
-nSeg = 45; % ONLY FOR nStep=1;
+nSeg = 17; % ONLY FOR nStep=1;
 
 %-------------------------------------------------------------------------
 % Model parameters
@@ -107,6 +107,7 @@ y = points(2,:); % y-coordinate of points
 % diameter (longest side) of each triangle: 1 x nTs
 msh.hT = getDiam(msh); % 1 x number of triangles
 msh.hTmax = max(msh.hT); % maximum of all diameters
+msh.nStd = size(points,2); % number of standard nodes
 
 %-------------------------------------------------------------------------
 % Level set function
@@ -137,27 +138,10 @@ nodeCTs=CT.nodes; areaChildCTs=CT.areaChild;iPs=CT.iPs;
 % Find small-cut triangles (idx in the OLD CTs)
 %-------------------------------------------------------------------------
 if pa.smallCut
-    [tri2del,t2Omg1,t2Omg2] = findSmallPhi(msh,CTs,CT,pa,phi);
-    % If there are small-cut triangles, remove them from CTs!!
-    if ~isempty(tri2del)
-        nCTs = size(CTs,2); % number of OLD cut triangles
-        % get NEW not-cut triangles
-        if ~isempty(t2Omg1)
-            NCTs1 = [NCTs1,CTs(:,t2Omg1)]; % add more triangles to NCTs1
-            tris.NCTs1=NCTs1;
-        end
-        if ~isempty(t2Omg2)
-            NCTs2 = [NCTs2,CTs(:,t2Omg2)]; % add more triangles to NCTs2
-            tris.NCTs2=NCTs2;
-        end
-        % get NEW cut triangles
-        CTs = CTs(:,setdiff(1:nCTs,tri2del));
-        tris.CTs=CTs;
-        % find again all information
-        clear nodeCTs typeCTs areaChildCTs iPs uNVCTs areaCTs; % in case
-        CT = getInfoCTs(CTs,phi,msh,pa);
-        nodeCTs=CT.nodes; areaChildCTs=CT.areaChild;iPs=CT.iPs;
-    end
+    [tris,CT] = findSmallPhi_after(msh,pa,phi,tris,CT);
+    clear CTs NCTs NCTs2 nodeCTs areaChildCTs iPs; % just in case
+    CTs=tris.CTs; NCTs1=tris.NCTs1; NCTs2=tris.NCTs2;
+    nodeCTs=CT.nodes; areaChildCTs=CT.areaChild;iPs=CT.iPs;
 end
 
 
@@ -166,7 +150,7 @@ end
 % NODES
 %=========================================================================
 msh.nNew = nodeCTs.n; % number of new nodes (nodes around the interface)
-msh.nStd = size(points,2); % number of standard nodes
+% msh.nStd = size(points,2); % number of standard nodes (already declared)
 msh.ndof = msh.nNew + msh.nStd; % number of dofs
 msh.newNodes = getNewNodes(nodeCTs.all,msh.nStd);
     % vector contaning new numbering of nodes around interface, column
@@ -259,7 +243,9 @@ Atw = getGMGG(tris,phi,CT,msh,pa,cpTW);
 % Load vector (all nodes including nodes on boundary)
 %-------------------------------------------------------------------------
 defFtw = model.defFtw;
-Ftw = getLf(tris,CT,msh,pa,defFtw);
+Ftw = getLf(msh,pa,tris,CT,defFtw);
+
+
 
 %-------------------------------------------------------------------------
 % BCs
@@ -296,7 +282,7 @@ wS = getWsep(numSoltw,msh,pa.bet1,pa.bet2);
 % SOLVING U
 % don't forget tw=1/beta*w
 %=========================================================================
-useNewton = 0; % wanna use Newton method or not?
+useNewton = 1; % wanna use Newton method or not?
 
 % initial solution
 % ------------------------------------------------------------------------
@@ -314,24 +300,26 @@ fprintf('difu: %0.7f\n',difu);
 
 imax = 50; % maximum number of steps
 step = 0;
-defFu = model.defFu;
+defG = defGu; % cf. defGu.m
+defFu = @(xx,yy,pa,sub) model.defFu(xx,yy,pa,sub,defG.change);
 typeBC = model.bcU(); % get type of BCs
 while (difu > itol) && (step<imax)
     step = step+1;
     
     % analyze numSolu into each subdomain
     % --------------------------------------------------------------------
-    uoldEach = getUold(uold,msh);
+    uoldEach = getWsep(uold,msh,1,1);
     
     if ~useNewton % don't wanna use Newton method
         
         % global matrix
-        % -----------------------------------------------------------------
-        Au = getGMgPP(tris,phi,uoldEach,CT,msh,pa,cpU);
+        % ----------------------------------------------------------------- 
+        Au = getGMgPP(msh,pa,cpU,tris,CT,phi,uoldEach,defG);
+        
         
         % load vector
-        % -----------------------------------------------------------------
-        Fu = getLfwg(tris,CT,msh,pa,defFu,uoldEach,wS);
+        % -----------------------------------------------------------------          
+        Fu = getLfwg(msh,pa,tris,CT,uoldEach,wS,defFu,defG);
         
         % bc
         % -----------------------------------------------------------------
@@ -356,14 +344,14 @@ while (difu > itol) && (step<imax)
     else % use Newton method (DF(u)*del = F(u), solve for del)
         
         % DF(u)*del
-        % -----------------------------------------------------------------
-        Adel = getGMuNewton(tris,phi,uoldEach,wS,CT,msh,pa,cpU);
-               
+        % -----------------------------------------------------------------       
+        Adel = getGMuNewton(msh,pa,cpU,tris,CT,phi,uoldEach,wS,defG);
+                
         % F(u)
         % -----------------------------------------------------------------
-        Au = getGMgPP(tris,phi,uoldEach,CT,msh,pa,cpU); 
+        Au = getGMgPP(msh,pa,cpU,tris,CT,phi,uoldEach,defG);
                     % like Au in normal iterative method
-        Fu = getLfwg(tris,CT,msh,pa,defFu,uoldEach,wS);
+        Fu = getLfwg(msh,pa,tris,CT,uoldEach,wS,defFu,defG);
                     % like Fu in normal iterative method
         Fdel = Au*uold - Fu;
         

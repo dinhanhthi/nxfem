@@ -1,0 +1,19 @@
+# Test with phi_h^0 
+# cr_phiOnGh0 --> ||phi^0||_L2(\Gam_h^0)
+# cr_phiphiOnOmg --> ||phi_h^N-phi^0||_L2(Omg)
+# case: irregular + 2^i for i from 3 to 6
+# cf. test_CR_phi0.edp
+
+
+
+cr_phiOnGh0(0) = 0
+cr_phiphiOnOmg(0) = 0
+
+cr_phiOnGh0(1) = 2.0648
+cr_phiphiOnOmg(1) = 2.38294
+
+cr_phiOnGh0(2) = 1.92124
+cr_phiphiOnOmg(2) = 1.64126
+
+cr_phiOnGh0(3) = 2.10219
+cr_phiphiOnOmg(3) = 2.14543

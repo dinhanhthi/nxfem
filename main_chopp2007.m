@@ -2,11 +2,12 @@
 % This file is used to find a very simple BIOFILM proposed by Chopp 2007
 % This is a SYSTEM of LINEAR equations u,v (u=substrate, v=potential)
 % ------------------------------------------------------------------------
+% REWRITE NOT FINISHED YET!
+% ------------------------------------------------------------------------
 % PURPOSE: Coding level set
 % Related files: 
 %   - ChoppSimpleKap.edp: for the code in FreeFem++
 %   - model_chopp2007.m: contains all info for the model
-%   - defG.m
 % ------------------------------------------------------------------------
 
 
@@ -34,6 +35,7 @@
 % mu = 3.6e6 (Omg1), 0 (Omg2)
 %=========================================================================
 
+addpath(genpath('func')); % add all necessary functions
 
 %% =======================================================================
 % PARAMETERS
@@ -50,7 +52,6 @@ pa.degN = 8; % Gaussian quadrature points in 2D (non-polynomial functions)
 %                    7-13, 8-16, 9-19, 10-25, 11-27, 12-33
 pa.tol = eps(1e3); % tolerance, 1e-14
 model = model_chopp2007; % choose model. cf. file model_article1.m
-% typeG: modify directly in defG.m
 
 %-------------------------------------------------------------------------
 % Deleting small cut
@@ -96,7 +97,7 @@ GeoDom = model.domain(); % domain
 %-------------------------------------------------------------------------
 % Mesh setting up
 %-------------------------------------------------------------------------
-nSeg = 31; % mesh settings
+nSeg = 11; % mesh settings
 if ~pa.reguMesh % not regular mesh?
     hEdgeMax = 2/nSeg;
     [points,edges,triangles] = initmesh(GeoDom,'hmax',hEdgeMax); %irregular
@@ -119,13 +120,14 @@ phi = model.defPhi(x,y,pa); % 1 x number of points (row array)
 phi(abs(phi)<pa.tol)=0; % find phi which are very small (~0) and set to 0
 
 
-
-
 %% =======================================================================
 % EACH TIME STEP
 %=========================================================================
-maxStep = 40; % max number of steps
-dt = 0.2; % time step
+pA = model.pa;
+pA = pA();
+t=0;
+dt = pA.dt;
+Tmax = pA.Tmax;
 for ns = 1:maxStep
     
     %% =======================================================================
@@ -223,7 +225,7 @@ for ns = 1:maxStep
     % Load vector (all nodes including nodes on boundary)
     %-------------------------------------------------------------------------
     defFu = model.defFu;
-    Fu = getLf(tris,CT,msh,pa,defFu);
+    Fu = getLf(msh,pa,tris,CT,defFu);
 
     %-------------------------------------------------------------------------
     % BCs
@@ -264,8 +266,8 @@ for ns = 1:maxStep
     %----------------------------------------------------------------------
     % in this case we use wg(u) ~ bet*u and w as bet*u, g(u) as 1
     wS = getWsep(uhNX,msh,pa.bet1,pa.bet2);
-    uold = wS; % not use because g(uold)=1
-    Fv = getLvChopp07(tris,CT,msh,pa,uold,wS);
+    Fv = getLvChopp07(msh,pa,tris,CT,wS);
+
 
     %----------------------------------------------------------------------
     % BCs

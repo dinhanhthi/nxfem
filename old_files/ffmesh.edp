@@ -1,0 +1,15 @@
+verbosity=0;
+real x0=0, x1=2;
+real y0=0, y1=1;
+// int m=2;
+// int n=m*2+1;
+int m=6;
+int n=5;
+mesh Th=square(n,m,[x0+(x1-x0)*x,y0+(y1-y0)*y]);
+plot(Th);
+savemesh(Th,"ffmeshSinha.msh");
+
+// test with hTmax
+fespace Ph(Th,P0);
+Ph h = hTriangle;
+cout << "hTmax= " << h[].max << endl;
