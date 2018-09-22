@@ -3,14 +3,16 @@
 // Model: model_levelset_vortex.m
 
 verbosity = 0;
-// int[int] nSeg = [17, 67, 117, 167, 217, 267, 317];
+int[int] nSeg = [11,22,44,88,176];
+int nSegSize = 5;
+
 // int nSegSize = nSeg.n;
-int nSegSize = 4;
+// int nSegSize = 4;
 int n; // number of segment at each time step
 mesh Th;
 string meshName;
 bool regularMesh = false;
-bool saveMesh = false;
+bool saveMesh = true;
 
 
 real[int] normPhiOnGh0(nSegSize); // ||phi^0||_L2(Gh)
@@ -33,7 +35,8 @@ func phi = sqrt( (x-0.5)^2 + (y-0.75)^2 ) - xi;
 
 
 for (int i=0; i<nSegSize; i++){
-	n = 2^(i+3);
+	// n = 2^(i+3);
+	n = nSeg(i);
 	
 
 	// MESH
@@ -42,7 +45,7 @@ for (int i=0; i<nSegSize; i++){
 		meshName = "Th_regular" + i + ".msh";
 	}else{
 		Th = buildmesh(C1(n) + C2(n) + C3(n) + C4(n));
-		meshName = "Th_irregular" + i + ".msh";
+		meshName = "Th_irregular_new" + i + ".msh";
 	}
 	
 	// plot(Th, wait=1);

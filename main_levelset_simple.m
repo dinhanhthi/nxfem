@@ -12,7 +12,7 @@ addpath(genpath('func')); % add all necessary functions
 
 % nseg_array = [37, 57, 77];
 % nseg_array = 57;
-nseg_array = zeros(1,4); % get from ffpp 
+nseg_array = zeros(1,5); % get from ffpp 
 
 
 
@@ -37,16 +37,16 @@ useFFmesh = 1; % use freefem++ mesh or not?
     reguMesh = 0; % use regular mesh or not? (for matlab mesh)
 pa.smallCut = 0; % ignore small-support basis (1=ignore,0=no)
     pa.tH = 10; % to find the small support using (20) or (21) in arnold 2008
-useFMM = 1; % use fast marching method or not (mshdist)?
+useFMM = 0; % use fast marching method or not (mshdist)?
     numUse = 0; % count the number of use of FMM
     alp_FMM = 0.1;
-useSUPG = 0; % if 1, need to make more settings
+useSUPG = 1; % if 1, need to make more settings
     delEps = 1e-3;
     delSD = 0.5;
 showPlot = 0; % show plot or not?
 savePlot = 1; % wanna save plot or not?
-    pathOption = '_FF_2';
-    testCase = 'Using ff mesh + wtSUPG + wFMM + thesis (no limit num of use FMM)'; % note for info_and_errors.txt
+    pathOption = '_FF_new';
+    testCase = 'Using ff mesh + wSUPG + wtFMM + thesis (no limit num of use FMM)'; % note for info_and_errors.txt
 withMesh = 0;
 
 
@@ -64,7 +64,7 @@ if ~useFFmesh
     end
 else
     if ~reguMesh
-        file = strcat('Th_irregular',num2str(iii-1),'.msh');
+        file = strcat('Th_irregular_new',num2str(iii-1),'.msh');
     else
         file = strcat('Th_regular',num2str(iii-1),'.msh');
     end
