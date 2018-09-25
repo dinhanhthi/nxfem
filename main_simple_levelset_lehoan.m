@@ -12,7 +12,7 @@ addpath(genpath('func')); % add all necessary functions
 
 % nseg_array = [37, 57, 77];
 % nseg_array = 57;
-nseg_array = zeros(1,5); % get from ffpp 
+nseg_array = zeros(1,4); % get from ffpp 
 
 
 
@@ -40,7 +40,7 @@ pa.smallCut = 0; % ignore small-support basis (1=ignore,0=no)
 useFMM = 0; % use fast marching method or not (mshdist)?
     numUse = 0; % count the number of use of FMM
     alp_FMM = 0.1;
-useSUPG = 1; % if 1, need to make more settings
+useSUPG = 0; % if 1, need to make more settings
     delEps = 1e-3;
     delSD = 0.5;
 showPlot = 0; % show plot or not?
@@ -50,7 +50,7 @@ savePlot = 1; % wanna save plot or not?
 withMesh = 0;
 
 
-for iii=2:size(nseg_array,2)
+for iii=3:size(nseg_array,2)
 disp("Running...\n");
 %% mesh setting up
 % nSeg = nseg_array(iii);
