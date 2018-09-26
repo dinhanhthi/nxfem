@@ -19,3 +19,6 @@ wget https://doc-0s-3c-docs.googleusercontent.com/docs/securesc/ha0ro937gcuc7l7d
 
 sudo ./install -agreeToLicense yes -mode silent -destinationFolder /bin/Matlab -fileInstallationKey xxxxx-xxxxx-xxxxx  -outputFile /tmp/mathworks_govi.log -activationPropertiesFile ./activate.ini
  
+
+
+/usr/local/MATLAB/R2017b
