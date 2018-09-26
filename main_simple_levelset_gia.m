@@ -37,10 +37,10 @@ useFFmesh = 1; % use freefem++ mesh or not?
     reguMesh = 0; % use regular mesh or not? (for matlab mesh)
 pa.smallCut = 0; % ignore small-support basis (1=ignore,0=no)
     pa.tH = 10; % to find the small support using (20) or (21) in arnold 2008
-useFMM = 0; % use fast marching method or not (mshdist)?
+useFMM = 1; % use fast marching method or not (mshdist)?
     numUse = 0; % count the number of use of FMM
     alp_FMM = 0.1;
-useSUPG = 0; % if 1, need to make more settings
+useSUPG = 1; % if 1, need to make more settings
     delEps = 1e-3;
     delSD = 0.5;
 showPlot = 0; % show plot or not?
@@ -50,7 +50,7 @@ savePlot = 1; % wanna save plot or not?
 withMesh = 0;
 
 
-for iii=1:2
+for iii=1:4
 disp("Running...\n");
 %% mesh setting up
 % nSeg = nseg_array(iii);
