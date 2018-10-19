@@ -11,7 +11,7 @@
 addpath(genpath('func')); % add all necessary functions
 
 % nseg_array = [37, 57, 77];
-nseg_array = 17;
+nseg_array = 57;
 % nseg_array = zeros(1,3); % get from ffpp 
 
 
@@ -37,15 +37,15 @@ useFFmesh = 0; % use freefem++ mesh or not?
     reguMesh = 0; % use regular mesh or not? (for matlab mesh)
 pa.smallCut = 0; % ignore small-support basis (1=ignore,0=no)
     pa.tH = 10; % to find the small support using (20) or (21) in arnold 2008
-useFMM = 0; % use fast marching method or not (mshdist)?
+useFMM = 1; % use fast marching method or not (mshdist)?
     numUse = 0; % count the number of use of FMM
-    alp_FMM = 0.1;
-useSUPG = 0; % if 1, need to make more settings
+    alp_FMM = 0.05;
+useSUPG = 1; % if 1, need to make more settings
     delEps = 1e-3;
     delSD = 0.5;
 showPlot = 1; % show plot or not?
-savePlot = 0; % wanna save plot or not?
-    pathOption = '_FF_new';
+savePlot = 1; % wanna save plot or not?
+    pathOption = '_BLOUZA';
     testCase = 'Using ff mesh + wSUPG + wtFMM + thesis (no limit num of use FMM)'; % note for info_and_errors.txt
 withMesh = false;
 
