@@ -43,7 +43,7 @@ useFMM = 1; % use fast marching method or not (mshdist)?
 useSUPG = 1; % if 1, need to make more settings
     delEps = 1e-3;
     delSD = 0.5;
-showPlot = 1; % show plot or not?
+showPlot = 0; % show plot or not?
 savePlot = 1; % wanna save plot or not?
     pathOption = '_BLOUZA';
     testCase = 'Using ff mesh + wSUPG + wtFMM + thesis (no limit num of use FMM)'; % note for info_and_errors.txt
@@ -477,6 +477,8 @@ end
     
 end
 
+toc
+
 %% get deltaT: 1 x nTs
 function delT = getDellsT(msh,vel_t,eps,SD)
     % This function is only to be used type of velocity = (x,y,sub)
@@ -519,5 +521,3 @@ function val = getCFL(msh, velo, dt, dx)
     
     val = max(normVeloT)*dt/dx;
 end
-
-toc
