@@ -4,7 +4,7 @@
 % PURPOSE: Coding level set + NOT YET couple with NXFEM (only phi)
 % MODEL: model_levelset_*
 % ------------------------------------------------------------------------
-
+tic
 
 
 %% add path of functions
@@ -519,3 +519,5 @@ function val = getCFL(msh, velo, dt, dx)
     
     val = max(normVeloT)*dt/dx;
 end
+
+toc
