@@ -50,8 +50,8 @@ savePlot = 0; % wanna save plot or not?
 withMesh = false;
 
 %% choose the machine to run
-% machine = "thi"; % options: thi, gia, lehoan, blouza, gaia
-machine = 'blouza';
+machine = "thi"; % options: thi, gia, lehoan, blouza, gaia
+% machine = 'blouza';
 
 
 % only enable showPlot option on thi's machine
