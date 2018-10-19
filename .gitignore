@@ -1,6 +1,6 @@
 *.asv
 test.m
 coding
-coding-result\
-results\
+coding-result
+results
 .vscode

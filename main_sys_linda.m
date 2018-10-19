@@ -141,7 +141,7 @@ if pa.smallCut
     [tris,CT] = findSmallPhi_after(msh,pa,phi,tris,CT);
     clear CTs NCTs NCTs2 nodeCTs areaChildCTs iPs; % just in case
     CTs=tris.CTs; NCTs1=tris.NCTs1; NCTs2=tris.NCTs2;
-    nodeCTs=CT.nodes; areaChildCTs=CT.areaChild;iPs=CT.iPs;
+    nodeCTs=CT.nodes; areaChildCTs=CT.areaChild; iPs=CT.iPs;
 end
 
 
@@ -336,7 +336,7 @@ while (difu > itol) && (step<imax)
         Fu = Fu - Au*unew; % modification of F
         % LU factorization
         unew(iNodes) = Au(iNodes,iNodes)\Fu(iNodes); % don't care nodes on boundary
-        % uh(iNodes) = gmres(Au(iNodes,iNodes),Fu(iNodes)); % GMRES factorization
+        % unew(iNodes) = gmres(Au(iNodes,iNodes),Fu(iNodes)); % GMRES factorization
         
         del = unew - uold;
         uold = unew; % update for the next step

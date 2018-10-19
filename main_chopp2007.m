@@ -2,14 +2,17 @@
 % This file is used to find a very simple BIOFILM proposed by Chopp 2007
 % This is a SYSTEM of LINEAR equations u,v (u=substrate, v=potential)
 % ------------------------------------------------------------------------
-% REWRITE NOT FINISHED YET!
-% ------------------------------------------------------------------------
 % PURPOSE: Coding level set
 % Related files: 
 %   - ChoppSimpleKap.edp: for the code in FreeFem++
 %   - model_chopp2007.m: contains all info for the model
 % ------------------------------------------------------------------------
-
+% RESULT: not enough information in the Chopp's article to compare the
+% results!!!!! Change to work with models introduced in Chopp06combine (cf.
+% main_chopp06combine.m)
+% ------------------------------------------------------------------------
+% Last modified: 15-10-2018
+% ------------------------------------------------------------------------
 
 %% =======================================================================
 % DOMAIN: [0,1]X[0,1], inital interface: half of circle ((1/2,0);r0)
@@ -35,89 +38,122 @@
 % mu = 3.6e6 (Omg1), 0 (Omg2)
 %=========================================================================
 
-addpath(genpath('func')); % add all necessary functions
-
 %% =======================================================================
 % PARAMETERS
-% Note that parameters are different for equations of w and u
+% Note that parameters are different for equations of u and v
 %=========================================================================
 
-%-------------------------------------------------------------------------
-% Fixed parameters
-%-------------------------------------------------------------------------
-pa.degP1D = 3; % Gaussian quadrature points in 1D (polinomial functions)
-pa.degP2D = 4; % Gaussian quadrature points in 2D (polinomial functions)
-pa.degN = 8; % Gaussian quadrature points in 2D (non-polynomial functions)
-% degree-#OfPoints : 1-1, 2-3, 3-4, 4-6, 5-7, 6-12,
-%                    7-13, 8-16, 9-19, 10-25, 11-27, 12-33
-pa.tol = eps(1e3); % tolerance, 1e-14
-model = model_chopp2007; % choose model. cf. file model_article1.m
+addpath(genpath('func'));   % add all necessary functions
 
+% fixed parameters
 %-------------------------------------------------------------------------
+pa.degP1D = 3;              % Gaussian quadrature points in 1D (polinomial functions)
+pa.degP2D = 4;              % Gaussian quadrature points in 2D (polinomial functions)
+pa.degN = 8;    % Gaussian quadrature points in 2D (non-polynomial functions)
+                % degree-#OfPoints : 1-1, 2-3, 3-4, 4-6, 5-7, 6-12,
+                %                    7-13, 8-16, 9-19, 10-25, 11-27, 12-33
+pa.tol = eps(1e3);          % tolerance, 1e-14
+
+
+% MODEL
+%-------------------------------------------------------------------------
+model = model_chopp2007;    % choose model. cf. file model_chopp2007.m
+showPlot = 1;
+    withMesh = false;
+
 % Deleting small cut
 %-------------------------------------------------------------------------
-pa.smallCut = 1; % ignore small-support basis (1=ignore,0=no)
+pa.smallCut = 0;            % ignore small-support basis (1=ignore,0=no)
 pa.tH = 10; % to find the small support using (20) or (21) in arnold 2008
 
-%-------------------------------------------------------------------------
-% Penalty parameters (\gam\int [w][varphi])
-%-------------------------------------------------------------------------
-pa.lamHu = 1e7; % penalty coefficient for u (substrate)
-pa.lamHv = 1e7; % penalty coefficient for v (potential)
 
-%-------------------------------------------------------------------------
 % Ghost penalty
 %-------------------------------------------------------------------------
-pa.useGP = 1; % wanna use ghost penalty term?
-pa.gam1 = 1e-7; % parameter for 1st term
-pa.gam2 = 1e-7 ; % parameter for 2nd term
+pa.useGP = 1;   % wanna use ghost penalty term?
+    pa.gam1 = 1e-6;             % parameter for 1st term
+    pa.gam2 = 1e-6 ;            % parameter for 2nd term
 
-%-------------------------------------------------------------------------
-% Mesh settings
-%-------------------------------------------------------------------------
-pa.reguMesh = 0; % use regular mesh or not?
 
-%-------------------------------------------------------------------------
 % Model parameters
 %-------------------------------------------------------------------------
-pa.alp1 = 120; pa.alp2 = 150; % diff coeff for eqn u
+pa.r0 = 0.1;  % interface
+    pa.a = 1; % aspect ratio (p.49 Chopp 07 xfem)
+    pa.distancing = 1; % make phi to be a signed distance function
 pa.bet1 = 1e6; pa.bet2 = 0; % this is not diff coef!
-pa.r0 = 0.3; % interface
 pa.mu1 = 3.6e6;
 pa.mu2 = 0;
-pa.bcu3 = 1e-3; % boundary condition for u on \pt\Omg_3
+% pa.bcu3 = 1e-1;             % boundary condition for u on \pt\Omg_3
+pa.bcu3 = 1e-5;             % boundary condition for u on \pt\Omg_3
 
 
+% Penalty parameters
+%-------------------------------------------------------------------------
+cpU.lamH = 1e6;             % penalty coefficient for u (substrate)
+cpV.lamH = 1e6;             % penalty coefficient for v (potential)
+cpU.kk1 = 120; cpU.kk2 = 150;% diff coef for u
+cpV.kk1 = 1; cpV.kk2 = 1;    % diff coef for u
 
-%% =======================================================================
+
 % DOMAIN
-%=========================================================================
+%-------------------------------------------------------------------------
 GeoDom = model.domain(); % domain
 
+
+% Mesh settings
 %-------------------------------------------------------------------------
-% Mesh setting up
-%-------------------------------------------------------------------------
-nSeg = 11; % mesh settings
+pa.reguMesh = 0;            % use regular mesh or not?
+nSeg = 57;  % mesh settings
+
 if ~pa.reguMesh % not regular mesh?
     hEdgeMax = 2/nSeg;
-    [points,edges,triangles] = initmesh(GeoDom,'hmax',hEdgeMax); %irregular
+    [points,edges,triangles] = initmesh(GeoDom,'hmax',hEdgeMax);    % irregular
 else
-    [points,edges,triangles] = poimesh(GeoDom,nSeg,nSeg); % regular
+    [points,edges,triangles] = poimesh(GeoDom,nSeg,nSeg);           % regular
 end
-msh.p = points; msh.t = triangles; msh.e = edges; % save to msh
-x = points(1,:); % x-coordinate of points
-y = points(2,:); % y-coordinate of points
+
+msh.p = points; msh.t = triangles; msh.e = edges;   % save to msh
+x = points(1,:);    % x-coordinate of points
+y = points(2,:);    % y-coordinate of points
+
 % diameter (longest side) of each triangle: 1 x nTs
-msh.hT = getDiam(msh); % 1 x number of triangles
-msh.hTmax = max(msh.hT); % maximum of all diameters
-hTmax = msh.hTmax;
+msh.hT = getDiam(msh);              % 1 x number of triangles
+msh.hTmax = max(msh.hT);            % maximum of all diameters
+msh.nStd = size(points,2);          % number of standard nodes
 
 
-%-------------------------------------------------------------------------
 % Level set function (INITIAL)
 %-------------------------------------------------------------------------
-phi = model.defPhi(x,y,pa); % 1 x number of points (row array)
-phi(abs(phi)<pa.tol)=0; % find phi which are very small (~0) and set to 0
+phi = model.defPhi(x,y,pa);         % 1 x number of points (row array)
+% phi(abs(phi)<pa.tol)=0;             % find phi which are very small (~0) and set to 0
+
+
+
+% level set settings
+%-------------------------------------------------------------------------
+useFMM = 1; % use fast marching method or not (mshdist)?
+    numUse = 0; % count the number of use of FMM
+    alp_FMM = 0.1;
+useSUPG = 1; % if 1, need to make more settings
+    delEps = 1e-3;
+    delSD = 0.5;
+    
+path_nxfem = '/home/thi/Dropbox/git/nxfem/'; % thi's local machine
+% path_nxfem = '/users/dinh/nxfem/'; % only on gaia machine
+path_phi = strcat(path_nxfem,'mshdist/');
+call_mshdist = strcat({'mshdist'},{' '},{path_phi},'phi'); % run in terminal
+call_mshdist = cell2mat(call_mshdist);
+
+
+%% Distancing level set function (if it's not)
+disp("Exporting to phi.mesh");
+mshdist_w_mesh(msh,path_phi,'phi'); % export to .mesh
+if pa.distancing
+    disp("Distancing phi...");
+    mshdist_w_sol(msh,phi,path_phi,'phi'); % export to phi.sol
+    system(call_mshdist); % run 'mshdist file/to/phi' (distancing)
+    phi = mshdist_r_sol(phi,path_phi,'phi'); % update phi
+end
+
 
 
 %% =======================================================================
@@ -125,53 +161,45 @@ phi(abs(phi)<pa.tol)=0; % find phi which are very small (~0) and set to 0
 %=========================================================================
 pA = model.pa;
 pA = pA();
-t=0;
-dt = pA.dt;
-Tmax = pA.Tmax;
+% dt = pA.dt;
+% Tmax = pA.Tmax;
+% maxStep = Tmax/dt;
+
+maxStep = 50; % using dt = dx/|u|
+
+vhOld = zeros(msh.nStd,1); % initial vh for velocity grad v
+
+disp("Starting the loop...");
+%% loop
 for ns = 1:maxStep
+    disp("-----------------------------");
+    Xdisp = ['step = ', num2str(ns)];
+    disp(Xdisp);
     
     %% =======================================================================
     % GET INFORMATION OF TRIANGLES
-    % The same for both equations of tw and u
+    % The same for both equations of u and v
     %=========================================================================
 
-    %-------------------------------------------------------------------------
     % Triangles
     %-------------------------------------------------------------------------
-    tris = getTriangles(phi,msh,pa); % tris has 3 factors (structure var)
+    tris = getTriangles(phi,msh,pa);    % tris has 3 factors (structure var)
     CTs=tris.CTs; NCTs1=tris.NCTs1; NCTs2=tris.NCTs2;
 
-    %-------------------------------------------------------------------------
+    
     % On cut triangles
     %-------------------------------------------------------------------------
-    CT = getInfoCTs(CTs,phi,msh,pa); % CT has many factors (structure var)
-    nodeCTs=CT.nodes; areaChildCTs=CT.areaChild;iPs=CT.iPs;
+    CT = getInfoCTs(CTs,phi,msh,pa);    % CT has many factors (structure var)
+    nodeCTs=CT.nodes; areaChildCTs=CT.areaChild; iPs=CT.iPs;
 
-    %-------------------------------------------------------------------------
+    
     % Find small-cut triangles (idx in the OLD CTs)
     %-------------------------------------------------------------------------
     if pa.smallCut
-        [tri2del,t2Omg1,t2Omg2] = findSmallPhi(msh,CTs,CT,pa,phi);
-        % If there are small-cut triangles, remove them from CTs!!
-        if ~isempty(tri2del)
-            nCTs = size(CTs,2); % number of OLD cut triangles
-            % get NEW not-cut triangles
-            if ~isempty(t2Omg1)
-                NCTs1 = [NCTs1,CTs(:,t2Omg1)]; % add more triangles to NCTs1
-                tris.NCTs1=NCTs1;
-            end
-            if ~isempty(t2Omg2)
-                NCTs2 = [NCTs2,CTs(:,t2Omg2)]; % add more triangles to NCTs2
-                tris.NCTs2=NCTs2;
-            end
-            % get NEW cut triangles
-            CTs = CTs(:,setdiff(1:nCTs,tri2del));
-            tris.CTs=CTs;
-            % find again all information
-            clear nodeCTs typeCTs areaChildCTs iPs uNVCTs areaCTs; % in case
-            CT = getInfoCTs(CTs,phi,msh,pa);
-            nodeCTs=CT.nodes; areaChildCTs=CT.areaChild;iPs=CT.iPs;
-        end
+        [tris,CT] = findSmallPhi_after(msh,pa,phi,tris,CT);
+        clear CTs NCTs NCTs2 nodeCTs areaChildCTs iPs; % just in case
+        CTs=tris.CTs; NCTs1=tris.NCTs1; NCTs2=tris.NCTs2;
+        nodeCTs=CT.nodes; areaChildCTs=CT.areaChild; iPs=CT.iPs;
     end
 
 
@@ -179,19 +207,35 @@ for ns = 1:maxStep
     %% =======================================================================
     % NODES
     %=========================================================================
-    msh.nNew = nodeCTs.n; % number of new nodes (nodes around the interface)
-    msh.nStd = size(points,2); % number of standard nodes
-    msh.ndof = msh.nNew + msh.nStd; % number of dofs
-    msh.newNodes = getNewNodes(nodeCTs.all,msh.nStd);
-        % vector contaning new numbering of nodes around interface, column
-    msh.node = getNodes(tris,nodeCTs,msh,phi,pa); % get all nodes
+    msh.nNew = nodeCTs.n;   % number of new nodes (nodes around the interface)
+    msh.ndof = msh.nNew + msh.nStd;         % number of dofs
+    msh.newNodes = getNewNodes(nodeCTs.all,msh.nStd);       % vector contaning new numbering of nodes around interface, column
+    msh.node = getNodes(tris,nodeCTs,msh,phi,pa);           % get all nodes
 
-    %-------------------------------------------------------------------------
+    
     % boundary nodes and inner nodes
     %-------------------------------------------------------------------------
     [iN,bN] = getibNodes(msh);
     bNodes = bN.all; iNodes=iN.all;
-    b3Nodes = bN.e3; % node on \pt\Omg_3 (top)
+    b3Nodes = bN.e3;        % node on \pt\Omg_3 (top)
+    
+    
+    disp("Plotting phi...");
+    %% plot phi
+    nf = 0; % reset every loop to be sure uh, vh plotted on the same figure
+%     abc = waitforbuttonpress; % wait for click
+    titlePlot = strcat('phi, step = ',num2str(ns));
+    if showPlot
+        nf = plotNXFEM(msh,iPs,nf,phi,'withMesh',withMesh,'title',titlePlot,'dim',2,'export',false); % phi
+    end
+    nCTs = size(iPs,3);
+    hold on
+    for t=1:nCTs
+        plot(iPs(1,:,t),iPs(2,:,t),'-r','LineWidth',1);
+        hold on
+    end
+    hold off
+%     pause(0.01);
     
     
     %% =======================================================================
@@ -199,15 +243,15 @@ for ns = 1:maxStep
     % depend on mesh and different for w and u
     % in child-functions, it's the variable "cp"
     %=========================================================================
-    kapU = model.kapU(areaChildCTs,pa);
-    cpU.kap1 = kapU.kap1; cpU.kap2 = kapU.kap2; % kappa_i
-    cpU.kk1 = pa.alp1; cpU.kk2 = pa.alp2;    % diff coef
-    cpU.lambda = model.lamU(cpU,msh.hT,CTs,pa); % penalty coef (not ghost penalty)
+    hTCTs = msh.hT(CTs(5,:));
+    
+    kapU = model.kapU(cpU,CT,pa);
+    cpU.kap1 = kapU.kap1; cpU.kap2 = kapU.kap2;             % kappa_i
+    cpU.lambda = model.lamU(cpU,hTCTs,CT,pa);               % penalty coef (not ghost penalty)
 
-    kapV = model.kapV(areaChildCTs,pa);
-    cpV.kap1 = kapV.kap1; cpV.kap2 = kapV.kap2; % kappa_i
-    cpV.kk1 = 1; cpV.kk2 = 1;    % diff coef
-    cpV.lambda = model.lamV(cpV,msh.hT,CTs,pa); % penalty coef (not ghost penalty)
+    kapV = model.kapV(cpV,CT,pa);
+    cpV.kap1 = kapV.kap1; cpV.kap2 = kapV.kap2;             % kappa_i
+    cpV.lambda = model.lamV(cpV,hTCTs,CT,pa);               % penalty coef (not ghost penalty)
 
 
 
@@ -216,38 +260,42 @@ for ns = 1:maxStep
     % SOLVING U
     %=========================================================================
 
-    %-------------------------------------------------------------------------
+    
     % Stiffness matrix (all nodes including nodes on boundary)
     %-------------------------------------------------------------------------
-    Au = getGMmPP(tris,phi,CT,msh,pa,cpU);
+    disp("Solving u...");
+    Au = getGM_Chopp07u(tris,phi,CT,msh,pa,cpU);
 
-    %-------------------------------------------------------------------------
+    
     % Load vector (all nodes including nodes on boundary)
     %-------------------------------------------------------------------------
     defFu = model.defFu;
     Fu = getLf(msh,pa,tris,CT,defFu);
+    
 
-    %-------------------------------------------------------------------------
+    
     % BCs
     %-------------------------------------------------------------------------
-    uhNX = zeros(msh.ndof,1); % column-array
-    typeBC = model.bcU(); % get type of BCs
+    uhNX = zeros(msh.ndof,1);               % column-array
+    typeBC = model.bcU();   % get type of BCs
     switch typeBC
-        case 1 % u=o on whole boundary
+        case 1              % u=o on whole boundary
             uhNX(bNodes) = 0;
-        case 2 % u=uex on whole boundary
+        case 2              % u=uex on whole boundary
             uhNX(bNodes) = uExNX(bNodes);
-        case 3 % u=pa.bcu3 on \pt\Omg_3
+        case 3              % u=pa.bcu3 on \pt\Omg_3
             uhNX(b3Nodes) = pa.bcu3;
     end
 
-    %----------------------------------------------------------------------
+    
     % Solving u
     %----------------------------------------------------------------------
-    Fu = Fu - Au*uhNX; % modification of F
+    Fu = Fu - Au*uhNX;      % modification of F
+    
     % LU factorization
-    uhNX(iNodes) = Au(iNodes,iNodes)\Fu(iNodes); % don't care nodes on boundary
-    % uhNX(iNodes) = gmres(Au(iNodes,iNodes),Fu(iNodes)); % GMRES factorization
+    uhNX(iNodes) = Au(iNodes,iNodes)\Fu(iNodes);            % don't care nodes on boundary
+    
+    % uhNX(iNodes) = gmres(Au(iNodes,iNodes),Fu(iNodes));   % GMRES factorization
     
     
     
@@ -255,41 +303,42 @@ for ns = 1:maxStep
     %% ====================================================================
     % SOLVING V
     %======================================================================
+    disp("Solving v...");
     
-    %----------------------------------------------------------------------
     % Stiffness matrix (all nodes including nodes on boundary)
     %----------------------------------------------------------------------
-    Av = getGMvChopp07(tris,phi,CT,msh,pa,cpV);
+    Av = getGM_Chopp07v(tris,phi,CT,msh,pa,cpV);
 
-    %----------------------------------------------------------------------
+    
     % Load vector (all nodes including nodes on boundary)
     %----------------------------------------------------------------------
-    % in this case we use wg(u) ~ bet*u and w as bet*u, g(u) as 1
-    wS = getWsep(uhNX,msh,pa.bet1,pa.bet2);
-    Fv = getLvChopp07(msh,pa,tris,CT,wS);
+    uSep = getWsep(uhNX,msh,-pa.bet1,-pa.bet2);
+    Fv = getL_Chopp07v(msh,pa,tris,CT,uSep);
 
 
-    %----------------------------------------------------------------------
+    
     % BCs
     %----------------------------------------------------------------------
-    vhNX = zeros(msh.ndof,1); % column-array
-    typeBC = model.bcV(); % get type of BCs
+    vhNX = zeros(msh.ndof,1);           % column-array
+    typeBC = model.bcV();               % get type of BCs
     switch typeBC
-        case 1 % v=o on whole boundary
+        case 1          % v=o on whole boundary
             vhNX(bNodes) = 0;
-        case 2 % v=vex on whole boundary
+        case 2          % v=vex on whole boundary
             vhNX(bNodes) = vExNX(bNodes);
-        case 3 % v=0 on \pt\Omg_3
+        case 3          % v=0 on \pt\Omg_3
             vhNX(b3Nodes) = 0;
     end
 
-    %----------------------------------------------------------------------
+    
     % Solving v
     %----------------------------------------------------------------------
-    Fv = Fv - Av*vhNX; % modification of F
+    Fv = Fv - Av*vhNX;      % modification of F
+    
     % LU factorization
-    vhNX(iNodes) = Av(iNodes,iNodes)\Fv(iNodes); % don't care nodes on boundary
-    % vhNX(iNodes) = gmres(Av(iNodes,iNodes),Fv(iNodes)); % GMRES factorization
+    vhNX(iNodes) = Av(iNodes,iNodes)\Fv(iNodes);            % don't care nodes on boundary
+    
+    % vhNX(iNodes) = gmres(Av(iNodes,iNodes),Fv(iNodes));   % GMRES factorization
     
     
     
@@ -297,8 +346,9 @@ for ns = 1:maxStep
     %% ====================================================================
     % u and v in std Vh
     %======================================================================
-    uhStd = interNX2STD(uhNX,msh);
-    vhStd = interNX2STD(vhNX,msh);
+    disp("Converting u, v to STD...");
+    uhSTD = interNX2STD(uhNX,msh);
+    vhSTD = interNX2STD(vhNX,msh);
     
     
     
@@ -306,61 +356,116 @@ for ns = 1:maxStep
     %% ====================================================================
     % PLOT u and v
     %======================================================================
-    nf = 0; % reset every loop to be sure uh, vh plotted on the same figure
+%     nf = 0; % reset every loop to be sure uh, vh plotted on the same figure
 %     nf = plotNXFEM(msh,iPs,nf,'eleLabel','off','nodeLabel','off'); % only mesh
-%     nf = plotNXFEM(msh,iPs,nf,uhStd,'withMesh',true,'title','uh','dim',2,'export',false); % uh
-%     plotNXFEM(msh,iPs,nf,vhStd,'withMesh',true,'title','vh','dim',2,'export',false); % vh
-    plotNXFEM(msh,iPs,nf,phi,'withMesh',true,'title','phi','dim',2,'export',false); % phi
     
+    titlePlot = strcat('uh, step = ',num2str(ns));
+    nf = plotNXFEM(msh,iPs,nf,uhSTD,'withMesh',true,'title',titlePlot,'dim',2,'export',false); % uh
     
-%     abc = waitforbuttonpress; % wait for click
+    titlePlot = strcat('vh, step = ',num2str(ns));
+    nf = plotNXFEM(msh,iPs,nf,vhSTD,'withMesh',true,'title',titlePlot,'dim',2,'export',false); % vh
 
-    
-%     nCTs = size(iPs,3);
-%     for t=1:nCTs
-%         plot(iPs(1,:,t),iPs(2,:,t),'-r','LineWidth',1);
-%         hold on
-%     end
-%     hold off
-    
-    pause(0.01);
+%     plotNXFEM(msh,iPs,nf,phi,'withMesh',true,'title','phi','dim',2,'export',false); % phi
+  
+    hold on
+    for t=1:nCTs
+        plot(iPs(1,:,t),iPs(2,:,t),'-r','LineWidth',1);
+        hold on
+    end
+    hold off
+
+%     abc = waitforbuttonpress; % wait for click
+%     pause(0.01);
     
     %% ====================================================================
     % SOLVING phi (level set function)
     % standard finite element
     %======================================================================
+    disp("Solving level set phi...");
     
-    %----------------------------------------------------------------------
+    % get del_T
+    if useSUPG
+        delOld = getDellsT(msh,vhOld,delEps,delSD); % Arnold's book p.223
+        delNew = getDellsT(msh,vhSTD,delEps,delSD);
+    else
+        delOld = zeros(1,size(msh.t,2)); % without SUPG
+        delNew = delOld;
+    end
+    
+    
+    % dt
+    dt = msh.hTmax/max(delNew);
+    
+    
     % stiffness matrix for level set
     %----------------------------------------------------------------------
-%     Aphi = getGMlsChopp07(msh,pa,vhStd,dt,0.5); % use only 1 file
-
-    % use form like in Arnold Book p.221
-    del = getDells(msh,vhStd);
-    Eij = getMEls(msh,pa,vhStd,del);
-    Hij = getMHls(msh,pa,vhStd,del,dt,0.5);
+    Enew = getMEls_gP(msh,pa,vhSTD,delNew,1);
+    Hnew = getMHls_gP(msh,pa,vhSTD,delNew,dt*0.5);
+    mI = speye(msh.nStd); % identity matrix
+    Aphi = mI + Enew^(-1)*Hnew;
     
-    Aphi = Eij + Hij;
     
-    %----------------------------------------------------------------------
     % load vector for level set
     %----------------------------------------------------------------------
-    AFphi = Eij - Hij;
-    phi = phi'; % row to column
+    Eold = getMEls_gP(msh,pa,vhOld,delOld,1);
+    Hold = getMHls_gP(msh,pa,vhOld,delOld,dt*0.5);
+    AFphi = mI - Eold^(-1)*Hold;
+    phi = phi';             % row to column
     Fphi = AFphi*phi;
     
-    %----------------------------------------------------------------------
+    
     % seek phi
     %----------------------------------------------------------------------
-    phi = Aphi\Fphi; % update phi
-    phi = phi'; % column to row
+    phi = Aphi\Fphi;        % update phi
+    phi = phi';             % column to row
     
-%     clear msh tris CTs NCTs1 NCTs2 nodeCTs iN bN bNodes b3Nodes cpU cpV
+    
+    %% update v
+    disp("Updating v...");
+    vhOld = vhSTD;
+    
+    
+    %% Reinitialization
+    %----------------------------------------------------------------------
+    norm_gradphi = getNormL2Gstd(msh,phi); % ||gradPhi||_L2
+    todisplayed = ['|1-norm_gradphi| = ',num2str(abs(1-norm_gradphi))];
+    disp(todisplayed);
+    
+%     if useFMM && abs(1-norm_gradphi) > alp_FMM && numUse <=1
+    if useFMM && abs(1-norm_gradphi) > alp_FMM
+        disp("Starting to use FMM...");
+        mshdist_w_sol(msh,phi,path_phi,'phi'); % export to phi.sol
+        system(call_mshdist); % run 'mshdist file/to/phi' (redistancing)
+        phi = mshdist_r_sol(phi,path_phi,'phi'); % update phi
+        numUse = numUse + 1;
+    end
+    
+    
+    
 end % for ns
 
 
-
-
-
-
-
+function delT = getDellsT(msh,vold,eps,SD)
+    % find ||grad v||_inf on each triangle
+    % This function "guest" formula presented in Arnold's book, page 223 (and also cf. (7.14))
+    % If in future, we need it more than once, I will put it in a separated file
+    % old file: getDells.m (output delT is a scalar)
+    % Input: - msh.hT : h on each triangle : 1 x nTs
+    %        - vold to find grad v
+    %        - a control number SD \in O(1) (cf. (7.14))
+    %        - given small eps > 0 (cf. 7.14), at page 223, he took eps=1e-3
+    % Output: a vector 1 x nTs
+    
+    tris = msh.t;
+    nTs = size(tris,2);
+    delT = zeros(1,nTs);
+    gP = getGradPhi(tris,msh); % 2 coordinates x 3 vertices x nTris
+    for t=1:nTs
+        v1t = abs(vold(tris(1,t)))*( abs(gP(1,1,t)) + abs(gP(2,1,t)) ); % vertex 1
+        v2t = abs(vold(tris(2,t)))*( abs(gP(1,2,t)) + abs(gP(2,2,t)) ); % vertex 2
+        v3t = abs(vold(tris(3,t)))*( abs(gP(1,3,t)) + abs(gP(2,3,t)) ); % vertex 3
+        delT(1,t) = max([eps, v1t, v2t, v3t]);
+    end
+    
+    delT = SD*msh.hT ./ delT;
+end

@@ -1,4 +1,4 @@
-function H = getMHls_gP(msh,pa,vold,del,dt,ep)
+function H = getMHls_gP(msh,pa,vold,delT,coef)
 % NEED TO MODIFY LATER, FOLLOW getGMgPP.m AND getGMuNewton.m
 % velocity is grad of Phi
 % get matrix H_ij for level set equation like in Arnold p.221
@@ -9,13 +9,20 @@ function H = getMHls_gP(msh,pa,vold,del,dt,ep)
 % Related: main_chopp2007.m, getMEls.m, note 6
 % Input: - vold in Vh std,
 %        - del (Arnold Book p.222)
-%        - dt time step
-%        - ep: theta in theory of full scheme (take ep=1/2)
 % Output: sparse matrix H
 
+Ts = msh.t; % all triangles of the mesh
 
-[i1,j1,v1] = getTriplePGGTs_gP(vold,msh,pa,dt*ep); % dt*(ep*gradv*gradphi)*xi
-[i2,j2,v2] = getTripleGGGGTs_gP(vold,msh,del*dt*ep); % dt*ep*del*(gradv*gradphi)*(gradv*gradxi)
+
+%% sum_K of ( del*(grad v*grad xi_j, xi_i) )_K
+del1 = ones(1,size(Ts,2)); % del=1
+del1 = del1*coef; % include coefficients in level set eqn
+[i1,j1,v1] = getTriplePGGTs(vold,msh,pa,del1); 
+
+
+%% sum_T of ( grad v*grad xi_j,del*(grad v*grad xi_i) )_T
+delT = delT*coef; % include coefficients in level set eqn
+[i2,j2,v2] = getTripleGGGGTs(vold,msh,delT);
 
 ii = [i1;i2];
 jj = [j1;j2];

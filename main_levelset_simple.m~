@@ -11,7 +11,7 @@
 addpath(genpath('func')); % add all necessary functions
 
 % nseg_array = [37, 57, 77];
-nseg_array = 57;
+nseg_array = 17;
 % nseg_array = zeros(1,3); % get from ffpp 
 
 
@@ -37,26 +37,24 @@ useFFmesh = 0; % use freefem++ mesh or not?
     reguMesh = 0; % use regular mesh or not? (for matlab mesh)
 pa.smallCut = 0; % ignore small-support basis (1=ignore,0=no)
     pa.tH = 10; % to find the small support using (20) or (21) in arnold 2008
-useFMM = 1; % use fast marching method or not (mshdist)?
+useFMM = 0; % use fast marching method or not (mshdist)?
     numUse = 0; % count the number of use of FMM
-    alp_FMM = 0.05;
-useSUPG = 1; % if 1, need to make more settings
+    alp_FMM = 0.1;
+useSUPG = 0; % if 1, need to make more settings
     delEps = 1e-3;
     delSD = 0.5;
 showPlot = 1; % show plot or not?
-savePlot = 1; % wanna save plot or not?
-    pathOption = '_BLOUZA';
+savePlot = 0; % wanna save plot or not?
+    pathOption = '_FF_new';
     testCase = 'Using ff mesh + wSUPG + wtFMM + thesis (no limit num of use FMM)'; % note for info_and_errors.txt
 withMesh = false;
 
 %% choose the machine to run
-machine = "blouza"; % options: thi, gia, lehoan, blouza, gaia
+machine = "thi"; % options: thi, gia, lehoan, blouza 
 
 
-% only enable showPlot option on thi's machine
-if machine ~= "thi"
-    showPlot = 0;
-end
+% only enable showPlot on thi's machine
+if machine
 
 for iii=1:size(nseg_array,2)
 disp("Running...");
@@ -109,9 +107,8 @@ switch machine
         path_nxfem = '/home/lehoan/git/nxfem/'; % lehoan's local machine
         call_mshdist = strcat({'mshdist'},{' '},{path_phi},'phi'); % run in terminal
     case "blouza"
-        path_nxfem = '/users/home/blouza/thi/nxfem/'; % blouza's local machine
-        call_mshdist = strcat({'/users/home/blouza/MshDist/build/mshdist'},{' '},{path_phi},'phi'); % run in terminal
-    case "gaia" % CHECK LATER!!!!
+        path_nxfem = '/home/blouza/git/nxfem/'; % blouza's local machine
+    case "gaia"
         path_nxfem = '/users/dinh/nxfem/'; % only on gaia machine
 %         call_mshdist = strcat({'mshdist'},{' '},{path_phi},'phi'); % run in terminal
 end

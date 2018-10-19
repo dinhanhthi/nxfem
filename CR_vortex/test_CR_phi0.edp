@@ -3,7 +3,7 @@
 // Model: model_levelset_vortex.m
 
 verbosity = 0;
-int[int] nSeg = [11,22,44,88,176];
+// int[int] nSeg = [11,22,44,88,176];
 int nSegSize = 5;
 
 // int nSegSize = nSeg.n;
@@ -35,8 +35,8 @@ func phi = sqrt( (x-0.5)^2 + (y-0.75)^2 ) - xi;
 
 
 for (int i=0; i<nSegSize; i++){
-	// n = 2^(i+3);
-	n = nSeg(i);
+	n = 2^(i+3);
+	// n = nSeg(i);
 	
 
 	// MESH
@@ -45,7 +45,7 @@ for (int i=0; i<nSegSize; i++){
 		meshName = "Th_regular" + i + ".msh";
 	}else{
 		Th = buildmesh(C1(n) + C2(n) + C3(n) + C4(n));
-		meshName = "Th_irregular_new" + i + ".msh";
+		meshName = "Th_irregular" + i + ".msh";
 	}
 	
 	// plot(Th, wait=1);
@@ -91,4 +91,4 @@ for (int i=0; i<nSegSize; i++){
 	cout << "cr_phiphiOnOmg(" << i << ") = " << CRphiphiOnOmg(i) << endl;
 }
 
-
+cout << "hTmax = " << hTmax << endl;

@@ -38,18 +38,19 @@
 
 %% Setting up
 function fh = model_chopp2007
-    fh.defG = @findDefGu; % g(u)
-    fh.defFu = @findDefFu; % RHS of equation of w
-    fh.defFv = @findDefFv; % RHS of equation of v
-    fh.defPhi = @findDefPhi; % interface
-    fh.domain = @findDomain; % domain setting
-    fh.bcU = @findTypeBCu; % BCs for u's equation
-    fh.bcV = @findTypeBCv; % BCs for u's equation
-    fh.kapU = @findKapU; % kappa for u's equation
-    fh.kapV = @findKapV; % kappa for u's equation
-    fh.lamU = @findLamU; % lambda for tw's equation
-    fh.lamV = @findLamV; % lambda for u's equation
-    fh.pa = @findPara; % parameters
+    fh.defFu = @findDefFu;      % RHS of equation of u
+    fh.defFv = @findDefFv;      % RHS of equation of v
+    fh.defPhi = @findDefPhi;    % interface
+    fh.domain = @findDomain;    % domain setting
+    fh.bcU = @findTypeBCu;      % BCs for u's equation
+    fh.bcV = @findTypeBCv;      % BCs for u's equation
+%     fh.kapU = @findKapU;        % kappa for u's equation
+    fh.kapU = @findKapV;        % kappa for u's equation
+    fh.kapV = @findKapV;        % kappa for u's equation
+%     fh.lamU = @findLamU;      % lambda for u's equation
+    fh.lamU = @findLamV;        % lambda for u's equation
+    fh.lamV = @findLamV;        % lambda for u's equation
+    fh.pa = @findPara;          % parameters
 end
 
 
@@ -60,17 +61,12 @@ function pa = findPara()
 end
 
 
-%% g(u)
-function valG = findDefGu(u)
-    valG = 1;
-end
-
 
 %% Domain
 function GeoDom = findDomain()
-    xDomVal = [0 1 1 0]; % x values of points constructing Omega
-    yDomVal = [0 0 1 1]; % corresponding y value
-    RectDom = [3,4,xDomVal,yDomVal]'; % rectangular domain "3" with "4" sides
+    xDomVal = [0 1 1 0];                % x values of points constructing Omega
+    yDomVal = [0 0 1 1];                % corresponding y value
+    RectDom = [3,4,xDomVal,yDomVal]';   % rectangular domain "3" with "4" sides
     GeoDom = decsg(RectDom);
 end
 
@@ -79,6 +75,7 @@ end
 function typeBC = findTypeBCu()
     % Output: the number indicating the type of boundary condition
     % find the list of types in file getErrEachStep.m
+    
     % 1: w=0 on whole boundary, 2:wex, 3: constant on 3
     typeBC = 3; 
 end
@@ -86,12 +83,15 @@ end
 function typeBC = findTypeBCv()
     % Output: the number indicating the type of boundary condition
     % find the list of types in file getErrEachStep.m
+    
     % 1: w=0 on whole boundary, 2:wex, 3: constant on 3
     typeBC = 3;
 end
 
 
 %% F
+% (only constant or given function f(x,y)
+% Don't contains something like g(u) where we're computing v
 function valF = findDefFu(xx,yy,pa,sub)
     % Define right hand side function f
     % Input: coordinate of points + indication subdomain
@@ -112,49 +112,48 @@ function valPhi=findDefPhi(xx,yy,pa)
     % Define level set function phi
     % Input: coordinate of points
     % Output: value of phi at points
-    valPhi = sqrt((xx-0.5).^2+yy.^2)-pa.r0;
+    
+%     valPhi = sqrt((xx-0.5).^2 + yy.^2) - pa.r0; % semi circle (no need to initialize)
+    
+    valPhi = pa.a^2*(xx-0.5).^2 + yy.^2/(pa.a^2) - pa.r0^2; % need to use mshdist to initilize to be a signed distance function
 end
 
 
 %% Kappa
-function kap = findKapU(areaChildCTs,pa)
-    % for seeking w
-    % kapi : 1 x nCTs
-    nCTs = size(areaChildCTs,2);
-    kap.kap1 = zeros(1,nCTs) + pa.alp2/(pa.alp1+pa.alp2);
-    kap.kap2 = zeros(1,nCTs) + pa.alp1/(pa.alp1+pa.alp2);
-end
 %-------------------------------------------------------------------------
-function kap = findKapV(areaChildCTs,pa)
-    % for seeking u
+function kap = findKapV(cp,CT,pa)
+    % for seeking u and v
     % kapi : 1 x nCTs
-    nCTs = size(areaChildCTs,2);
-    kap.kap1 = zeros(1,nCTs) + 0.5;
-    kap.kap2 = zeros(1,nCTs) + 0.5;
+    
+    if pa.useGP
+        nCTs = size(CT.areaChild,2);
+        kap.kap1 = zeros(1,nCTs) + cp.kk2/(cp.kk1+cp.kk2);
+        kap.kap2 = zeros(1,nCTs) + cp.kk1/(cp.kk1+cp.kk2);
+    else
+        kap.kap1 = cp.kk1*CT.areaChild(2,:) ./ (cp.kk1*CT.areaChild(2,:) + cp.kk2*CT.areaChild(1,:));
+        kap.kap2 = cp.kk2*CT.areaChild(1,:) ./ (cp.kk1*CT.areaChild(2,:) + cp.kk2*CT.areaChild(1,:));
+    end
 end
 
 
 %% Lambda
-function lam = findLamU(cp,hT,CTs,pa)
-    % lam: 1 x nCTs
-    
-    hTCT = hT(CTs(5,:));
-    coef = 4*pa.lamHu*cp.kk1*cp.kk2/(cp.kk1+cp.kk2);
-    lam = coef./hTCT;
-
-%     nCTs = size(CTs,2);
-%     lam = zeros(1,nCTs) + 4*pa.lamHu*cp.kk1*cp.kk2/(cp.kk1+cp.kk2);
-end
 %-------------------------------------------------------------------------
-function lam = findLamV(cp,hT,CTs,pa)
+function lam = findLamV(cp,hTCTs,CT,pa)
     % lam: 1 x nCTs
+    nCTs = size(hTCTs, 2);
     
-    % belongs hT
-    hTCT = hT(CTs(5,:));
-    coef = 4*pa.lamHv*cp.kk1*cp.kk2/(cp.kk1+cp.kk2);
-    lam = coef./hTCT;
-
-    % not belong hT
-%     nCTs = size(CTs,2);
-%     lam = zeros(1,nCTs) + 4*pa.lamHv*cp.kk1*cp.kk2/(cp.kk1+cp.kk2);
+    if pa.useGP
+        coef = 4*cp.lamH*cp.kk1*cp.kk2/(cp.kk1+cp.kk2);
+        
+        lam = coef./hTCTs;              % belongs to hT
+%         lam = zeros(1,nCTs) + coef;   % not belong to hT
+    else
+        lenAB = zeros(1,nCTs); % nCTs x 1
+        lenAB(1,:) = ( (CT.iPs(1,2,:) - CT.iPs(1,1,:)).^2 + (CT.iPs(2,2,:) - CT.iPs(2,1,:)).^2 ) .^(0.5);
+        coef = cp.lamH*cp.kk1*cp.kk2 .* lenAB...
+            ./(cp.kk2*CT.areaChild(1,:) + cp.kk1*CT.areaChild(2,:));
+        
+        lam = coef./hTCTs;              % belongs to hT
+%         lam = zeros(1,nCTs) + coef;   % not belong to hT
+    end
 end

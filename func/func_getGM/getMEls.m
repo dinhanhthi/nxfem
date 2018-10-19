@@ -23,7 +23,7 @@ K = []; % take the default K
 [i1,j1,v1] = getTriplePPNCTs(msh,pa,Ts,K);
 
 
-% sum_T of ( xi_j,del*dot(velo,grad xi_i) )_T
+%% sum_T of ( xi_j,del*dot(velo,grad xi_i) )_T
 delT = delT*coef;
 [i2,j2,v2] = getTripleVeloGPP(msh,pa,Ts,delT,'xi',defVx);
 [i3,j3,v3] = getTripleVeloGPP(msh,pa,Ts,delT,'yi',defVy);

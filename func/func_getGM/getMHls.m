@@ -10,8 +10,6 @@ function H = getMHls(msh,pa,velo,delT,coef)
 % Related: main_chopp2007.m, main_levelset_simple, getMEls.m, note 6
 % Input: - velo(x,y,pa,sub) function handle, sub indicates velo.x or y
 %        - delT (Arnold Book p.222) or something else? : 1xnTs
-%        - dt: time step
-%        - ep: epsilon in theory of full scheme (take ep=1/2)
 % Output: sparse matrix H to be used in finding matrix of level set eqn
 %           note that, it contains also dt*epsilon
 
