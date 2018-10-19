@@ -21,7 +21,8 @@ function fh = model_levelset_x
     fh.defPhi = @findDefPhi;
     fh.domain = @findDomain;
     fh.velo = @findVelo;
-    fh.para = @findPara;
+    fh.veloGrad = @findVeloGrad; % only for testing gradPhi*gradphi
+    fh.pa = @findPara;
 end
 
 function pa = findPara()
@@ -33,8 +34,10 @@ end
 %% domain
 function GeoDom = findDomain()
 % Output: a matrix containing all information of domain
-    xDomVal = [-1 1 1 -1]; % x values of points constructing Omega
-    yDomVal = [-1 -1 1 1]; % corresponding y value
+%     xDomVal = [-1 1 1 -1]; % x values of points constructing Omega
+%     yDomVal = [-1 -1 1 1]; % corresponding y value
+    xDomVal = [0 1 1 0]; % x values of points constructing Omega
+    yDomVal = [0 0 1 1];
     RectDom = [3,4,xDomVal,yDomVal]'; % rectangular domain "3" with "4" sides
     GeoDom = decsg(RectDom);
 end
@@ -53,7 +56,8 @@ function valPhi=findDefPhi(xx,yy,pa)
 % Define level set function phi
 % Input: coordinate of points
 % Output: value of phi at points
-    pa.xi = -0.21; % interface
+%     pa.xi = -0.21; % interface
+    pa.xi = 0.21;
     valPhi = xx - pa.xi;
 end
 
@@ -64,8 +68,15 @@ function val=findVelo(xx,yy,tt,sub)
 % Input: coordinate of points & time
 % Output: [x,y]
     if sub==1 % x coor
-        val = 0.8;
+        val = zeros(1,size(xx,2)) + 0.8;
     else % y coor
-        val = 0;
+        val = zeros(1,size(xx,2));
     end
+end
+
+function val=findVeloGrad(xx,yy,tt)
+% Define velocity field
+% Input: coordinate of points & time
+% Output: [x,y]
+    val = 0.8*xx;
 end

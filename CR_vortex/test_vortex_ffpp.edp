@@ -18,11 +18,13 @@
 
 
 verbosity = 0;
-
+// int[int] nSeg = [11,22,44,88,176];
+// int nSegSize = 5;
 
 // ============ SETTINGS =================
-int nSegSize = 1;
+int nSegSize = 5;
 int n; // number of segment at each time step
+// mesh Th;
 real[int] rerrPhiOnGamh(nSegSize); // ||phi^0||_L2(Gh)
 real[int] rerrPhiPhihOnOmg(nSegSize); // ||phi_h^0 - phi^0||_L2(Omg)
 real[int] rhTmax(nSegSize); // h
@@ -64,9 +66,9 @@ int nLoop = Tmax/dt;
 
 // ============ LOOPS =================
 for (int i=0; i<nSegSize; i++){
-  // n = 2^(i+3);
+  n = 2^(i+3);
   // n = 2^8; // ok
-  n = 2^6;
+  // n = 2^6;
 
 
   // ============ Mesh =================
@@ -98,7 +100,7 @@ for (int i=0; i<nSegSize; i++){
     t += dt;
 
     phih = convect([uh, vh], -dt, phiOld); // phi^{n+1} from phi^n, u^n
-    plot(phih, cmm=" t = " + t, wait=0, fill=1, value=1);
+    // plot(phih, cmm=" t = " + t, wait=0, fill=1, value=1);
 
     uh = velo(x,y,t,1); // u^{n+1}
     vh = velo(x,y,t,2);
@@ -115,21 +117,21 @@ for (int i=0; i<nSegSize; i++){
 
   // ============ CR =================
   if (i != 0){
-		// CRphiOnGh0(i) = log(rerrPhiOnGamh(i-1)/rerrPhiOnGamh(i)) / log(rhTmax(i-1)/rhTmax(i));
+		CRphiOnGh0(i) = log(rerrPhiOnGamh(i-1)/rerrPhiOnGamh(i)) / log(rhTmax(i-1)/rhTmax(i));
 		CRphiphiOnOmg(i) = log(rerrPhiPhihOnOmg(i-1)/rerrPhiPhihOnOmg(i)) / log(rhTmax(i-1)/rhTmax(i));
 	}else{
-		// CRphiOnGh0(i) = 0;
+		CRphiOnGh0(i) = 0;
 		CRphiphiOnOmg(i) = 0;
 	}
 
 
   // ============ display =================
-  // cout << "h(" << i << ") = " << rhTmax(i) << endl;
+  cout << "h(" << i << ") = " << rhTmax(i) << endl;
 	
-	cout << "rerrPhiOnGamh(" << i << ") = " << rerrPhiOnGamh(i) << endl;
-	cout << "rerrPhiPhihOnOmg(" << i << ") = " << rerrPhiPhihOnOmg(i) << endl << endl;
+	// cout << "rerrPhiOnGamh(" << i << ") = " << rerrPhiOnGamh(i) << endl;
+	// cout << "rerrPhiPhihOnOmg(" << i << ") = " << rerrPhiPhihOnOmg(i) << endl << endl;
 	
-	// cout << "cr_phiOnGh0(" << i << ") = " << CRphiOnGh0(i) << endl;
-	// cout << "cr_phiphiOnOmg(" << i << ") = " << CRphiphiOnOmg(i) << endl;
+	cout << "cr_phiOnGh0(" << i << ") = " << CRphiOnGh0(i) << endl;
+	cout << "cr_phiphiOnOmg(" << i << ") = " << CRphiphiOnOmg(i) << endl;
   cout << endl << endl;
 }

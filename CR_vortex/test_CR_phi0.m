@@ -10,9 +10,13 @@ addpath(genpath('func')); % add all necessary functions
 
 % nseg_array = [37, 57, 77, 101];
 % nseg_array = 57;
-nseg_array = zeros(1,4);
+nseg_array = zeros(1,5);
 
-hTmax = zeros(size(nseg_array,2),1);
+% hTmax = zeros(size(nseg_array,2),1);
+
+hTmax = [0.1964185496	0.09701703355	0.04780764512	0.02450774691	0.01276380971];
+hTmax = hTmax';
+
 normPhionGh0 = zeros(size(nseg_array,2),1);
 normPhih0PhionOmg = zeros(size(nseg_array,2),1);
 
@@ -63,7 +67,8 @@ for iii=1:size(nseg_array,2)
     % diameter (longest side) of each triangle: 1 x nTs
     msh.hT = getDiam(msh); % 1 x number of triangles
     msh.hTmax = max(msh.hT); % maximum of all diameters
-    hTmax(iii) = msh.hTmax;
+%     hTmax(iii) = msh.hTmax;
+
     
     phi = model.defPhi(x,y,pa); % 1 x number of points (row array)
 %     phi(abs(phi)<pa.tol) = 0; % find phi which are very small (~0) and set to 0

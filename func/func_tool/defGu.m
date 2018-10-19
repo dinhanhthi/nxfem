@@ -4,18 +4,20 @@
 function gu = defGu
     gu.change = @defChange; % changeable
     gu.dchange = @defDiffChange; % derivative (depends on chage)
-    gu.G1 = @defG1; % use in main_sys_linda
+    gu.G1 = @defG1; % used in main_sys_linda
 end
 
 
 %% Definition
 
-function val = defChange(u) % changeable g(u)
-    val = u.^2;
+function val = defChange(u,pa) % changeable g(u)
+%     val = u.^2;
+    val = u./(pa.K0 + u); % chopp06combine
 end
 
-function val = defDiffChange(u) % derivative of g(u) changeable
-    val = 2*u;
+function val = defDiffChange(u,pa) % derivative of g(u) changeable
+%     val = 2*u;
+    val = pa.K0/(pa.K0+u).^2; % chopp06combine
 end
 
 function val = defG1(u) % *ug'(u)-g(u)

@@ -1,6 +1,6 @@
 function wS = getWsep(tw,msh,k1,k2)
 % Find w in each subdomain to be used in finding u
-% Not that w=beta*tw
+% Not that w=beta*tw (it's kk*tw)
 % Status: 
 % We learn the idea from getUold.m
 % This file firstly used in the file getGMuLinda (get global matrix for u)

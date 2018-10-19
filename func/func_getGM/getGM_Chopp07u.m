@@ -1,14 +1,12 @@
-function Au = getGMgPP(msh,pa,cp,tris,CT,phi,uold,defG)
-% Find the global stiffness matrix for u (there is more g(u)*phi*phi)
-% Related file: main_sys_linda
-% Status: - checked with the old inputParser
-%         - (old) tested like the getGMgPP before change to getK
-% This function built from the shape of bilinear form
-% Input: - all triangles: tris
-%        - CT's info
-%        - uold.omg1, .omg2, .ct1, ct.2 (all are in stdFEM)
-%		 - g(u) function handle
-% Output: global stiffness matrix Au
+function A = getGM_Chopp07u(tris,phi,CT,msh,pa,cp)
+% Find the global stiffness matrix for u in Chopp07 (there is more mu*phi*phi)
+% SHAPE: grad*grad + 3 terms on Gam - mu*u*phi
+% Related file: main_chopp2007.m, getGM_chopp07v
+% Base on getGMgPP but in this case g is just a constant mu
+% Status: 
+% Input: - triangles on not cut triangles
+%        - information about cut triangles
+% Output: global stiffness matrix A
 
 CTs=tris.CTs; NCTs1=tris.NCTs1; NCTs2=tris.NCTs2; 
 aChild=CT.areaChild; iPs=CT.iPs; uN=CT.uN;
@@ -25,7 +23,7 @@ kk1 = cp.kk1; kk2 = cp.kk2; % diff coef
 %-------------------------------------------------------------------------
 [iGG1,jGG1,vGG1] = getTripleGGNCTs(NCTs1,kk1,msh); % NCTs1
 [iGG2,jGG2,vGG2] = getTripleGGNCTs(NCTs2,kk2,msh); % NCTs2
-[iGGc,jGGc,vGGc1,vGGc2] = getTripleGGCTs(CTs,aChild,kk1,kk2,msh); %CTs
+[iGGc,jGGc,vGGc1,vGGc2] = getTripleGGCTs(CTs,aChild,kk1,kk2,msh);%CTs
 
 %-------------------------------------------------------------------------
 % 3 terms on interface
@@ -37,19 +35,14 @@ L = repmat(cp.lambda,4,1); % lambda: 1xnCTs
     % term L*phi*phi (sign +)
 
 %-------------------------------------------------------------------------
-% Term int_Omg kk*g(uold)*phi*phi
+% Term int_Omg mu*phi*phi (term int_Omg mu*u*phi)
 %-------------------------------------------------------------------------
-sol.u = uold;
-func.h = @(x,y,pa,sub) (sub==1)*kk1 + (sub==2)*kk2;
-func.gu = defG.change;
+func.h = @(x,y,pa,sub) (sub==1)*(pa.mu1) + (sub==2)*(pa.mu2);
+sol = [];
 K = getPf(msh,pa,tris,CT,sol,func);
-
 [igPP1,jgPP1,vgPP1] = getTriplePPNCTs(msh,pa,NCTs1,K.NC1); % NCTs1
 [igPP2,jgPP2,vgPP2] = getTriplePPNCTs(msh,pa,NCTs2,K.NC2); % NCTs2
 [igPPc,jgPPc,vgPPc1,vgPPc2] = getTriplePPCTs(msh,pa,CTs,CT,K); % CTs
-% sign "-" in bilinear form
-vgPP1=-vgPP1; vgPP2=-vgPP2; vgPPc1=-vgPPc1; vgPPc2=-vgPPc2;
-
 
 %-------------------------------------------------------------------------
 % These terms act like terms grad grad. So we just need to add them to 
@@ -60,7 +53,6 @@ iGG2 = [iGG2;igPP2]; jGG2 = [jGG2;jgPP2]; vGG2 = [vGG2;vgPP2];
 iGGc = [iGGc;igPPc]; jGGc = [jGGc;jgPPc]; 
 vGGc1 = [vGGc1;vgPPc1]; vGGc2 = [vGGc2;vgPPc2];
 
-
 %-------------------------------------------------------------------------
 % Put into cut triangles cases
 %-------------------------------------------------------------------------
@@ -68,6 +60,7 @@ it1 = [iGGc;iGP;iPP]; jt1 = [jGGc;jGP;jPP]; vt1 = [vGGc1;vGP1;vPP1]; % A_ij
 it2 = it1; jt2 = jt1; vt2 = [vGGc2;vGP2;vPP2];  % A_k(i)k(j)
 it3 = [iGP;iPP]; jt3 = [jGP;jPP]; vt3 = [vGP3;vPP3]; % A_k(i)j
 it4 = [iGP;iPP]; jt4 = [jGP;jPP]; vt4 = [vGP4;vPP4]; % A_ik(j)
+
 
 
 %% =======================================================================
@@ -108,6 +101,7 @@ jt4 = newNodes(jt4); % column-array
 iG = [iG;it4]; jG = [jG;jt4]; vG = [vG;vt4];
 
 
+
 %% =======================================================================
 % Ghost penalty terms
 %=========================================================================
@@ -117,9 +111,10 @@ if pa.useGP
 end
 
 
+
 %% =======================================================================
 % GLOBAL MATRIX
 %=========================================================================
-Au = sparse(iG,jG,vG);
+A = sparse(iG,jG,vG);
 
 end

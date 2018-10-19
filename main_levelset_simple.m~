@@ -53,10 +53,8 @@ withMesh = false;
 machine = "thi"; % options: thi, gia, lehoan, blouza 
 
 
-% only enable showPlot option on thi's machine
-if machine ~= "thi"
-    showPlot = 0;
-end
+% only enable showPlot on thi's machine
+if machine
 
 for iii=1:size(nseg_array,2)
 disp("Running...");
@@ -109,9 +107,8 @@ switch machine
         path_nxfem = '/home/lehoan/git/nxfem/'; % lehoan's local machine
         call_mshdist = strcat({'mshdist'},{' '},{path_phi},'phi'); % run in terminal
     case "blouza"
-        path_nxfem = '/users/home/blouza/thi/nxfem/'; % blouza's local machine
-        call_mshdist = strcat({'/users/home/blouza/MshDist/build/mshdist'},{' '},{path_phi},'phi'); % run in terminal
-    case "gaia" % CHECK LATER!!!!
+        path_nxfem = '/home/blouza/git/nxfem/'; % blouza's local machine
+    case "gaia"
         path_nxfem = '/users/dinh/nxfem/'; % only on gaia machine
 %         call_mshdist = strcat({'mshdist'},{' '},{path_phi},'phi'); % run in terminal
 end

@@ -1,11 +1,11 @@
-function [ii,jj,vv] = getTriplePGGTs_gP(vold,msh,pa,del)
-% velocity is grad of Phi
-% get triples for \int_{all tris} phi*delta*(grad v*grad phi)
+function [ii,jj,vv] = getTriplePGGTs(vold,msh,pa,delT)
+% Get triples for \int_{all tris} phi*delta*(grad v*grad phi)
+% Velocity is grad of Phi
 % for the level set equation (note 6)
-% cf. getGMlsChopp07.m
-% NOTE: don't use NXFEM, it's standard FEM
-% Input: - v (already known) = vold
-%        - coeff del
+% cf. main_chopp2007, getMEls_gP, getMHls_gP
+% REMARK: don't use NXFEM, it's standard FEM
+% Input: - v (already known) = vold in STD
+%        - del_T: 1 x nTs (SUPG coefficients)
 % Output: ii,jj,vv
 
 tris = msh.t;
@@ -16,6 +16,7 @@ ii = zeros(9*nTs,1); jj = zeros(9*nTs,1); vv = zeros(9*nTs,1);
 idx=1;
 for t=1:nTs
     triangle = tris(:,t);
+    del = delT(t); % delta
     for i=1:3
         for j=1:3
             ii(idx) = tris(i,t);
@@ -27,8 +28,8 @@ for t=1:nTs
             gvgPi = vold(tris(1,t))*dot(gP1,gPi)...
                     + vold(tris(2,t))*dot(gP2,gPi)...
                     + vold(tris(3,t))*dot(gP3,gPi); % gvPi is constant
-            P = []; % force P=1 inside getLWhole
-            vv(idx) = del*gvgPi*getLWhole(triangle,j,msh,pa,P);
+            P = []; % force P=1 inside getfPhiWhole
+            vv(idx) = del*gvgPi*getfPhiWhole(msh,pa,triangle,j,P);
             idx = idx+1;
         end
     end

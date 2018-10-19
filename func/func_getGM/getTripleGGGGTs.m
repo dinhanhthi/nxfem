@@ -1,10 +1,10 @@
-function [ii,jj,vv] = getTripleGGGGTs_gP(vold,msh,del)
+function [ii,jj,vv] = getTripleGGGGTs(vold,msh,delT)
 % velocity is grad of Phi
 % get triples for \int_{all tris} del*(grad v*grad phi)*(grad v*grad phi)
 % for the level set equation (note 6)
-% cf. getGMlsChopp07.m
+% cf. main_chopp2007, getMEls_gP, getMHls_gP
 % NOTE: don't use NXFEM, it's standard FEM
-% Input: - v (already known) = vold
+% Input: - v (already known) = vold in STD
 %        - coeff del
 % Output: ii,jj,vv
 
@@ -14,6 +14,7 @@ ii = zeros(9*nTs,1); jj = zeros(9*nTs,1); vv = zeros(9*nTs,1);
 
 idx=1;
 for t=1:nTs
+    del = delT(t); % delta
     for i=1:3
         for j=1:3
             gP1 = getGrad(1,t,msh);

@@ -1,5 +1,4 @@
-function E = getMEls_gP(msh,pa,vold,del)
-% NEED TO MODIFY LATER, FOLLOW getGMgPP.m AND getGMuNewton.m
+function E = getMEls_gP(msh,pa,vold,delT,coef)
 % velocity is grad of Phi
 % get matrix E_ij for level set equation like in Arnold p.221
 % E_ij = sum_T of ( xi_j,xi_i + del*dot(gradv,grad xi_i) )_L2
@@ -7,12 +6,18 @@ function E = getMEls_gP(msh,pa,vold,del)
 % can use it (again) in finding load vector
 % Related: main_chopp2007.m, getMHls.m, note 6
 % Input: - vold in Vh std,
-%        - del (Arnold Book p.222)
+%        - delT (Arnold Book p.222) or something else? : 1xnTs
 % Output: sparse matrix E
 
+Ts = msh.t;
 
-[i1,j1,v1] = getTriplePPTs(msh,pa); % xi*xi
-[i2,j2,v2] = getTriplePGGTs_gP(vold,msh,pa,del); % xi*del*(gradv*gradxi)
+%% int_Ts phi_j*phi_i
+K = []; % take the default K
+[i1,j1,v1] = getTriplePPNCTs(msh,pa,Ts,K);
+
+%% sum_K of ( xi_j,del*(grad v*grad xi_i) )_K
+delT = delT*coef;
+[i2,j2,v2] = getTriplePGGTs(vold,msh,pa,delT);
 
 ii = [i1;i2];
 jj = [j1;j2];

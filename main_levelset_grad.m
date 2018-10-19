@@ -1,17 +1,21 @@
 %% =======================================================================
 % This file is used to test with a very simple level set function
+% The same with main_levelset_simple BUT ONLY FOR GRAD
+% grad(u) in this test case = u in main_levelset_simple
 % ------------------------------------------------------------------------
 % PURPOSE: Coding level set + NOT YET couple with NXFEM (only phi)
 % MODEL: model_levelset_*
 % ------------------------------------------------------------------------
-
+% RESULT: Cannot verify because vh in Vh, we cannot choose a v by a normal
+% expression to obtain grad of v as usual (grad of v in Vh is totally
+% different!!!)
 
 
 %% add path of functions
 addpath(genpath('func')); % add all necessary functions
 
 % nseg_array = [37, 57, 77];
-nseg_array = 17;
+nseg_array = 27;
 % nseg_array = zeros(1,3); % get from ffpp 
 
 
@@ -28,7 +32,7 @@ pa.tol = eps(1e3); % tolerance, 1e-14
 model = model_levelset_x; % Becker's test case with interface: x=x_0
 % model = model_levelset_vortex;  % Niklas' test case
 GeoDom = model.domain(); % domain
-velo = model.velo; % Velocity (grad of potential in other cases)
+veloGrad = model.veloGrad; % Velocity (grad of potential in other cases)
 
 
 
@@ -40,7 +44,7 @@ pa.smallCut = 0; % ignore small-support basis (1=ignore,0=no)
 useFMM = 0; % use fast marching method or not (mshdist)?
     numUse = 0; % count the number of use of FMM
     alp_FMM = 0.1;
-useSUPG = 0; % if 1, need to make more settings
+useSUPG = 0; %nseg_array = 17; if 1, need to make more settings
     delEps = 1e-3;
     delSD = 0.5;
 showPlot = 1; % show plot or not?
@@ -49,21 +53,13 @@ savePlot = 0; % wanna save plot or not?
     testCase = 'Using ff mesh + wSUPG + wtFMM + thesis (no limit num of use FMM)'; % note for info_and_errors.txt
 withMesh = false;
 
-%% choose the machine to run
-machine = "thi"; % options: thi, gia, lehoan, blouza 
-
-
-% only enable showPlot option on thi's machine
-if machine ~= "thi"
-    showPlot = 0;
-end
 
 for iii=1:size(nseg_array,2)
 disp("Running...");
 %% mesh setting up
 nSeg = nseg_array(iii);
 % nSeg = iii;
-if ~useFFmesh % don't use ff mesh
+if ~useFFmesh
     disp("Use matlab mesh...");
     if ~reguMesh % not regular mesh?
         hEdgeMax = 2/nSeg;
@@ -97,32 +93,16 @@ phi = model.defPhi(x,y,pa); % 1 x number of points (row array)
 
 
 %% create command to run mshdist outside matlab
-
-switch machine
-    case "thi"
-        path_nxfem = '/home/thi/Dropbox/git/nxfem/'; % thi's local machine
-        call_mshdist = strcat({'mshdist'},{' '},{path_phi},'phi'); % run in terminal
-    case "gia"
-        path_nxfem = '/home/gia/nxfem/'; % gia's local machine
-        call_mshdist = strcat({'mshdist'},{' '},{path_phi},'phi'); % run in terminal
-    case "lehoan"
-        path_nxfem = '/home/lehoan/git/nxfem/'; % lehoan's local machine
-        call_mshdist = strcat({'mshdist'},{' '},{path_phi},'phi'); % run in terminal
-    case "blouza"
-        path_nxfem = '/users/home/blouza/thi/nxfem/'; % blouza's local machine
-        call_mshdist = strcat({'/users/home/blouza/MshDist/build/mshdist'},{' '},{path_phi},'phi'); % run in terminal
-    case "gaia" % CHECK LATER!!!!
-        path_nxfem = '/users/dinh/nxfem/'; % only on gaia machine
-%         call_mshdist = strcat({'mshdist'},{' '},{path_phi},'phi'); % run in terminal
-end
+path_nxfem = '/home/thi/Dropbox/git/nxfem/'; % thi's local machine
+% path_nxfem = '/users/dinh/nxfem/'; % only on gaia machine
 path_phi = strcat(path_nxfem,'mshdist/');
+call_mshdist = strcat({'mshdist'},{' '},{path_phi},'phi'); % run in terminal
 call_mshdist = cell2mat(call_mshdist);
 
 
 
 %% write to files .mesh and .sol to use toolbox mshdist
 if useFMM
-    disp("Write to phi.mesh & phi.sol...");
     mshdist_w_mesh(msh,path_phi,'phi'); % export to phi.mesh
     mshdist_w_sol(msh,phi,path_phi,'phi'); % export to phi.sol
 end
@@ -141,7 +121,6 @@ maxStep = Tmax/dt;
 
 %% create folder of test files results
 if savePlot
-    disp("Creating folder to save plots...");
     if reguMesh
        path_regu = 'regu_';
     else
@@ -181,7 +160,7 @@ nf = 0; % reset every loop to be sure uh, vh plotted on the same figure
 titlePlot = strcat('t= ',num2str(t));
 
 if showPlot
-    disp("Show plot of phi...");
+    disp("Plotting phi...");
     plotNXFEM(msh,iPs,nf,phi,'withMesh',withMesh,'title',titlePlot,'dim',2,'export',false); % phi
     nCTs = size(iPs,3);
     hold on
@@ -192,7 +171,6 @@ if showPlot
     hold off
 end
 
-
 % if useFMM
 %     mshdist_w_sol(msh,phi,path_phi,'phi'); % export to phi.sol
 %     system(call_mshdist); % run 'mshdist file/to/phi' (redistancing)
@@ -200,7 +178,6 @@ end
 % end
 
 if savePlot
-    disp("Saving plots...");
     f=figure('visible','off');
     pdeplot(points,edges,triangles,'XYData',phi,'Title',titlePlot);
     hold on
@@ -237,7 +214,7 @@ if ~isempty(CTs)
 %     display(normPhionGh0);
 end
 
-veloOld = @(x,y,sub) velo(x,y,0,sub);
+vhOld = zeros(msh.nStd, 1); % initial velocity
 
 
 
@@ -260,9 +237,13 @@ veloOld = @(x,y,sub) velo(x,y,0,sub);
 
 CFL = zeros(1,maxStep); % store CFL value
 
-disp("Starting loop...");
+disp("Starting the loop...");
 %% loops
 for ns = 1:maxStep
+    disp("-----------------------------");
+    Xdisp = ['step = ', num2str(ns)];
+    disp(Xdisp);
+    
     %% update velo
     t = t+dt;
     
@@ -270,13 +251,13 @@ for ns = 1:maxStep
     % veloNew = veloOld;
     
     % if u depends on time
-    veloNew = @(x,y,sub) velo(x,y,t,sub);
+%     vhSTD = veloGrad(x,y,t);
+    vhSTD = vhOld;
 
     
     
     % CFL
-    disp("CFL...");
-    CFL(ns) = getCFL(msh, veloNew, dt, hTmax);
+%     CFL(ns) = getCFL(msh, vhSTD, dt, hTmax);
     
    
     %% boundary condition
@@ -286,8 +267,8 @@ for ns = 1:maxStep
     
     %% get del_T
     if useSUPG
-        delOld = getDellsT(msh,veloOld,delEps,delSD); % Arnold's book p.223
-        delNew = getDellsT(msh,veloNew,delEps,delSD);
+        delOld = getDellsT(msh,vhOld,delEps,delSD); % Arnold's book p.223
+        delNew = getDellsT(msh,vhSTD,delEps,delSD);
     else
         delOld = zeros(1,size(msh.t,2)); % without SUPG
         delNew = delOld;
@@ -297,28 +278,17 @@ for ns = 1:maxStep
 
 
     %% stiffness matrix
-    Enew = getMEls(msh,pa,veloNew,delNew,1);
-    Hnew = getMHls(msh,pa,veloNew,delNew,dt*0.5);
-    
-    % if u doesn't depend on time
-    % Aphi = Enew + Hnew;
-    
-    % If u depends on t
+    Enew = getMEls_gP(msh,pa,vhSTD,delNew,1);
+    Hnew = getMHls_gP(msh,pa,vhSTD,delNew,dt*0.5);
     mI = speye(msh.nStd); % identity matrix
     Aphi = mI + Enew^(-1)*Hnew;
     
     
     
     %% load vector
-    
-    % If u doesn't depend on t
-    % AFphi = Eij - Hij;
-    
-    % If u depends on t
-    Eold = getMEls(msh,pa,veloOld,delOld,1);
-    Hold = getMHls(msh,pa,veloOld,delOld,dt*0.5);
+    Eold = getMEls_gP(msh,pa,vhOld,delOld,1);
+    Hold = getMHls_gP(msh,pa,vhOld,delOld,dt*0.5);
     AFphi = mI - Eold^(-1)*Hold;
-    
     phi = phi'; % row to column
     Fphi = AFphi*phi;
     
@@ -331,8 +301,8 @@ for ns = 1:maxStep
     
     
     %% Update velocity
-    disp("Updating velocity...");
-    veloOld = veloNew;
+    disp("Updating v...");
+    vhOld = vhSTD;
 
     
     
@@ -340,7 +310,7 @@ for ns = 1:maxStep
     %% mshdist
 %     if useFMM && abs(1-norm_gradphi) > alp_FMM && numUse <=1
     if useFMM && abs(1-norm_gradphi) > alp_FMM
-        disp("Use FMM...");
+        disp("FMM...");
         mshdist_w_sol(msh,phi,path_phi,'phi'); % export to phi.sol
         system(call_mshdist); % run 'mshdist file/to/phi' (redistancing)
         phi = mshdist_r_sol(phi,path_phi,'phi'); % update phi
@@ -362,9 +332,9 @@ for ns = 1:maxStep
     
     %% plot phi
 %     abc = waitforbuttonpress; % wait for click
+    disp("Plotting phi");
     titlePlot = strcat('t= ',num2str(t));
     if showPlot
-        disp("Plotting phi...");
         plotNXFEM(msh,iPs,nf,phi,'withMesh',withMesh,'title',titlePlot,'dim',2,'export',false); % phi
         nCTs = size(iPs,3);
         hold on
@@ -440,7 +410,7 @@ normPhihNPhionOmg = getNormL2fhf(msh,pa,phi,model.defPhi); % ||phi_h^N - phi^0||
 
 %% save error result to file
 if savePlot
-    disp("Saving error files...");
+    disp("Saving errors...");
     fileName = strcat(path_test_result,'/info_and_errors_',num2str(nSeg),'.txt');
     fileID = fopen(fileName,'w');
         fprintf(fileID,'%s,\n',testCase);
@@ -474,44 +444,42 @@ end
 end
 
 %% get deltaT: 1 x nTs
-function delT = getDellsT(msh,vel_t,eps,SD)
-    % This function is only to be used type of velocity = (x,y,sub)
-    % This function follows formula presented in Arnold's book, page 223 (and also cf. (7.14))
+function delT = getDellsT(msh,vold,eps,SD)
+    % find ||grad v||_inf on each triangle
+    % This function "guest" formula presented in Arnold's book, page 223 (and also cf. (7.14))
     % If in future, we need it more than once, I will put it in a separated file
+    % old file: getDells.m (output delT is a scalar)
     % Input: - msh.hT : h on each triangle : 1 x nTs
-    %        - velo at each time step t: (x,y,sub)
-    %        - msh.p to get all x,y coordinates
-    %        - a control number SD = O(1) (cf. (7.14))
+    %        - vold to find grad v
+    %        - a control number SD \in O(1) (cf. (7.14))
     %        - given small eps > 0 (cf. 7.14), at page 223, he took eps=1e-3
     % Output: a vector 1 x nTs
-
-    x = msh.p(1,:); y = msh.p(2,:);
-
-    % Take velo at each triangle
-    veloPu = vel_t(x,y,1); % 1 x nPs
-    veloPv = vel_t(x,y,2); % 1 x nPs
-    veloTu = veloPu(msh.t(1:3,:)); % 3 x nTs
-    veloTumax = max(abs(veloTu),[],1); % 1 x nTs
-    veloTv = veloPv(msh.t(1:3,:)); % 3 x nTs
-    veloTvmax = max(abs(veloTv),[],1); % 1 x nTs
-    normVeloT = max(veloTumax,veloTvmax); % 1 x nTs
-
-    normVeloT = max(eps,normVeloT); % 1 x nTs
-
-    delT = SD*msh.hT./normVeloT;
+    
+    tris = msh.t;
+    nTs = size(tris,2);
+    delT = zeros(1,nTs);
+    gP = getGradPhi(tris,msh); % 2 coordinates x 3 vertices x nTris
+    for t=1:nTs
+        v1t = abs(vold(tris(1,t)))*( abs(gP(1,1,t)) + abs(gP(2,1,t)) ); % vertex 1
+        v2t = abs(vold(tris(2,t)))*( abs(gP(1,2,t)) + abs(gP(2,2,t)) ); % vertex 2
+        v3t = abs(vold(tris(3,t)))*( abs(gP(1,3,t)) + abs(gP(2,3,t)) ); % vertex 3
+        delT(1,t) = max([eps, v1t, v2t, v3t]);
+    end
+    
+    delT = SD*msh.hT ./ delT;
 end
 
-function val = getCFL(msh, velo, dt, dx)
-    x = msh.p(1,:); y = msh.p(2,:);
-    
-    % Take velo at each triangle
-    veloPu = velo(x,y,1); % 1 x nPs
-    veloPv = velo(x,y,2); % 1 x nPs
-    veloTu = veloPu(msh.t(1:3,:)); % 3 x nTs
-    veloTumax = max(abs(veloTu),[],1); % 1 x nTs
-    veloTv = veloPv(msh.t(1:3,:)); % 3 x nTs
-    veloTvmax = max(abs(veloTv),[],1); % 1 x nTs
-    normVeloT = max(veloTumax,veloTvmax); % 1 x nTs
-    
-    val = max(normVeloT)*dt/dx;
-end
+% function val = getCFL(msh, velo, dt, dx)
+%     x = msh.p(1,:); y = msh.p(2,:);
+%     
+%     % Take velo at each triangle
+%     veloPu = velo(x,y,1); % 1 x nPs
+%     veloPv = velo(x,y,2); % 1 x nPs
+%     veloTu = veloPu(msh.t(1:3,:)); % 3 x nTs
+%     veloTumax = max(abs(veloTu),[],1); % 1 x nTs
+%     veloTv = veloPv(msh.t(1:3,:)); % 3 x nTs
+%     veloTvmax = max(abs(veloTv),[],1); % 1 x nTs
+%     normVeloT = max(veloTumax,veloTvmax); % 1 x nTs
+%     
+%     val = max(normVeloT)*dt/dx;
+% end
