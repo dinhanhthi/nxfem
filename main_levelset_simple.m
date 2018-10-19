@@ -101,21 +101,25 @@ phi = model.defPhi(x,y,pa); % 1 x number of points (row array)
 switch machine
     case "thi"
         path_nxfem = '/home/thi/Dropbox/git/nxfem/'; % thi's local machine
+        path_phi = strcat(path_nxfem,'mshdist/');
         call_mshdist = strcat({'mshdist'},{' '},{path_phi},'phi'); % run in terminal
     case "gia"
         path_nxfem = '/home/gia/nxfem/'; % gia's local machine
+        path_phi = strcat(path_nxfem,'mshdist/');
         call_mshdist = strcat({'mshdist'},{' '},{path_phi},'phi'); % run in terminal
     case "lehoan"
         path_nxfem = '/home/lehoan/git/nxfem/'; % lehoan's local machine
+        path_phi = strcat(path_nxfem,'mshdist/');
         call_mshdist = strcat({'mshdist'},{' '},{path_phi},'phi'); % run in terminal
     case "blouza"
         path_nxfem = '/users/home/blouza/thi/nxfem/'; % blouza's local machine
+        path_phi = strcat(path_nxfem,'mshdist/');
         call_mshdist = strcat({'/users/home/blouza/MshDist/build/mshdist'},{' '},{path_phi},'phi'); % run in terminal
     case "gaia" % CHECK LATER!!!!
         path_nxfem = '/users/dinh/nxfem/'; % only on gaia machine
+        path_phi = strcat(path_nxfem,'mshdist/');
 %         call_mshdist = strcat({'mshdist'},{' '},{path_phi},'phi'); % run in terminal
 end
-path_phi = strcat(path_nxfem,'mshdist/');
 call_mshdist = cell2mat(call_mshdist);
 
 
