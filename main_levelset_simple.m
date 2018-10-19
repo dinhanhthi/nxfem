@@ -11,7 +11,7 @@ tic
 addpath(genpath('func')); % add all necessary functions
 
 % nseg_array = [37, 57, 77];
-nseg_array = 57;
+nseg_array = 27;
 % nseg_array = zeros(1,3); % get from ffpp 
 
 
@@ -25,8 +25,8 @@ pa.tol = eps(1e3); % tolerance, 1e-14
 
 
 %% models
-model = model_levelset_x; % Becker's test case with interface: x=x_0
-% model = model_levelset_vortex;  % Niklas' test case
+% model = model_levelset_x; % Becker's test case with interface: x=x_0
+model = model_levelset_vortex;  % Niklas' test case
 GeoDom = model.domain(); % domain
 velo = model.velo; % Velocity (grad of potential in other cases)
 
@@ -44,13 +44,14 @@ useSUPG = 1; % if 1, need to make more settings
     delEps = 1e-3;
     delSD = 0.5;
 showPlot = 0; % show plot or not?
-savePlot = 1; % wanna save plot or not?
+savePlot = 0; % wanna save plot or not?
     pathOption = '_BLOUZA';
     testCase = 'Using ff mesh + wSUPG + wtFMM + thesis (no limit num of use FMM)'; % note for info_and_errors.txt
 withMesh = false;
 
 %% choose the machine to run
-machine = "blouza"; % options: thi, gia, lehoan, blouza, gaia
+% machine = "thi"; % options: thi, gia, lehoan, blouza, gaia
+machine = 'blouza';
 
 
 % only enable showPlot option on thi's machine

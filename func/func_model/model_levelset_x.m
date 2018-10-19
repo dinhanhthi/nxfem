@@ -17,6 +17,7 @@
 
 %% main function
 function fh = model_levelset_x
+    fh.name = 'model_levelset_x';
     fh.defF = @findDefF;
     fh.defPhi = @findDefPhi;
     fh.domain = @findDomain;
