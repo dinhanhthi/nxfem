@@ -11,7 +11,7 @@ tic
 addpath(genpath('func')); % add all necessary functions
 
 % nseg_array = [37, 57, 77];
-nseg_array = 27;
+nseg_array = 57;
 % nseg_array = zeros(1,3); % get from ffpp 
 
 
@@ -45,13 +45,14 @@ useSUPG = 1; % if 1, need to make more settings
     delSD = 0.5;
 showPlot = 0; % show plot or not?
 savePlot = 0; % wanna save plot or not?
-    pathOption = '_BLOUZA';
+    pathOption = '_GOOGLE';
     testCase = 'Using ff mesh + wSUPG + wtFMM + thesis (no limit num of use FMM)'; % note for info_and_errors.txt
 withMesh = false;
 
 %% choose the machine to run
-machine = "thi"; % options: thi, gia, lehoan, blouza, gaia
+machine = "google"; % options: thi, gia, lehoan, blouza, gaia, google
 % machine = 'blouza';
+% machine = "thi";
 
 
 % only enable showPlot option on thi's machine
@@ -102,6 +103,10 @@ phi = model.defPhi(x,y,pa); % 1 x number of points (row array)
 switch machine
     case "thi"
         path_nxfem = '/home/thi/Dropbox/git/nxfem/'; % thi's local machine
+        path_phi = strcat(path_nxfem,'mshdist/');
+        call_mshdist = strcat({'mshdist'},{' '},{path_phi},'phi'); % run in terminal
+    case "google"
+        path_nxfem = '/home/thi/nxfem/'; % thi's local machine
         path_phi = strcat(path_nxfem,'mshdist/');
         call_mshdist = strcat({'mshdist'},{' '},{path_phi},'phi'); % run in terminal
     case "gia"
