@@ -54,7 +54,7 @@ withMesh = false;
 % options: thi, gia, lehoan, blouza, gaia, google, ghost
 % machine = 'blouza';
 % machine = "thi";
-machine = "ghost";
+machine = 'ghost';
 
 
 % only enable showPlot option on thi's machine
