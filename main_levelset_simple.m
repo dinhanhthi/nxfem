@@ -50,9 +50,11 @@ savePlot = 0; % wanna save plot or not?
 withMesh = false;
 
 %% choose the machine to run
-machine = "google"; % options: thi, gia, lehoan, blouza, gaia, google
+% machine = "google"; 
+% options: thi, gia, lehoan, blouza, gaia, google, ghost
 % machine = 'blouza';
 % machine = "thi";
+machine = "ghost";
 
 
 % only enable showPlot option on thi's machine
@@ -106,7 +108,11 @@ switch machine
         path_phi = strcat(path_nxfem,'mshdist/');
         call_mshdist = strcat({'mshdist'},{' '},{path_phi},'phi'); % run in terminal
     case "google"
-        path_nxfem = '/home/thi/nxfem/'; % thi's local machine
+        path_nxfem = '/home/thi/nxfem/';
+        path_phi = strcat(path_nxfem,'mshdist/');
+        call_mshdist = strcat({'mshdist'},{' '},{path_phi},'phi'); % run in terminal
+    case "ghost"
+        path_nxfem = '/home/ghost/nxfem/'; 
         path_phi = strcat(path_nxfem,'mshdist/');
         call_mshdist = strcat({'mshdist'},{' '},{path_phi},'phi'); % run in terminal
     case "gia"
