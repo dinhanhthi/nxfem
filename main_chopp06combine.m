@@ -104,8 +104,8 @@ cpV.lamH = 1e5; % penalty coefficient for v (potential)
     % machine = 'google'; 
     % options: thi, gia, lehoan, blouza, gaia, google, ghost
 % machine = 'blouza';
-machine = 'thi';
-% machine = 'ghost';
+% machine = 'thi';
+machine = 'ghost';
 
 
 % only enable showPlot option on thi's machine
