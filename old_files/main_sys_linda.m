@@ -7,7 +7,7 @@
 % PURPOSE: Verify nxfem with nonlinear system.
 % cf. linda-simple-system-ffpp.edp for the code in FreeFem++ (fitted mesh)
 %-------------------------------------------------------------------------
-% Last modified: 21-10-18 (for a more general getGMgPP)
+% OLD FILE: from modifying getGMgPP for a more general case used in chopp06combine
 %-------------------------------------------------------------------------
 % DOMAIN: [0,1]X[0,1], interface: circle ((0.5,0.5);r0) inside domain
 %-------------------------------------------------------------------------
@@ -295,8 +295,8 @@ uold = zeros(msh.ndof,1);
 % tolerance
 % ------------------------------------------------------------------------
 itol = 1e-8;
-delL2 = getNormL2nxfem(uold - exSolNXu,tris,CT,msh,pa);
-Uip1L2 = getNormL2nxfem(exSolNXu,tris,CT,msh,pa);
+delL2 = getNormL2(uold - exSolNXu,tris,CT,msh,pa);
+Uip1L2 = getNormL2(exSolNXu,tris,CT,msh,pa);
 difu = delL2/Uip1L2; % |del|_L2/|u_i+1|_L2fprintf('difu: %0.7f\n',difu);
 fprintf('difu: %0.7f\n',difu);
 
@@ -316,8 +316,7 @@ while (difu > itol) && (step<imax)
         
         % global matrix
         % ----------------------------------------------------------------- 
-        coef.omg1 = -cpU.kk1; coef.omg2 = -cpU.kk2;
-        Au = getGMgPP(msh,pa,cpU,tris,CT,phi,uoldEach,defG.change,coef);
+        Au = getGMgPP(msh,pa,cpU,tris,CT,phi,uoldEach,defG);
         
         
         % load vector
@@ -352,8 +351,7 @@ while (difu > itol) && (step<imax)
                 
         % F(u)
         % -----------------------------------------------------------------
-        coef.omg1 = -cpU.kk1; coef.omg2 = -cpU.kk2;
-        Au = getGMgPP(msh,pa,cpU,tris,CT,phi,uoldEach,defG.change,coef);
+        Au = getGMgPP(msh,pa,cpU,tris,CT,phi,uoldEach,defG);
                     % like Au in normal iterative method
         Fu = getLfwg(msh,pa,tris,CT,uoldEach,wS,defFu,defG);
                     % like Fu in normal iterative method
@@ -375,8 +373,8 @@ while (difu > itol) && (step<imax)
         uold(iNodes) = uold(iNodes) - del(iNodes); % u_i+1 = u_i - del, update for the next step
     end
     
-    delL2 = getNormL2nxfem(del,tris,CT,msh,pa);
-    Uip1L2 = getNormL2nxfem(uold,tris,CT,msh,pa);
+    delL2 = getNormL2(del,tris,CT,msh,pa);
+    Uip1L2 = getNormL2(uold,tris,CT,msh,pa);
 %     difu = delL2/Uip1L2; % |del|_L2/|u_i+1|_L2
     difu = delL2;
     fprintf('difu: %0.18f\n',difu);
@@ -418,3 +416,5 @@ nf = plotNXFEM(msh,iPs,nf,sol.uVh,'withMesh',false,...
                 'title','uh','dim',3); % uh
 nf = plotNXFEM(msh,iPs,nf,sol.uex,'withMesh',false,'title','uex',...
             'dim',3,'export',false); % uex
+
+

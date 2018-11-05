@@ -59,32 +59,32 @@ GeoDom = model.domain(); % domain
 
 
 %% setting
-findCR = 1; % wanna find convergence rate? 1 or 0
-useFilesNotPlot = 0; % 1=export figures to files (and without plotting them)
+findCR = 0; % wanna find convergence rate? 1 or 0
+savePlot = 0; % 1 = export figures to files (and without plotting them)
 pa.smallCut = 1; % ignore small-support basis (1=ignore,0=no)
-pa.tH = 100; % to find the small support using (20) or (21) in arnold 2008
+    pa.tH = 100; % to find the small support using (20) or (21) in arnold 2008
+
 pa.lamH = 1e4; % penalty coefficient
 
+% ghost penalty
+pa.useGP = 0; % wanna use ghost penalty term?
+    pa.gam1 = 1e-9; % parameter for 1st term
+    pa.gam2 = 1e-9; % parameter for 2nd term
 
-
-%% ghost penalty
-pa.useGP = 1; % wanna use ghost penalty term?
-pa.gam1 = 1e-9; % parameter for 1st term
-pa.gam2 = 1e-9; % parameter for 2nd term
-
+showPlot = 1; % wanna plot or not? (JUST FOR nStep=1)
+    nf = 0; % counter of figures (plot each plot in a separated figure)
 
 
 %% more settings
 if findCR==1 % wanna  find the convergence rate
     nStep = 4; % number of interations
     pa.reguMesh = 0; % use regular mesh or not?
-    wannaPlot = 0; % DON'T CHANGE!
+    showPlot = 0; % DON'T CHANGE!
     useDOF = 0; % use dofs to find convergence rate? (default = h)
 else % should be used only for plotting
     nStep = 1; % shouldn't change
     pa.reguMesh = 0; % use regular mesh or not?
     nSeg = 51; % ONLY FOR nStep=1;
-    wannaPlot = 1; % wanna plot or not? (JUST FOR nStep=1)
     % Go to the end of this file to change what you wanna plot
 end
 
@@ -109,7 +109,6 @@ else
 end
 for z=nStep:-1:1
 %     if nStep>1
-% %         numSeg(z) = 2^(z-1)*10+1; % 11,21,41,81
 %         numSeg(z) = 2^z*10+1; % 21,41,81,161
 %     else % nStep=1
 %         numSeg(z) = nSeg;
@@ -127,11 +126,12 @@ end
 if nStep>1 % finding convergence rate
     
     %% finding the convergence rate
-    tx=zeros(1,nStep); ty=zeros(2,nStep);
+    tx = zeros(1,nStep); 
+    ty=zeros(2,nStep);
     for i=1:nStep
-       tx(i)=msh(i).hTmax;
-       ty(1,i)=err(i).L2;
-       ty(2,i)=err(i).ENorm;
+       tx(i) = msh(i).hTmax;
+       ty(1,i) = err(i).L2;
+       ty(2,i) = err(i).ENorm;
     end
     tmp = polyfit(log(tx),log(ty(1,:)),1);
     order.L2 = tmp(1);
@@ -141,32 +141,32 @@ if nStep>1 % finding convergence rate
     
     %% Figure of convergence rate
     % Only for error in L2 and ENorm
-    % See the file results\errPlot.jpg
-    if useFilesNotPlot
-        f=figure('visible','off');
+    % See the file results\main_nxfem\main_err.jpg
+    if savePlot
+        f = figure('visible','off');
         plot(log(tx),log(ty(1,:)),'-r.',...
             log(tx),log(ty(2,:)),'-b.');
         legend('L2','ENorm');
         xlabel('log(h)'); 
         ylabel('log(error)');
-        print -djpeg results\main_err.jpg;
+        print -djpeg results\main_nxfem\err_L2_ENorm.jpg;
         close(f);
         
         %% EXPORT errors TO FILES
-        % see file results\errors.txt
+        % see file results\main_nxfem\errors.txt
         
         cr = zeros(2,nStep);
         for i=2:nStep
            cr(1,i) = log(ty(1,i)/ty(1,i-1))/log(tx(i)/tx(i-1)); % L2
            cr(2,i) = log(ty(2,i)/ty(2,i-1))/log(tx(i)/tx(i-1)); % ENorm
         end
-        errFileMat=[tx;ty(1,:);cr(1,:);ty(2,:);cr(2,:)];
-        fileID = fopen('results\main_err.txt','w');
+        errFileMat = [tx;ty(1,:);cr(1,:);ty(2,:);cr(2,:)];
+        fileID = fopen('results\main_nxfem\err_L2_ENorm.txt','w');
         fprintf(fileID,'Model: %2.0f \n',mdl);
         fprintf(fileID,'%7s %12s %6s %12s %6s\n','h','L2','CR','ENorm','CR');
         fprintf(fileID,'%6.5f & %12.8f & %6.2f & %12.8f & %6.2f \n',errFileMat);
         fclose(fileID);
-    else
+    else % don't save, just plot
         plot(log(tx),log(ty(1,:)),'-r.',...
             log(tx),log(ty(2,:)),'-b.');
         legend('L2','ENorm');
@@ -192,14 +192,11 @@ end
 %% ========================================================
 % PLOTTING
 % =========================================================
-if wannaPlot==1
-    nf = 0;
-    % nf = plotNXFEM(msh,pplot.iPs,nf,'eleLabel','off','nodeLabel','on'); % only mesh
-%     nf = plotNXFEM(msh,pplot.iPs,nf,sol(1).Vh,'withMesh',false,'title','uh','dim',2,'withGamh',true); % uh
-%     nf = plotNXFEM(msh,pplot.iPs,nf,sol(1).ex,'withMesh',false,'title','uex','dim',2,'withGamh',true); % uex
+if showPlot==1
+%     nf = plotNXFEM(msh,pa,phi,pplot.iPs,nf,'eleLabel','off','nodeLabel','off'); % only mesh
+    nf = plotNXFEM(msh,pa,phi,iPs,nf,unewSTD,'withMesh',withMesh,'title',titlePlot); % uh
     nf = plotNXFEM(msh,pplot.iPs,nf,sol(1).ex,'withMesh',false,'title','uex','dim',3,'export',false); % uex
     nf = plotNXFEM(msh,pplot.iPs,nf,sol(1).Vh,'withMesh',false,'title','uh','dim',3); % uh
-    % nf = plotNXFEM(msh,pplot.iPs,nf,phi{1},'withMesh',false,'title','level set','dim',3,'export',false); % level set function
 end
 
 plotGrad = 0; % plot gradient

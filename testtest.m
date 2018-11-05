@@ -1,35 +1,23 @@
-% % system('/users/home/blouza/MshDist/build/mshdist mshdist/phi')
-% system('mshdist mshdist/phi');
-% 
-% NT = 5;
-% idx=0;
-% CP = zeros(1,NT);
-% CP(1:NT) = CP(1:NT) + 1;
-% CP
-
+% pdemesh(points,edges,triangles); % plot mesh
+%     hold on;
     
-% CP = zeros(1,nCT);
-phiTri = zeros(3,nCT);
-phiTri = phi(CTs(1,1:nCT)) .* phi(CTs(2,1:nCT)) <0... 
-            & abs(phi(CTs(1,1:nCT)))>tole...
-            & abs(phi(CTs(2,1:nCT)))>tole
-
-
-
-% eee = phiTri(1,1:nCT) < 0
-
-
-function check = equal0(num1,num2,tole)
-    if (abs(num1)<tole)||(abs(num2)<tole)
-        check=1;
-    else
-        check=0;
-    end
-end
-function check = negative(num1,num2,tole)
-    if (num1*num2<0)&&(abs(num1)>tole)&&(abs(num2)>tole)
-        check=1; 
-    else
-        check=0;
-    end
-end
+    % plot intersections
+        nCTs = size(iPs,3);
+        for it=1:nCTs
+            plot(iPs(1,:,it),iPs(2,:,it),'-r','LineWidth',1);
+            hold on
+        end
+        
+        % plot segments Gh conciding to mesh's edges
+        segment = getMeshSegmentOnGh(msh,pa,phi);
+        for it=1:size(segment,2)
+            plot(points(1,segment(:,it)),points(2,segment(:,it)),'-r','LineWidth',1);
+            hold on
+        end
+       
+    
+    gvx = gvnew.x; gvy = gvnew.y;
+    gvx(1,NCTs1(5,:))=0; gvy(1,NCTs1(5,:))=0;
+    gvx(1,NCTs2(5,:))=0; gvy(1,NCTs2(5,:))=0;
+    pdeplot(points,edges,triangles(1:3,:),'FlowData',[gvx; gvy]); 
+    hold off;

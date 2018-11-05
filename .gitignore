@@ -4,3 +4,6 @@ coding
 coding-result
 results
 .vscode
+*.m~
+
+MatlabCodeFEMBook/

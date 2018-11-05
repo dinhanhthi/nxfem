@@ -1,12 +1,15 @@
-function Au = getGMgPP(msh,pa,cp,tris,CT,phi,uold,defG,coef)
-% Find the global stiffness matrix for u (there is more coef*g(u)*phi*phi)
-% Related file: main_sys_linda, main_chopp06combine
-% Note: edited from building main_chopp06combine (21/10/18)
+function Au = getGMgPP(msh,pa,cp,tris,CT,phi,uold,defG)
+% Find the global stiffness matrix for u (there is more g(u)*phi*phi)
+% Related file: main_sys_linda
+% Note: this is older version before editing from main_chopp06combine
+% (21/10/18)
 % Status: - checked with the old inputParser
 %         - (old) tested like the getGMgPP before change to getK
-% Input: - uold.omg1, .omg2, .ct1, ct.2 (all are in stdFEM)
+% This function built from the shape of bilinear form
+% Input: - all triangles: tris
+%        - CT's info
+%        - uold.omg1, .omg2, .ct1, ct.2 (all are in stdFEM)
 %		 - g(u) function handle
-%        - coef: coef.omg1, coef.omg2 in each case of omg (should include sign)
 % Output: global stiffness matrix Au
 
 CTs=tris.CTs; NCTs1=tris.NCTs1; NCTs2=tris.NCTs2; 
@@ -36,16 +39,18 @@ L = repmat(cp.lambda,4,1); % lambda: 1xnCTs
     % term L*phi*phi (sign +)
 
 %-------------------------------------------------------------------------
-% Term int_Omg coef*g(uold)*phi*phi
+% Term int_Omg kk*g(uold)*phi*phi
 %-------------------------------------------------------------------------
 sol.u = uold;
-func.h = @(x,y,pa,sub) (sub==1)*coef.omg1 + (sub==2)*coef.omg2;
-func.gu = defG;
+func.h = @(x,y,pa,sub) (sub==1)*kk1 + (sub==2)*kk2;
+func.gu = defG.change;
 K = getPf(msh,pa,tris,CT,sol,func);
+
 [igPP1,jgPP1,vgPP1] = getTriplePPNCTs(msh,pa,NCTs1,K.NC1); % NCTs1
 [igPP2,jgPP2,vgPP2] = getTriplePPNCTs(msh,pa,NCTs2,K.NC2); % NCTs2
 [igPPc,jgPPc,vgPPc1,vgPPc2] = getTriplePPCTs(msh,pa,CTs,CT,K); % CTs
-
+% sign "-" in bilinear form
+vgPP1=-vgPP1; vgPP2=-vgPP2; vgPPc1=-vgPPc1; vgPPc2=-vgPPc2;
 
 
 %-------------------------------------------------------------------------

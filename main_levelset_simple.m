@@ -4,14 +4,13 @@
 % PURPOSE: Coding level set + NOT YET couple with NXFEM (only phi)
 % MODEL: model_levelset_*
 % ------------------------------------------------------------------------
-tic
 
 
 %% add path of functions
 addpath(genpath('func')); % add all necessary functions
 
 % nseg_array = [37, 57, 77];
-nseg_array = 57;
+nseg_array = 27;
 % nseg_array = zeros(1,3); % get from ffpp 
 
 
@@ -34,31 +33,31 @@ velo = model.velo; % Velocity (grad of potential in other cases)
 
 %% setting
 useFFmesh = 0; % use freefem++ mesh or not?
-    reguMesh = 0; % use regular mesh or not? (for matlab mesh)
+    reguMesh = 1; % use regular mesh or not? (for matlab mesh)
 pa.smallCut = 0; % ignore small-support basis (1=ignore,0=no)
     pa.tH = 10; % to find the small support using (20) or (21) in arnold 2008
-useFMM = 1; % use fast marching method or not (mshdist)?
+useFMM = 0; % use fast marching method or not (mshdist)?
     numUse = 0; % count the number of use of FMM
     alp_FMM = 0.05;
-useSUPG = 1; % if 1, need to make more settings
+useSUPG = 0; % if 1, need to make more settings
     delEps = 1e-3;
     delSD = 0.5;
-showPlot = 0; % show plot or not?
+showPlot = 1; % show plot or not?
 savePlot = 0; % wanna save plot or not?
     pathOption = '_GOOGLE';
     testCase = 'Using ff mesh + wSUPG + wtFMM + thesis (no limit num of use FMM)'; % note for info_and_errors.txt
-withMesh = false;
+withMesh = true;
 
 %% choose the machine to run
-% machine = "google"; 
+% machine = 'google'; 
 % options: thi, gia, lehoan, blouza, gaia, google, ghost
 % machine = 'blouza';
-% machine = "thi";
-machine = 'ghost';
+machine = 'thi';
+% machine = 'ghost';
 
 
 % only enable showPlot option on thi's machine
-if machine ~= "thi"
+if ~strcmp(machine,'thi')
     showPlot = 0;
 end
 
@@ -96,12 +95,11 @@ hTmax = msh.hTmax;
 
 %% Level set function (INITIAL)
 phi = model.defPhi(x,y,pa); % 1 x number of points (row array)
-% phi(abs(phi)<pa.tol) = 0; % find phi which are very small (~0) and set to 0
+phi(abs(phi)<pa.tol) = 0; % find phi which are very small (~0) and set to 0
 
 
 
 %% create command to run mshdist outside matlab
-
 switch machine
     case "thi"
         path_nxfem = '/home/thi/Dropbox/git/nxfem/'; % thi's local machine
@@ -138,9 +136,11 @@ call_mshdist = cell2mat(call_mshdist);
 
 %% write to files .mesh and .sol to use toolbox mshdist
 if useFMM
-    disp("Write to phi.mesh & phi.sol...");
+    tic; time=0;
+    fprintf("Write to phi.mesh & phi.sol... ");
     mshdist_w_mesh(msh,path_phi,'phi'); % export to phi.mesh
     mshdist_w_sol(msh,phi,path_phi,'phi'); % export to phi.sol
+    fprintf("%fs\n",toc-time);
 end
 
 
@@ -196,16 +196,14 @@ iPs = CT.iPs;
 nf = 0; % reset every loop to be sure uh, vh plotted on the same figure
 titlePlot = strcat('t= ',num2str(t));
 
+
 if showPlot
-    disp("Show plot of phi...");
-    plotNXFEM(msh,iPs,nf,phi,'withMesh',withMesh,'title',titlePlot,'dim',2,'export',false); % phi
+    tic; time=0;
+    fprintf("Show plot of phi...");
+    plotNXFEM(msh,pa,phi,iPs,nf,phi,'withMesh',withMesh,...
+                'title',titlePlot,'dim',2,'export',false); % phi
     nCTs = size(iPs,3);
-    hold on
-    for it=1:nCTs
-        plot(iPs(1,:,it),iPs(2,:,it),'-r','LineWidth',1);
-        hold on
-    end
-    hold off
+    fprintf("%fs\n",toc-time);
 end
 
 
@@ -216,7 +214,8 @@ end
 % end
 
 if savePlot
-    disp("Saving plots...");
+    tic;time=0;
+    fprintf("Saving plots... ");
     f=figure('visible','off');
     pdeplot(points,edges,triangles,'XYData',phi,'Title',titlePlot);
     hold on
@@ -241,6 +240,7 @@ if savePlot
     
 %     print(fileName,'-dpng'); % old
     close(f);
+    fprintf("%fs\n",toc-time);
 end
 
 
@@ -291,8 +291,10 @@ for ns = 1:maxStep
     
     
     % CFL
-    disp("CFL...");
+    tic;time=0;
+    fprintf("CFL...");
     CFL(ns) = getCFL(msh, veloNew, dt, hTmax);
+    fprintf("%fs\n",toc-time);
     
    
     %% boundary condition
@@ -313,6 +315,8 @@ for ns = 1:maxStep
 
 
     %% stiffness matrix
+    tic;time=0;
+    fprintf('Get stiffness matrix Enew, Hnew... ');
     Enew = getMEls(msh,pa,veloNew,delNew,1);
     Hnew = getMHls(msh,pa,veloNew,delNew,dt*0.5);
     
@@ -322,11 +326,13 @@ for ns = 1:maxStep
     % If u depends on t
     mI = speye(msh.nStd); % identity matrix
     Aphi = mI + Enew^(-1)*Hnew;
+    fprintf("%fs\n",toc-time);
     
     
     
     %% load vector
-    
+    tic;time=0;
+    fprintf('Get load vector (Eold, Hold, Afphi)... ');
     % If u doesn't depend on t
     % AFphi = Eij - Hij;
     
@@ -337,6 +343,7 @@ for ns = 1:maxStep
     
     phi = phi'; % row to column
     Fphi = AFphi*phi;
+    fprintf("%fs\n",toc-time);
     
     
     
@@ -356,11 +363,13 @@ for ns = 1:maxStep
     %% mshdist
 %     if useFMM && abs(1-norm_gradphi) > alp_FMM && numUse <=1
     if useFMM && abs(1-norm_gradphi) > alp_FMM
-        disp("Use FMM...");
+        tic;time=0;
+        fprintf("Use FMM... ");
         mshdist_w_sol(msh,phi,path_phi,'phi'); % export to phi.sol
         system(call_mshdist); % run 'mshdist file/to/phi' (redistancing)
         phi = mshdist_r_sol(phi,path_phi,'phi'); % update phi
         numUse = numUse + 1;
+        fprintf("%fs\n",toc-time);
     end
     
     
@@ -381,14 +390,9 @@ for ns = 1:maxStep
     titlePlot = strcat('t= ',num2str(t));
     if showPlot
         disp("Plotting phi...");
-        plotNXFEM(msh,iPs,nf,phi,'withMesh',withMesh,'title',titlePlot,'dim',2,'export',false); % phi
+        plotNXFEM(msh,pa,phi,iPs,nf,phi,'withMesh',withMesh,...
+                'title',titlePlot,'dim',2,'export',false); % phi
         nCTs = size(iPs,3);
-        hold on
-        for it=1:nCTs
-            plot(iPs(1,:,it),iPs(2,:,it),'-r','LineWidth',1);
-            hold on
-        end
-        hold off
     end
     
     
@@ -489,7 +493,7 @@ end
     
 end
 
-toc
+
 
 %% get deltaT: 1 x nTs
 function delT = getDellsT(msh,vel_t,eps,SD)

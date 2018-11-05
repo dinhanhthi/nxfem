@@ -15,7 +15,7 @@ nodes.iomg1 = nodes.std((phi<0)&(abs(phi)>pa.tol)); % all std nodes inside Omg1
 nodes.onG = nodes.std(abs(phi)<pa.tol); % all std nodes on Gam
 nodes.iomg2 = nodes.std((phi>0)&(abs(phi)>pa.tol)); % all std nodes inside Omg2
     
-nodes.omg1 = unique(tris.NCTs1(1:3,:)); 
+nodes.omg1 = unique(tris.NCTs1(1:3,:));
 nodes.omg1 = union(nodes.omg1,nodeCTs.onG);
     % nodes inside Omg1 and on Gam, column-array
     % there still nodes on Gam in CTs which not belongs to 

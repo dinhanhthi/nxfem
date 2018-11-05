@@ -1,13 +1,14 @@
 function [ii,jj,vv] = getGhostPenalty(CTs,phi,msh,pa,cp)
 % Get 2 ghost penalty terms j_1, j_2
-% state: 
+% Status: (29-10-18) big modification on "hT(idxNBTris(eGP(3,edge)))", the
+%   old one is "hT(neighborCTs(eGP(3,edge)))" (it's wrong)
 % Input: cut triangles + phi + hT of all triangles
 % Output: triplet to contribute to build global matrix
 
 hT = msh.hT;
 
 %% Get information about edges
-[eGP,neighborCTs] = getGPEdges(CTs,phi,msh,pa);
+[eGP,idxNBTris] = getGPEdges(CTs,phi,msh,pa);
 
 % classify into 2 sub domains
 % idx in eGP
@@ -18,9 +19,9 @@ j2 = find(eGP(5,:)==2); % not-cut edges for term j_2
 nej1 = size(j1,2); % number of not-cut edges for j_1
 nej2 = size(j2,2); % number of not-cut edges for j_2
 nejc = size(jc,2); % number of cut edges
-nbCTs = msh.t(:,neighborCTs); % neighbor cut triangles
-gradPhinbCTs = getGradPhi(nbCTs,msh); % grad of phi wrt vertices of nbCTs
-% gradPhinbCTs = 2 coordinates x 3 vertices x number of nbCTs
+neighborCTs = msh.t(:,idxNBTris); % neighbor cut triangles (4 x number of neighbor triangles)
+gradPhinbCTs = getGradPhi(neighborCTs,msh); % grad of phi wrt vertices of neighborCTs
+% gradPhinbCTs = 2 coordinates x 3 vertices x number of neighborCTs
 
 
 %% setting up
@@ -52,7 +53,7 @@ for e=1:nejc
     normalVT = getUnitNV(eP1,eP2); % unit normal vector to e
     len1 = sqrt((eP1(1)-iP(1))^2 +(eP1(2)-iP(2))^2); % length of part of edge in Omg1 (for j1)
     len2 = sqrt((eP2(1)-iP(1))^2 +(eP2(2)-iP(2))^2); % length of part of edge in Omg1 (for j1)
-    hE = max( hT(nbCTs(eGP(3,edge))),hT(nbCTs(eGP(4,edge))) ); % max h of 2 h in 2 adjacent triangles
+    hE = max( hT(idxNBTris(eGP(3,edge))),hT(idxNBTris(eGP(4,edge))) ); % max h of 2 h in 2 adjacent triangles
     for i=1:2
        for j=1:2
            % [grad_n phi_i]_e
@@ -86,7 +87,7 @@ for e=1:nej1
     eP2 = points(:,eGP(2,edge)); % endpoint 2 in Omg1
     normalVT = getUnitNV(eP1,eP2); % unit normal vector to e
     lenEdge = sqrt((eP1(1)-eP2(1))^2 +(eP1(2)-eP2(2))^2); % length of edge
-    hE = max( hT(nbCTs(eGP(3,edge))),hT(nbCTs(eGP(4,edge))) ); % max h of 2 h in 2 adjacent triangles
+    hE = max( hT(idxNBTris(eGP(3,edge))),hT(idxNBTris(eGP(4,edge))) ); % max h of 2 h in 2 adjacent triangles
     for i=1:2
         for j=1:2
            ii(idx) = eGP(i,edge);
@@ -112,7 +113,7 @@ for e=1:nej2
     eP2 = points(:,eGP(2,edge)); % endpoint 2 in Omg2
     normalVT = getUnitNV(eP1,eP2); % unit normal vector to e
     lenEdge = sqrt((eP1(1)-eP2(1))^2 +(eP1(2)-eP2(2))^2); % length of edge
-    hE = max( hT(nbCTs(eGP(3,edge))),hT(nbCTs(eGP(4,edge))) ); % max h of 2 h in 2 adjacent triangles
+    hE = max( hT(idxNBTris(eGP(3,edge))),hT(idxNBTris(eGP(4,edge))) ); % max h of 2 h in 2 adjacent triangles
     for i=1:2
         for j=1:2
            ii(idx) = newNodes(eGP(i,edge));

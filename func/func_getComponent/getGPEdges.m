@@ -1,4 +1,4 @@
-function [eGP,neighborTris] = getGPEdges(tris,phi,msh,pa)
+function [eGP,idxNBTris] = getGPEdges(tris,phi,msh,pa)
 % Find the edges around the interface to compute the penalty terms
 % NOTE: we can use this file not only for cut triangles!!!!
 % Status: checked with mdl=4, tH=3, regu=0, nSeg=5
@@ -6,7 +6,7 @@ function [eGP,neighborTris] = getGPEdges(tris,phi,msh,pa)
 % Input: cut triangles + phi + type of tris
 % Output: - vector contains ghost-penalty edges (5 x nEs)
 %           + lines 1-2: 2 endpoints 
-%           + lines 3-4: 2 adjacent triangles (idx in neighborTris)
+%           + lines 3-4: 2 adjacent triangles (idx in idxNBTris)
 %           + line 5: type of edge (in which part of Omg?)
 %           + lines 6-7: the order of 2 endpoints in the triangle indicated
 %               in line 3 (1,2 or 3)
@@ -18,24 +18,24 @@ triangles=msh.t;
 %% Find all neighbor triangles of cut triangles
 % it includes cut-triangles themselves
 %----------------------------------------------------
-neighborTris = pdeent(triangles,tris(5,:)); % row array, idx in msh.t
-nNBTris = size(neighborTris,2); % number of neighbors of tris
+idxNBTris = pdeent(triangles,tris(5,:)); % row array, idx in msh.t
+nNBTris = size(idxNBTris,2); % number of neighbors of tris
 
 
 %% find all edges of neighbor triangles
 %----------------------------------------------------
 eNBtris = zeros(9,3*nNBTris);
-eNBtris(1:2,1:nNBTris) = triangles([1,2],neighborTris); % edge i-j
-eNBtris(1:2,nNBTris+1:2*nNBTris) = triangles([2,3],neighborTris); % edge j-k
-eNBtris(1:2,2*nNBTris+1:3*nNBTris) = triangles([3,1],neighborTris); % edge k-i
+eNBtris(1:2,1:nNBTris) = triangles([1,2],idxNBTris); % edge i-j
+eNBtris(1:2,nNBTris+1:2*nNBTris) = triangles([2,3],idxNBTris); % edge j-k
+eNBtris(1:2,2*nNBTris+1:3*nNBTris) = triangles([3,1],idxNBTris); % edge k-i
 
 
 %% remember also the 'father' triangle
 % idx is in neighborCTs
 %----------------------------------------------------
-eNBtris(3,1:nNBTris) = 1:nNBTris; % numbering in neighborTris
-eNBtris(3,nNBTris+1:2*nNBTris) = 1:nNBTris; % numbering in neighborTris
-eNBtris(3,2*nNBTris+1:3*nNBTris) = 1:nNBTris; % numbering in neighborTris
+eNBtris(3,1:nNBTris) = 1:nNBTris; % numbering in idxNBTris
+eNBtris(3,nNBTris+1:2*nNBTris) = 1:nNBTris; % numbering in idxNBTris
+eNBtris(3,2*nNBTris+1:3*nNBTris) = 1:nNBTris; % numbering in idxNBTris
 
 
 
@@ -56,7 +56,7 @@ posF = setdiff(iF,interFL,'stable');% first occurence of duplicate triangle
 posL = setdiff(iL,interFL,'stable'); % last occurence of duplicate triangle
 
 eGP = eNBtris(:,posF); % contain triangle K
-eGP(4,:) = eNBtris(3,posL); % contain triangle K', numbering in neighborTris
+eGP(4,:) = eNBtris(3,posL); % contain triangle K', numbering in idxNBTris
 eGP(8:9,:) = eNBtris([7,6],posL); % position of vertices in K'
 % note: i-j in K but j-i in K', that's why we take [7,6] not [6,7]
 
@@ -65,7 +65,7 @@ eGP(8:9,:) = eNBtris([7,6],posL); % position of vertices in K'
 % eGP must contain all edges belonging to CTs, but there are some edges
 % doesn't.
 %--------------------------------------------------------
-tmp = ismember(neighborTris(eGP(3:4,:))',tris(5,:));
+tmp = ismember(idxNBTris(eGP(3:4,:))',tris(5,:));
 eGP=eGP(:,tmp(:,1)|tmp(:,2));
 
 

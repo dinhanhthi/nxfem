@@ -6,8 +6,8 @@ function P = getPf(msh,pa,tris,CT,sol,func)
 %        - cut triangle's info
 %        - sol.u, sol.w : two variables, 4 components
 %        - func.h for h(x,y,pa,sub) function handle
-%          func.gu for g(u) function handle
-%          func.fw for f(w) function handle
+%          func.gu for g(u,pa) function handle
+%          func.fw for f(w,pa) function handle
 % Ouput: - P.NC1, P.NC2: for NCTs
 %        - P.CTW1, P.CTW2, P.CTP1, P.CTP2: for CTs
 %       (all are nTs x nwt matrix)
@@ -67,7 +67,7 @@ end
             vuold = uoldT(1)*shFu(1)+uoldT(2)*shFu(2)+uoldT(3)*shFu(3);
             vwold = woldT(1)*shFu(1)+woldT(2)*shFu(2)+woldT(3)*shFu(3);
             [xk,yk] = getCoorSTD(pt(:,k),v1,v2,v3);
-            P(t,k) = defGu(vuold)*defFw(vwold)*defH(xk,yk,pa,sub);
+            P(t,k) = defGu(vuold,pa)*defFw(vwold)*defH(xk,yk,pa,sub);
         end
     end
     end
@@ -111,7 +111,7 @@ end
             [shFu,~,~] = getP1shapes(xHk,yHk);
             vuold = uoldT(1)*shFu(1)+uoldT(2)*shFu(2)+uoldT(3)*shFu(3);
             vwold = woldT(1)*shFu(1)+woldT(2)*shFu(2)+woldT(3)*shFu(3);
-            P(t,k) = defGu(vuold)*defFw(vwold)*defH(xk,yk,pa,sub);
+            P(t,k) = defGu(vuold,pa)*defFw(vwold)*defH(xk,yk,pa,sub);
         end
     end
     end
@@ -135,7 +135,7 @@ function val = findDefH(xx,yy,pa,sub)
     val= 1;
 end
 
-function val = findDefG(uu)
+function val = findDefG(uu,pa)
     val= 1;
 end
 

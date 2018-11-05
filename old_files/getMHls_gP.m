@@ -3,13 +3,19 @@ function H = getMHls_gP(msh,pa,vold,delT,coef)
 % velocity is grad of Phi
 % get matrix H_ij for level set equation like in Arnold p.221
 % H_ij = sum_T of ( dot(gradv,grad xi_j),xi_i + del*dot(gradv,grad xi_i) )_L2
-% this file computes dt*eps*Hij
+% This file computes coef*Hij
 % this technique is diff from finding Global matrix separatelt because we
 % can use it (again) in finding load vector
 % Related: main_chopp2007.m, getMEls.m, note 6
 % Input: - vold in Vh std,
 %        - del (Arnold Book p.222)
+%        - coef goes with Hij
 % Output: sparse matrix H
+% ----------------------------------------------------------
+% Update 26/10/18: This file used to compute grad v on vertices of each
+%   triangle. We now use pdegrad to find grad v on the center of each
+%   triangle (getMHlsgP.m), i.e. grad v is constant on whole triangle and discont at edge.
+% ----------------------------------------------------------
 
 Ts = msh.t; % all triangles of the mesh
 

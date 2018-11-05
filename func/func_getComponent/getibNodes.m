@@ -2,6 +2,7 @@ function [iN,bN] = getibNodes(msh)
 % Get boundary and inner nodes for NXFEM
 % Input:
 % Output: inner nodes (iN), boundary nodes (bN) (all in row arrays)
+%           (including the new nodes)
 
 newNodes = msh.newNodes; edges = msh.e;
 nodeCTs = msh.node.CT.all;

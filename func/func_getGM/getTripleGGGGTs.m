@@ -1,35 +1,34 @@
-function [ii,jj,vv] = getTripleGGGGTs(vold,msh,delT)
-% velocity is grad of Phi
-% get triples for \int_{all tris} del*(grad v*grad phi)*(grad v*grad phi)
-% for the level set equation (note 6)
-% cf. main_chopp2007, getMEls_gP, getMHls_gP
+function [ii,jj,vv] = getTripleGGGGTs(gP,msh,delT)
+% Velocity is grad of Phi
+% Get triples for \int_{all tris} del*(grad v*grad phi)*(grad v*grad phi)
+% For the level set equation (note 6)
+% cf. main_chopp*, getMElsgP, getMHlsgP
 % NOTE: don't use NXFEM, it's standard FEM
-% Input: - v (already known) = vold in STD
+% Input: - gP: gP.x (1 x nTs), gP.y (1 x nTs): grad of v
 %        - coeff del
 % Output: ii,jj,vv
+% ----------------------------------------------------------
+% Update 26/10/18: The OLD file used to compute grad v on vertices of each
+%   triangle. We now use pdegrad to find grad v on the center of each
+%   triangle (this file), i.e. grad v is constant on whole triangle and discont at edge.
+% ----------------------------------------------------------
 
 tris = msh.t;
 nTs = size(tris,2);
 ii = zeros(9*nTs,1); jj = zeros(9*nTs,1); vv = zeros(9*nTs,1);
 
+gradPhi = getGradPhi(tris,msh); % 2 coor x 3 vertices x nTris
+
 idx=1;
 for t=1:nTs
     del = delT(t); % delta
+    gv = [gP.x(t), gP.y(t)];
     for i=1:3
         for j=1:3
-            gP1 = getGrad(1,t,msh);
-            gP2 = getGrad(2,t,msh);
-            gP3 = getGrad(3,t,msh);
             ii(idx) = tris(i,t);
             jj(idx) = tris(j,t);
-            gPj = getGrad(j,t,msh);
-            gvgPj = vold(tris(1,t))*dot(gP1,gPj)...
-                    + vold(tris(2,t))*dot(gP2,gPj)...
-                    + vold(tris(3,t))*dot(gP3,gPj); % gvPj is constant
-            gPi = getGrad(i,t,msh);
-            gvgPi = vold(tris(1,t))*dot(gP1,gPi)...
-                    + vold(tris(2,t))*dot(gP2,gPi)...
-                    + vold(tris(3,t))*dot(gP3,gPi); % gvPi is constant
+            gvgPj = dot(gv,gradPhi(:,j,t)); % gvPj is constant
+            gvgPi = dot(gv,gradPhi(:,i,t)); % gvPi is constant
             vv(idx) = del*gvgPj*gvgPi;
             idx = idx+1;
         end

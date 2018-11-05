@@ -1,34 +1,38 @@
-function [ii,jj,vv] = getTriplePGGTs(gP,msh,pa,delT)
+function [ii,jj,vv] = getTriplePGGTs(vold,msh,pa,delT)
 % Get triples for \int_{all tris} phi*delta*(grad v*grad phi)
 % Velocity is grad of Phi
-% For the level set equation (note 6)
-% cf. main_chopp*, getMElsgP, getMHlsgP
+% for the level set equation (note 6)
+% cf. main_chopp2007, getMEls_gP, getMHls_gP
 % REMARK: don't use NXFEM, it's standard FEM
-% Input: - gP: gP.x (1 x nTs), gP.y (1 x nTs): grad of v
+% Input: - v (already known) = vold in STD
 %        - del_T: 1 x nTs (SUPG coefficients)
 % Output: ii,jj,vv
 % ----------------------------------------------------------
-% Update 26/10/18: The OLD file used to compute grad v on vertices of each
+% Update 26/10/18: This file used to compute grad v on vertices of each
 %   triangle. We now use pdegrad to find grad v on the center of each
-%   triangle (this file), i.e. grad v is constant on whole triangle and discont at edge.
+%   triangle, i.e. grad v is constant on whole triangle and discont at edge.
 % ----------------------------------------------------------
 
 tris = msh.t;
 nTs = size(tris,2);
 ii = zeros(9*nTs,1); jj = zeros(9*nTs,1); vv = zeros(9*nTs,1);
 
-gradPhi = getGradPhi(tris,msh); % 2 coor x 3 vertices x nTris
 
 idx=1;
 for t=1:nTs
     triangle = tris(:,t);
     del = delT(t); % delta
-    gv = [gP.x(t), gP.y(t)];
     for i=1:3
         for j=1:3
             ii(idx) = tris(i,t);
             jj(idx) = tris(j,t);
-            gvgPi = dot(gv,gradPhi(:,i,t)); % gvPi is constant
+            gPi = getGrad(i,t,msh);
+            gP1 = getGrad(1,t,msh);
+            gP2 = getGrad(2,t,msh);
+            gP3 = getGrad(3,t,msh);
+            gvgPi = vold(tris(1,t))*dot(gP1,gPi)...
+                    + vold(tris(2,t))*dot(gP2,gPi)...
+                    + vold(tris(3,t))*dot(gP3,gPi); % gvPi is constant
             P = []; % force P=1 inside getfPhiWhole
             vv(idx) = del*gvgPi*getfPhiWhole(msh,pa,triangle,j,P);
             idx = idx+1;

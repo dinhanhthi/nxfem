@@ -1,8 +1,13 @@
-function val = getNormL2fstd(msh,pa,f)
+function val = getNormL2fSTD(msh,pa,f)
 % Get ||f(x,y)||_L2(\Omg) where f is a function handle
-% First used in finding find norm of exact phi in Omg
+% First used in finding find norm of exact phi (level set) in Omg
 % Input: - f(x,y,pa) : function handle
 % Output: scalar value of norm
+% ---------------------------------------------
+% Important (3/11): this f in this case is NOT for the exact solution
+%   uex(x,y,pa,sub), for this type of function (handle), cf.
+%   getNormL2uexSTD.m
+% ---------------------------------------------
 
 triangles = msh.t; points = msh.p;
 nTs = size(triangles,2);

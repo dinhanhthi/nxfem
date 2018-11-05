@@ -1,11 +1,12 @@
 function gradPhi = getGradPhi(Ts,msh)
 % Find gradient (Grad) of function phi_i of the triangles
-% State: wrong!!!!
+% Note: (29-10-18) Last status is "wrong!!!" but don't know why, check
+%   again in test_gradPhi.m --> good for both regular & irregular!
 % Input: triangles we want to find Grad of Phi
 % Output: matrix contains grad of all Phi_i of all triangles we want
 %         matrix: 2 coordinates of grad x 3 vertices x nTris
-% not that the index of last component in gradPhi (nTris) is the index of
-%           triangle in tris, not in the global triangles!!!
+% Note that the index of last component in gradPhi (nTris) is the index of
+%           triangle in Ts, not in the global triangles!!!
 
 points = msh.p; nTs = size(Ts,2);
 gradPhi = zeros(2,3,nTs); % guarantee size of 2x3xnTs

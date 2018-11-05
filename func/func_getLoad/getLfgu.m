@@ -5,7 +5,7 @@ function RHS = getLfgu(msh,pa,tris,CT,uold,defF,defGu,coef1,coef2)
 % Related file: main_chopp06combine.m (first used)
 % State:
 % Input: - uold : solution uh, 4 component got from getWsep, including -beta
-%        - defGu: function handle from defGu.m
+%        - defGu(u,pa): function handle from defGu.m
 %        - coef1, coef2 w.r.t Omg1 and Omg2 (including the sign)
 %        - RHS f(x,y) from model_...
 % Output: global load vector F (nNodes+nNew) x 1
@@ -33,8 +33,8 @@ P = getPf(msh,pa,tris,CT,sol,func);
 % Term int coef*g(u)*phi (sign goes with coef)
 %-------------------------------------------------------------------------
 % get P
-sol.u = uold; % from getWsep, uold here already includes "-beta*"
-func.gu = @(u) defGu(u,pa);
+sol.u = uold; % from getWsep, uold here already includes coef
+func.gu = defGu;
 func.h = @(x,y,pa,sub) findDefH(x,y,pa,sub,coef1,coef2);
 P = getPf(msh,pa,tris,CT,sol,func);
 % get indices
