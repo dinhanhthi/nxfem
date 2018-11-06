@@ -1,0 +1,3 @@
+Machine: ghost,
+Model: model_chopp06combine,
+ndof: 2863,
