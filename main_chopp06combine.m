@@ -68,7 +68,7 @@ showPlot = 0; % wanna show plots?
     plotGradv = 0; % plot gradient of v on cut triangles
 
 savePlot = 1; % wanna save plot or not?
-    pathOption = '';
+    pathOption = '_r0001';
     
 pa.smallCut = 1;  % ignore small-support basis (1=ignore,0=no)
     pa.tH = 10; % to find the small support using (20) or (21) in arnold 2008
@@ -80,7 +80,7 @@ useNewton = 1; % use Newton to solve nonlinear problems?
     itol = 1e-3;
     
 % ghost penalty
-pa.useGP = 1; % wanna use ghost penalty term?
+pa.useGP = 0; % wanna use ghost penalty term?
     pa.gam1 = 1e-6; % parameter for 1st term
     pa.gam2 = 1e-6 ; % parameter for 2nd term
 
@@ -117,8 +117,8 @@ end
 
 %% Model parameters
 %-------------------------------------------------------------------------
-% pa.r0 = 0.01;  % interface
-pa.r0 = 0.05; % testing
+pa.r0 = 0.01;  % interface
+% pa.r0 = 0.05; % testing
     pa.distancing = 0; % make phi to be a signed distance function
 pa.muS1 = 8.	; pa.muS2 = 0;
 pa.muP1 = 8.28785; pa.muP2 = 0;
@@ -223,10 +223,11 @@ end
 % Create a folder to save the plots
 if savePlot
     disp("Creating folder to save plots...");
+    path_machine = machine;
     if reguMesh
-       path_regu = 'regu_';
+       path_regu = '_regu_';
     else
-        path_regu = 'irregu_';
+        path_regu = '_irregu_';
     end
     if ~useFFmesh
         path_useFF = 'matlabMesh';
@@ -249,8 +250,8 @@ if savePlot
         path_useGP = '_wtGP';
     end
     path_test_result = strcat(path_nxfem,'results/chopp06combine/',...
-                                path_regu,path_useFF,path_useGP,...
-                                    path_useSUPG,path_useFMM,pathOption);
+                        path_machine,path_regu,path_useFF,path_useGP,...
+                            path_useSUPG,path_useFMM,pathOption);
     path_test_remove = strcat({'rm -r'},{' '},{path_test_result}); % in case of duplicated folder
     path_test_remove = cell2mat(path_test_remove);
     system(path_test_remove);
@@ -681,7 +682,7 @@ if savePlot
     fileID = fopen(fileName,'w');
         fprintf(fileID,'Machine: %s,\n',machine);
         fprintf(fileID,'Model: %s,\n',model.name);
-        fprintf(fileID,'ndof: %d,\n',msh.dof);
+        fprintf(fileID,'ndof: %d,\n',msh.ndof);
         fprintf(fileID,'hTmax: %0.10f,\n',hTmax);
         fprintf(fileID,'Regular mesh: %d,\n',reguMesh);
         fprintf(fileID,'Use small-cut: %d,\n',pa.smallCut);
