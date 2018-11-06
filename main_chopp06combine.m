@@ -102,10 +102,10 @@ cpV.lamH = 1e5; % penalty coefficient for v (potential)
 % choose the machine to run
 %-------------------------------------------------------------------------
 % options: thi, gia, lehoan, blouza, gaia, google, ghost
-machine = 'google'; 
+% machine = 'google'; 
 % machine = 'blouza';
 % machine = 'thi';
-% machine = 'ghost';
+machine = 'ghost';
 
 
 % only enable showPlot option on thi's machine
@@ -117,8 +117,8 @@ end
 
 %% Model parameters
 %-------------------------------------------------------------------------
-pa.r0 = 0.01;  % interface
-% pa.r0 = 0.05; % testing
+% pa.r0 = 0.01;  % interface
+pa.r0 = 0.05; % testing
     pa.distancing = 0; % make phi to be a signed distance function
 pa.muS1 = 8.	; pa.muS2 = 0;
 pa.muP1 = 8.28785; pa.muP2 = 0;
