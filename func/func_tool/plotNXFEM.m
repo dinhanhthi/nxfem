@@ -38,8 +38,6 @@ addParameter(p,'eleLabel','off',@(s) ismember(s,{'on','off'}));
 addParameter(p,'nodeLabel','off',@(s) ismember(s,{'on','off'})); 
     % display element label?
 addParameter(p,'title','no title'); % plot's title
-addParameter(p,'export',false,@islogical); 
-    % export to a .jpg file with the name the same with title
 addParameter(p,'show',true,@islogical); % show the plot or not
 addParameter(p,'iC','r',@ischar); % show the plot or not
 parse(p,msh,pa,phi,iPs,cnf,varargin{:});
@@ -61,16 +59,10 @@ if ~isempty(resu.sol)
     switch resu.dim
         case 2 % 2D
             pdeplot(points,edges,triangles,'XYData',resu.sol,'Title',resu.title);
-            if (resu.export) && (~strcmp(resu.title,'no title'))
-                print(strcat('results\',resu.title),'-dpng'); % export to file
-            end
         case 3 % 3D
             pdeplot(points,[],triangles,'XYData',resu.sol,'XYStyle',...
                 'interp','ZData',resu.sol,'ZStyle','continuous',...
                 'ColorBar','off','Title',resu.title);
-            if (resu.export) && (~strcmp(resu.title,'no title'))
-                print(strcat('results\',resu.title),'-dpng'); % export to file
-            end
     end
 end
 
@@ -82,9 +74,6 @@ if resu.withMesh
     title(resu.title);
     pdemesh(points,edges,triangles,'NodeLabels',resu.nodeLabel,...
                 'ElementLabels',resu.eleLabel);
-    if (resu.export) && (~strcmp(resu.title,'no title'))
-        print(strcat('results\',resu.title),'-dpng'); % export to file
-    end
     hold off
 end
 
@@ -108,7 +97,6 @@ if resu.withGamh % plot with Gam_h or not
         plot(points(1,segment(:,it)),points(2,segment(:,it)),iC,'LineWidth',1.5);
         hold on
     end
-
     hold off
 end
 
