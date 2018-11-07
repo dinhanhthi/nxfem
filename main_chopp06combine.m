@@ -106,9 +106,9 @@ cpV.lamH = 1e5; % penalty coefficient for v (potential)
 % choose the machine to run
 %-------------------------------------------------------------------------
 % options: thi, gia, lehoan, blouza, gaia, google, ghost
-% machine = 'google'; 
+machine = 'google'; 
 % machine = 'blouza';
-machine = 'thi';
+% machine = 'thi';
 % machine = 'ghost';
 
 
