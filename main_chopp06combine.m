@@ -106,9 +106,9 @@ cpV.lamH = 1e5; % penalty coefficient for v (potential)
 % choose the machine to run
 %-------------------------------------------------------------------------
 % options: thi, gia, lehoan, blouza, gaia, google, ghost
-machine = 'google'; 
+% machine = 'google'; 
 % machine = 'blouza';
-% machine = 'thi';
+machine = 'thi';
 % machine = 'ghost';
 
 
@@ -232,8 +232,10 @@ if savePlot
     path_machine = machine;
     if reguMesh && (~useFFmesh)
        path_regu = '_regu';
-    else
+    elseif ~useFFmesh
         path_regu = '_irregu';
+    else
+        path_regu = '';
     end
     if ~useFFmesh
         path_useFF = '_matlabMesh';
@@ -751,6 +753,7 @@ if savePlot
         fprintf(fileID,'number of days: %f,\n',maxDay);
         fprintf(fileID,'the last dt: %f,\n',dt);
         fprintf(fileID,'\n');
+        fprintf(fileID,'Use FreeFem++ mesh: %d,\n',useFFmesh);
         fprintf(fileID,'Regular mesh: %d,\n',reguMesh);
         fprintf(fileID,'Use small-cut: %d,\n',pa.smallCut);
         fprintf(fileID,'\n');
