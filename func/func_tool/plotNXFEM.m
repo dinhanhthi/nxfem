@@ -40,6 +40,8 @@ addParameter(p,'nodeLabel','off',@(s) ismember(s,{'on','off'}));
 addParameter(p,'title','no title'); % plot's title
 addParameter(p,'export',false,@islogical); 
     % export to a .jpg file with the name the same with title
+addParameter(p,'show',true,@islogical); % show the plot or not
+addParameter(p,'iC','r',@ischar); % show the plot or not
 parse(p,msh,pa,phi,iPs,cnf,varargin{:});
 nf = cnf; % number of plot
 resu = p.Results;
@@ -48,11 +50,14 @@ resu = p.Results;
 % Check and do the plot
 %=========================================================================
 
-if isempty(resu.sol) % plot the mesh only
+if resu.show
     nf = nf+1; figure(nf);
-    resu.withMesh = 1;
-else % there is a sol and we will plot it
-    nf = nf+1; figure(nf);
+end
+
+    
+%% plot solution or not
+%-------------------------------------------------------------------------
+if ~isempty(resu.sol) 
     switch resu.dim
         case 2 % 2D
             pdeplot(points,edges,triangles,'XYData',resu.sol,'Title',resu.title);
@@ -69,41 +74,45 @@ else % there is a sol and we will plot it
     end
 end
 
-% plot the mesh or not
+
+%% plot the mesh or not
 %-------------------------------------------------------------------------
 if resu.withMesh
-    if isempty(resu.sol)
-        title('The mesh');
-    end
     hold on
+    title(resu.title);
     pdemesh(points,edges,triangles,'NodeLabels',resu.nodeLabel,...
                 'ElementLabels',resu.eleLabel);
-    if resu.withGamh % plot with Gam_h or not
-        
-        % plot intersections
-        nCTs = size(iPs,3);
-        for it=1:nCTs
-            plot(iPs(1,:,it),iPs(2,:,it),'-r','LineWidth',1);
-            hold on
-        end
-        
-        % plot segments Gh conciding to mesh's edges
-        segment = getMeshSegmentOnGh(msh,pa,phi);
-        for it=1:size(segment,2)
-            plot(points(1,segment(:,it)),points(2,segment(:,it)),'-r','LineWidth',1);
-            hold on
-        end
-        
-        hold off
-    end
     if (resu.export) && (~strcmp(resu.title,'no title'))
         print(strcat('results\',resu.title),'-dpng'); % export to file
     end
     hold off
 end
 
-hold off
 
+%% plot interface or not
+%-------------------------------------------------------------------------
+if resu.withGamh % plot with Gam_h or not  
+    % plot intersections
+    nCTs = size(iPs,3);
+    hold on
+    title(resu.title);
+    iC = strcat('-',resu.iC);
+    for it=1:nCTs
+        plot(iPs(1,:,it),iPs(2,:,it),iC,'LineWidth',1.5);
+        hold on
+    end
+
+    % plot segments Gh conciding to mesh's edges
+    segment = getMeshSegmentOnGh(msh,pa,phi);
+    for it=1:size(segment,2)
+        plot(points(1,segment(:,it)),points(2,segment(:,it)),iC,'LineWidth',1.5);
+        hold on
+    end
+
+    hold off
+end
+
+hold off
 
 
 end
