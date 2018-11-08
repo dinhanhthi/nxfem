@@ -132,7 +132,7 @@ cpU.kk1 = 120; cpU.kk2 = 150;% diff coef for u
 cpV.kk1 = 1; cpV.kk2 = 1;    % diff coef for u
 
 maxDay = 20;
-% CFL = 0.5;
+CFL = 1;
 
 
 %% DOMAIN
