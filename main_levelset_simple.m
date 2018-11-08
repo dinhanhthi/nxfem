@@ -10,7 +10,7 @@
 addpath(genpath('func')); % add all necessary functions
 
 % nseg_array = [37, 57, 77];
-nseg_array = 27;
+nseg_array = 57;
 % nseg_array = zeros(1,3); % get from ffpp 
 
 
@@ -24,8 +24,8 @@ pa.tol = eps(1e3); % tolerance, 1e-14
 
 
 %% models
-model = model_levelset_x; % Becker's test case with interface: x=x_0
-% model = model_levelset_vortex;  % Niklas' test case
+% model = model_levelset_x; % Becker's test case with interface: x=x_0
+model = model_levelset_vortex;  % Niklas' test case
 GeoDom = model.domain(); % domain
 velo = model.velo; % Velocity (grad of potential in other cases)
 
@@ -201,7 +201,7 @@ if showPlot
     tic; time=0;
     fprintf("Show plot of phi...");
     plotNXFEM(msh,pa,phi,iPs,nf,phi,'withMesh',withMesh,...
-                'title',titlePlot,'dim',2,'export',false); % phi
+                'title',titlePlot,'iC','b'); % phi
     nCTs = size(iPs,3);
     fprintf("%fs\n",toc-time);
 end
@@ -363,6 +363,7 @@ for ns = 1:maxStep
     
     
     norm_gradphi = getNormL2GfhSTD(msh,phi); % ||gradPhi||_L2
+    fprintf('|1-norm_gradphi| = %f\n',abs(1-norm_gradphi));
     %% mshdist
 %     if useFMM && abs(1-norm_gradphi) > alp_FMM && numUse <=1
     if useFMM && abs(1-norm_gradphi) > alp_FMM
@@ -389,12 +390,11 @@ for ns = 1:maxStep
     
     
     %% plot phi
-%     abc = waitforbuttonpress; % wait for click
-    titlePlot = strcat('t= ',num2str(t));
     if showPlot
+        titlePlot = strcat('t= ',num2str(t));
         disp("Plotting phi...");
         plotNXFEM(msh,pa,phi,iPs,nf,phi,'withMesh',withMesh,...
-                'title',titlePlot,'dim',2,'export',false); % phi
+                'title',titlePlot,'iC','b'); % phi
         nCTs = size(iPs,3);
     end
     

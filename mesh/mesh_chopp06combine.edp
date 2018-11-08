@@ -1,7 +1,7 @@
 // Mesh
 real x0=0, x1=0.5, y0=0, y1=0.5;
-int n=20;
-// int n=15;
+// int n=20;
+int n=15;
 mesh Th = square(n,n,[x0+(x1-x0)*x,y0+(y1-y0)*y]);
 // plot(Th, wait=true);
 
