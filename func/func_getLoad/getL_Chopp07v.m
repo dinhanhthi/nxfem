@@ -19,7 +19,7 @@ newNodes = msh.newNodes;
 %-------------------------------------------------------------------------
 % get P
 sol.u = uold; % from getWsep, uold here already includes "-beta*"
-func.gu = @(u) u; % g(u) = u
+func.gu = @(u,pa) u; % g(u) = u
 P = getPf(msh,pa,tris,CT,sol,func);
 % get indices
 [i1,f1] = getfPhiNCTs(msh,pa,NCTs1,P.NC1); % NCTs1

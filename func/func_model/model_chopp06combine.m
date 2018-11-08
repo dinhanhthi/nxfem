@@ -62,6 +62,7 @@ end
 function GeoDom = findDomain()
     xDomVal = [0 0.5 0.5 0];                % x values of points constructing Omega
     yDomVal = [0 0 0.5 0.5];                % corresponding y value
+%     yDomVal = [0 0 0.3 0.3]; % testing
     RectDom = [3,4,xDomVal,yDomVal]';   % rectangular domain "3" with "4" sides
     GeoDom = decsg(RectDom);
 end
