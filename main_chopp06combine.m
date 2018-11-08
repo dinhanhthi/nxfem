@@ -103,8 +103,8 @@ useSUPG = 1; % if 1, need to make more settings
 
 % Penalty parameters
 %-------------------------------------------------------------------------
-cpU.lamH = 1e4; % penalty coefficient for u (substrate)
-cpV.lamH = 1e6; % penalty coefficient for v (potential)
+cpU.lamH = 1e6; % penalty coefficient for u (substrate)
+cpV.lamH = 1e8; % penalty coefficient for v (potential)
 
 % choose the machine to run
 %-------------------------------------------------------------------------
@@ -236,16 +236,16 @@ if savePlot
     disp("Creating folder to save plots...");
     path_machine = machine;
     if reguMesh && (~useFFmesh)
-       path_regu = '_regu';
+       path_regu = 'regu_';
     elseif ~useFFmesh
-        path_regu = '_irregu';
+        path_regu = 'irregu_';
     else
         path_regu = '';
     end
     if ~useFFmesh
-        path_useFF = '_matlabMesh';
+        path_useFF = 'matlabMesh';
     else
-       path_useFF = '_FFmesh';
+       path_useFF = 'FFmesh';
     end
     if useFMM 
         path_useFMM = '_wFMM'; 
@@ -264,8 +264,8 @@ if savePlot
     end
     path_tris = num2str(size(triangles,2)); % number of triangles
     path_test_result = strcat(path_nxfem,'results/chopp06combine/',...
-                        path_machine,path_regu,path_useFF,path_useGP,...
-                            path_useSUPG,path_useFMM,'_',path_tris,'_',pathOption);
+                path_regu,path_useFF,path_useGP,path_useSUPG,...
+                path_useFMM,'_',path_tris,'_',pathOption,'_',path_machine);
     path_test_remove = strcat({'rm -r'},{' '},{path_test_result}); % in case of duplicated folder
     path_test_remove = cell2mat(path_test_remove);
     system(path_test_remove);
@@ -274,6 +274,37 @@ if savePlot
     system(path_test_create);
 end
 
+
+if savePlot
+   % Save parameters' info to file
+    fileName = strcat(path_test_result,'/parameters_',num2str(nSeg),'.txt');
+    fileID = fopen(fileName,'w');
+        fprintf(fileID,'Machine: %s,\n',machine);
+        fprintf(fileID,'Model: %s,\n',model.name);
+        fprintf(fileID,'hTmax: %0.10f,\n',msh.hTmax);
+        fprintf(fileID,'no. triangles: %d,\n',size(triangles,2));
+        fprintf(fileID,'\n');
+        fprintf(fileID,'number of days: %f,\n',maxDay);
+        fprintf(fileID,'\n');
+        fprintf(fileID,'Use FreeFem++ mesh: %d,\n',useFFmesh);
+        fprintf(fileID,'Regular mesh: %d,\n',reguMesh);
+        fprintf(fileID,'Use small-cut: %d,\n',pa.smallCut);
+        fprintf(fileID,'\n');
+        fprintf(fileID,'Use FMM: %d,\n',useFMM);
+        fprintf(fileID,'__al_FMM: %f,\n',alp_FMM);
+        fprintf(fileID,'__numUseFMM: %d,\n',numUseFMM);
+        fprintf(fileID,'__numUseFMM: %d,\n',stepUseFMM);
+        fprintf(fileID,'\n');
+        fprintf(fileID,'useSUPG: %d,\n',useSUPG);
+        fprintf(fileID,'__delEps: %f,\n',delEps);
+        fprintf(fileID,'__delSD: %f,\n',delSD);
+        fprintf(fileID,'\n');
+        fprintf(fileID,'use Ghost penalty: %d,\n',pa.useGP);
+        fprintf(fileID,'__gam1: %f,\n',pa.gam1);
+        fprintf(fileID,'__gam2: %f,\n',pa.gam2);
+        fprintf(fileID,'\n');
+    fclose(fileID); 
+end
 
 
 %% =======================================================================
@@ -755,37 +786,14 @@ end % for ns
 %% save info file
 if savePlot
    % Save parameters' info to file
-    fileName = strcat(path_test_result,'/parameters_',num2str(nSeg),'.txt');
+    fileName = strcat(path_test_result,...
+        '/parameters_',num2str(size(triangles,2)),'.txt');
     fileID = fopen(fileName,'w');
-        fprintf(fileID,'Machine: %s,\n',machine);
-        fprintf(fileID,'Model: %s,\n',model.name);
-        fprintf(fileID,'ndof: %d,\n',msh.ndof);
-        fprintf(fileID,'hTmax: %0.10f,\n',msh.hTmax);
-        fprintf(fileID,'no. triangles: %d,\n',size(triangles,2));
         fprintf(fileID,'\n');
-        fprintf(fileID,'number of days: %f,\n',maxDay);
         fprintf(fileID,'the last dt: %f,\n',dt);
-        fprintf(fileID,'\n');
-        fprintf(fileID,'Use FreeFem++ mesh: %d,\n',useFFmesh);
-        fprintf(fileID,'Regular mesh: %d,\n',reguMesh);
-        fprintf(fileID,'Use small-cut: %d,\n',pa.smallCut);
-        fprintf(fileID,'\n');
-        fprintf(fileID,'Use FMM: %d,\n',useFMM);
-        fprintf(fileID,'__al_FMM: %f,\n',alp_FMM);
-        fprintf(fileID,'__numUseFMM: %d,\n',numUseFMM);
-        fprintf(fileID,'__numUseFMM: %d,\n',stepUseFMM);
-        fprintf(fileID,'\n');
-        fprintf(fileID,'useSUPG: %d,\n',useSUPG);
-        fprintf(fileID,'__delEps: %f,\n',delEps);
-        fprintf(fileID,'__delSD: %f,\n',delSD);
-        fprintf(fileID,'\n');
-        fprintf(fileID,'use Ghost penalty: %d,\n',pa.useGP);
-        fprintf(fileID,'__gam1: %f,\n',pa.gam1);
-        fprintf(fileID,'__gam2: %f,\n',pa.gam2);
         fprintf(fileID,'\n');
     fclose(fileID); 
 end
-
 
 
 %% CLEAN UP

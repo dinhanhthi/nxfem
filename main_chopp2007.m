@@ -70,7 +70,7 @@ plotContourChange = 0; % only plot the interface with time (hold on to see the t
 plotSolution = 1; % plot solution or not? (uh, vh)
 
 savePlot = 1; % wanna save plot or not?
-    pathOption = 'reduceNoise_1e61e8_15';
+    pathOption = 'reduceNoise_1e61e8_bcu3_em3';
 
 pa.smallCut = 0;            % ignore small-support basis (1=ignore,0=no)
 pa.tH = 10; % to find the small support using (20) or (21) in arnold 2008
@@ -87,7 +87,7 @@ pa.useGP = 1; % wanna use ghost penalty term?
     pa.gam2 = 1e-6 ; % parameter for 2nd term
 
 % Fast marching method
-useFMM = 1; % use fast marching method or not (mshdist)?
+useFMM = 0; % use fast marching method or not (mshdist)?
     numUseFMM = 0; % count the number of use of FMM
     alp_FMM = 0.1;
     stepUseFMM = 15; % use every 15 step (disable al_FMM method)
@@ -125,13 +125,13 @@ pa.r0 = 0.1;  % interface
 % pa.bet1 = 1e6; pa.bet2 = 0; % this is not diff coef!
 pa.bet1 = 1e8; pa.bet2 = 0; % testing
 pa.mu1 = 3.6e6; pa.mu2 = 0;
-% pa.bcu3 = 1e-1; % testing
-pa.bcu3 = 1e-5; % boundary condition for u on \pt\Omg_3
+pa.bcu3 = 1e-3; % testing
+% pa.bcu3 = 1e-5; % boundary condition for u on \pt\Omg_3
 
 cpU.kk1 = 120; cpU.kk2 = 150;% diff coef for u
 cpV.kk1 = 1; cpV.kk2 = 1;    % diff coef for u
 
-maxDay = 20;
+maxDay = 45;
 CFL = 0.5;
 
 
@@ -228,16 +228,16 @@ if savePlot
     disp("Creating folder to save plots...");
     path_machine = machine;
     if reguMesh && (~useFFmesh)
-       path_regu = '_regu';
+       path_regu = 'regu_';
     elseif ~useFFmesh
-        path_regu = '_irregu';
+        path_regu = 'irregu_';
     else
         path_regu = '';
     end
     if ~useFFmesh
-        path_useFF = '_matlabMesh';
+        path_useFF = 'matlabMesh';
     else
-       path_useFF = '_FFmesh';
+       path_useFF = 'FFmesh';
     end
     if useFMM 
         path_useFMM = '_wFMM'; 
