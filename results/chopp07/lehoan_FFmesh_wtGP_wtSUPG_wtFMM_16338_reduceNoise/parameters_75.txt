@@ -1,0 +1,26 @@
+Machine: lehoan,
+Model: model_chopp2007,
+ndof: 9075,
+hTmax: 0.0176776695,
+no. triangles: 16338,
+
+number of days: 20.000000,
+the last dt: 10.081113,
+
+Use FreeFem++ mesh: 1,
+Regular mesh: 1,
+Use small-cut: 0,
+
+Use FMM: 0,
+__al_FMM: 0.100000,
+__numUseFMM: 0,
+__numUseFMM: 15,
+
+useSUPG: 0,
+__delEps: 0.001000,
+__delSD: 0.000000,
+
+use Ghost penalty: 0,
+__gam1: 0.000010,
+__gam2: 0.000001,
+
