@@ -1,3 +1,39 @@
+Test 7: The bad of choice lamH.,
 
-the last dt: 0.207646,
+Machine: google,
+Model: model_chopp2007,
+hTmax: 0.0235702260,
+no. triangles: 9169,
 
+number of days: 45.000000,
+
+Use FreeFem++ mesh: 1,
+Regular mesh: 1,
+Use small-cut: 0,
+
+Use FMM: 0,
+__al_FMM: 0.100000,
+__numUseFMM: 0,
+__numUseFMM: 15,
+
+useSUPG: 1,
+__delEps: 0.001000,
+__delSD: 0.500000,
+
+use Ghost penalty: 1,
+__gam1: 0.000001,
+__gam2: 0.000001,
+
+Panalty terms:
+__lamHu: 1e6,
+__lamHv: 1e8,
+
+Model parameters:
+__r0: 0.100000,
+__bet1: 100000000.000000,
+__bet2: 0.000000,
+__mu1: 3600000.000000,
+__mu2: 0.000000,
+__bcu3: 0.000010,
+
+The last dt: 0.27

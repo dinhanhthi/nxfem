@@ -66,13 +66,13 @@ showPlot = 0;
 % for both showPlot & savePlot
 withMesh = false;
 plotGradv = 0; % plot gradient of v on cut triangles
-plotContourChange = 0; % only plot the interface with time (hold on to see the track)
+plotContourChange = 1; % only plot the interface with time (hold on to see the track)
 plotSolution = 1; % plot solution or not? (uh, vh)
 
 savePlot = 1; % wanna save plot or not?
-    testCase = '7'; % count the test and used to name the folder
+    testCase = '8'; % count the test and used to name the folder
     pathOption = '_A';
-    moreInfo = 'Test 7: The bad of choice lamH.'; % write inside file txt
+    moreInfo = 'Test 8: Khong tang bcu3, chi tang beta.'; % write inside file txt
 
 pa.smallCut = 0;            % ignore small-support basis (1=ignore,0=no)
 pa.tH = 10; % to find the small support using (20) or (21) in arnold 2008
@@ -101,8 +101,8 @@ useSUPG = 1; % if 1, need to make more settings
 %     delSD = 0;
 
 % Penalty parameters
-cpU.lamH = 1e2; % penalty coefficient for u (substrate)
-cpV.lamH = 1e4; % penalty coefficient for v (potential)
+cpU.lamH = 1e6; % penalty coefficient for u (substrate)
+cpV.lamH = 1e8; % penalty coefficient for v (potential)
 
 % choose the machine to run
 %-------------------------------------------------------------------------
@@ -127,7 +127,7 @@ pa.r0 = 0.1;  % interface
 % pa.bet1 = 1e6; pa.bet2 = 0; % this is not diff coef!
 pa.bet1 = 1e8; pa.bet2 = 0; % testing
 pa.mu1 = 3.6e6; pa.mu2 = 0;
-% pa.bcu3 = 1e-3; % testing
+% pa.bcu3 = 1e-4; % testing
 pa.bcu3 = 1e-5; % boundary condition for u on \pt\Omg_3
 
 cpU.kk1 = 120; cpU.kk2 = 150;% diff coef for u
@@ -312,7 +312,7 @@ if savePlot
         fprintf(fileID,'__mu2: %f,\n',pa.mu2);
         fprintf(fileID,'__bcu3: %f,\n',pa.bcu3);
         fprintf(fileID,'\n');
-    fclose(fileID); 
+%     fclose(fileID); 
 end
 
 
@@ -668,8 +668,8 @@ end % for ns
 %% save info file
 if savePlot
    % Save parameters' info to file
-    fileName = strcat(path_test_result,...
-        '/parameters_',num2str(size(triangles,2)),'.txt');
+%     fileName = strcat(path_test_result,...
+%         '/parameters_',num2str(size(triangles,2)),'.txt');
     fileID = fopen(fileName,'w');
         fprintf(fileID,'\n');
         fprintf(fileID,'the last dt: %f,\n',dt);
