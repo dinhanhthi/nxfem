@@ -65,16 +65,20 @@ pa.tol = eps(1e3); % tolerance, 1e-14
 %-------------------------------------------------------------------------
 model = model_chopp06combine;    % choose model. cf. file model_chopp2007.m
 
-showPlot = 1; % wanna show plots?
+%% NEED TO BE CHANGED EVERY TEST CASE
+savePlot = 1; % wanna save plot or not?
+    testCase = '1'; % count the test and used to name the folder
+    pathOption = '_Start';
+    moreInfo = ''; % write inside file txt
+
+%%
+showPlot = 0; % wanna show plots?
 
 % for both showPlot & savePlot
 withMesh = false;
 plotGradv = 0; % plot gradient of v on cut triangles
 plotContourChange = 1; % only plot the interface with time (hold on to see the track)
-plotSolution = 0; % plot solution or not? (uh, vh)
-    
-savePlot = 0; % wanna save plot or not?
-    pathOption = '_TestLaiCaiThanhCong';
+plotSolution = 1; % plot solution or not? (uh, vh)
     
 pa.smallCut = 0;  % ignore small-support basis (1=ignore,0=no)
     pa.tH = 10; % to find the small support using (20) or (21) in arnold 2008
@@ -86,7 +90,7 @@ useNewton = 1; % use Newton to solve nonlinear problems?
     itol = 1e-3;
     
 % ghost penalty
-pa.useGP = 0; % wanna use ghost penalty term?
+pa.useGP = 1; % wanna use ghost penalty term?
     pa.gam1 = 1e-6; % parameter for 1st term
     pa.gam2 = 1e-6 ; % parameter for 2nd term
 
@@ -111,8 +115,9 @@ cpV.lamH = 1e8; % penalty coefficient for v (potential)
 % options: thi, gia, lehoan, blouza, gaia, google, ghost
 % machine = 'google'; 
 % machine = 'blouza';
-machine = 'thi';
+% machine = 'thi';
 % machine = 'ghost';
+machine = 'lehoan';
 
 
 % only enable showPlot option on thi's machine
@@ -264,7 +269,7 @@ if savePlot
     end
     path_tris = num2str(size(triangles,2)); % number of triangles
     path_test_result = strcat(path_nxfem,'results/chopp06combine/',...
-                path_regu,path_useFF,path_useGP,path_useSUPG,...
+                testCase,'_',path_regu,path_useFF,path_useGP,path_useSUPG,...
                 path_useFMM,'_',path_tris,'_',pathOption,'_',path_machine);
     path_test_remove = strcat({'rm -r'},{' '},{path_test_result}); % in case of duplicated folder
     path_test_remove = cell2mat(path_test_remove);
@@ -279,6 +284,8 @@ if savePlot
    % Save parameters' info to file
     fileName = strcat(path_test_result,'/parameters_',num2str(nSeg),'.txt');
     fileID = fopen(fileName,'w');
+        fprintf(fileID,'%s,\n',moreInfo);
+        fprintf(fileID,'\n');
         fprintf(fileID,'Machine: %s,\n',machine);
         fprintf(fileID,'Model: %s,\n',model.name);
         fprintf(fileID,'hTmax: %0.10f,\n',msh.hTmax);
@@ -395,8 +402,10 @@ while day < maxDay
         titlePlot = strcat('phi, jour = ',num2str(round(day,2)));
         
         if plotContourChange % don't show phi's value, just show its contours with time
-            nf = plotNXFEM(msh,pa,phi,iPs,nf,'title',titlePlot,...
+            if mod(ns,2)==1 % 2 step 1 time
+                nf = plotNXFEM(msh,pa,phi,iPs,nf,'title',titlePlot,...
                     'withMesh',withMesh); % only mesh
+            end
         else % plot phi's value also
             nf = plotNXFEM(msh,pa,phi,iPs,nf,phi,'withMesh',withMesh,...
                 'title',titlePlot,'iC','b'); % phi
