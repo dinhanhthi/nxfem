@@ -67,9 +67,9 @@ model = model_chopp06combine;    % choose model. cf. file model_chopp2007.m
 
 %% NEED TO BE CHANGED EVERY TEST CASE
 savePlot = 1; % wanna save plot or not?
-    testCase = '3'; % count the test and used to name the folder
+    testCase = '4'; % count the test and used to name the folder
     pathOption = '_Start';
-    moreInfo = 'Quay lai cai commit thanh cong.'; % write inside file txt
+    moreInfo = 'Test4: Lan 3 giong y chang commit cu tru cai CFL va khong chac cho mesh, lan nay thu lai.'; % write inside file txt
 
 %%
 showPlot = 0; % wanna show plots?
@@ -146,7 +146,7 @@ useFixedDist = 1; % use fixed distance Dirichlet condition like in Chopp?
 %     pa.L = 0.05; % testing
 
 maxDay = 45; % using dt = dx/|u|
-CFL = 0.5;
+CFL = 1;
 
 
 %% DOMAIN

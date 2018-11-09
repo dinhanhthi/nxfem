@@ -7,7 +7,7 @@ mesh Th = square(n,n,[x0+(x1-x0)*x,y0+(y1-y0)*y]);
 
 // split mesh (only 1 func)
 // func f = 1 + (1 + 2*(y-1.5)^2)*(x<0.5) + (1 + 2*(y-1.5)^2)*(x>=0.5);
-real bound = 0.1;
+real bound = 0.08;
 real bound2 = 0.2;
 // func f = 1 + 2*((y-1)^2)*(x<bound) 
 //         + (1 + 2*(y-1.5)^2)*(x>=bound & x<=bound2) 
