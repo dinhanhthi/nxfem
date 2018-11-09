@@ -8,13 +8,10 @@
 %   - (function lambda): the choice of lambda's form
 %   - description of domain
 %   - (boundary condition)
-% ------------------------------------------------------------------------
-% Last modified: 08-11-2018
-% ------------------------------------------------------------------------
 
 
 %% =======================================================================
-% DOMAIN: [0,0.5]X[0,0.5], inital interface: half of circle ((1/4,0);r0)
+% DOMAIN: [0,1]X[0,1], inital interface: half of circle ((1/2,0);r0)
 %-------------------------------------------------------------------------
 % MODELS:
 % r=sqrt(x^2+y^2)-r0 the interface
@@ -41,7 +38,6 @@
 
 %% Setting up
 function fh = model_chopp2007
-    fh.name = 'model_chopp2007';
     fh.defFu = @findDefFu;      % RHS of equation of u
     fh.defFv = @findDefFv;      % RHS of equation of v
     fh.defPhi = @findDefPhi;    % interface
@@ -58,11 +54,18 @@ function fh = model_chopp2007
 end
 
 
+%% Finding parameters
+function pa = findPara()
+    pa.Tmax = 1;
+    pa.dt = 0.05;
+end
+
+
 
 %% Domain
 function GeoDom = findDomain()
-    xDomVal = [0 0.5 0.5 0];                % x values of points constructing Omega
-    yDomVal = [0 0 0.5 0.5];                % corresponding y value
+    xDomVal = [0 1 1 0];                % x values of points constructing Omega
+    yDomVal = [0 0 1 1];                % corresponding y value
     RectDom = [3,4,xDomVal,yDomVal]';   % rectangular domain "3" with "4" sides
     GeoDom = decsg(RectDom);
 end
@@ -110,9 +113,9 @@ function valPhi=findDefPhi(xx,yy,pa)
     % Input: coordinate of points
     % Output: value of phi at points
     
-    valPhi = sqrt((xx-0.25).^2 + yy.^2) - pa.r0; % semi circle (no need to initialize)
+%     valPhi = sqrt((xx-0.5).^2 + yy.^2) - pa.r0; % semi circle (no need to initialize)
     
-%     valPhi = pa.a^2*(xx-0.5).^2 + yy.^2/(pa.a^2) - pa.r0^2; % need to use mshdist to initilize to be a signed distance function
+    valPhi = pa.a^2*(xx-0.5).^2 + yy.^2/(pa.a^2) - pa.r0^2; % need to use mshdist to initilize to be a signed distance function
 end
 
 

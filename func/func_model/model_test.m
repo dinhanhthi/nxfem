@@ -1,40 +1,47 @@
-%% This is a function handles containing all information about model for Chopp06combine
+%% This is a function handles containing all information about model for chopp2007
 % It's corresponding to 
-%       - file main_chopp06combine.m
-%       - file hw_chopp06combine.pdf
+%       - file main_chopp2007.m
+%       - file choppSimpleKap.edp (freefem++)
+% This file includes:
+%   - function defF : def of RHS 
+%   - function defPhi: def of initial interface
+%   - (function lambda): the choice of lambda's form
+%   - description of domain
+%   - (boundary condition)
+% ------------------------------------------------------------------------
+% Last modified: 08-11-2018
+% ------------------------------------------------------------------------
 
 
 %% =======================================================================
-% DOMAIN: [0,0.5]X[0,0.5], inital interface: half of circle ((0.25,0);r0)
-% all meters are in mm
+% DOMAIN: [0,0.5]X[0,0.5], inital interface: half of circle ((1/4,0);r0)
 %-------------------------------------------------------------------------
 % MODELS:
-% r=sqrt((x-0.25)^2+y^2)-r0 the interface
-% Omg1 = Omg_b, Omg2 = Omg_f
+% r=sqrt(x^2+y^2)-r0 the interface
 %-------------------------------------------------------------------------
-% Equation of u (substrate S):
-% -nabla(Ds*nabla(u)) + f*muS*u/(K0+u) = 0  in Omega
-% [u]=[Ds*nabla_n(u)]=0     on Gamma
-% u = 8.3e-6   on \partial\Omega_3
+% Equation of u (substrate):
+% -nabla(alpha*nabla(u)) = -mu*u  in Omega
+% [u]=[alpha*nabla_n(u)]=0     on Gamma
+% u = 1e-5   on \partial\Omega_3
 % nabla_n u = 0 elsewhere
 %-------------------------------------------------------------------------
-% Equation of v (potential Phi):
-% -nabla(nabla(v)) = -f*muP*u/(K0+u) in Omega
+% Equation of v (potential):
+% -nabla(nabla(v)) = -beta*u in Omega
 % v=nabla_n(v)=0 on Gamma 
-% v=0 on \partial\Omega_3 (checked again!)
+% v=0 on \partial\Omega_3
 % nabla_n v = 0 elsewhere
 %-------------------------------------------------------------------------
 % PARAMETERS:
-% Ds = 146.88 (Omg1), 183.6 (Omg2) (DSb=0.8DSf)
-% muS = 8.54932 (Omg1), 0 (Omg2)
-% muP = 8.28785 (Omg1), 0 (Omg2)
+% alpha = 120 (Omg1), 150 (Omg2)
+% beta = 1e6 (Omg1), 0 (Omg2)
+% mu = 3.6e6 (Omg1), 0 (Omg2)
 %=========================================================================
 
 
 
 %% Setting up
-function fh = model_chopp06combine
-    fh.name = 'model_chopp06combine';
+function fh = model_test
+    fh.name = 'model_test';
     fh.defFu = @findDefFu;      % RHS of equation of u
     fh.defFv = @findDefFv;      % RHS of equation of v
     fh.defPhi = @findDefPhi;    % interface
@@ -47,14 +54,8 @@ function fh = model_chopp06combine
 %     fh.lamU = @findLamU;      % lambda for u's equation
     fh.lamU = @findLamV;        % lambda for u's equation
     fh.lamV = @findLamV;        % lambda for u's equation
-%     fh.pa = @findPara;          % parameters
+    fh.pa = @findPara;          % parameters
 end
-
-
-% %% Finding parameters
-% function pa = findPara()
-%     pa.Tmax = 1;
-% end
 
 
 
@@ -62,7 +63,6 @@ end
 function GeoDom = findDomain()
     xDomVal = [0 0.5 0.5 0];                % x values of points constructing Omega
     yDomVal = [0 0 0.5 0.5];                % corresponding y value
-%     yDomVal = [0 0 0.3 0.3]; % testing
     RectDom = [3,4,xDomVal,yDomVal]';   % rectangular domain "3" with "4" sides
     GeoDom = decsg(RectDom);
 end
@@ -100,7 +100,11 @@ function valF = findDefFv(xx,yy,pa,sub)
     % Define right hand side function fu
     % Input: coordinate of points + indication subdomain
     % Output: value of F at points
-    valF = 0;
+    if sub==1
+        valF = 1e-2;
+    else
+        valF = 0;
+    end
 end
 
 
@@ -110,8 +114,9 @@ function valPhi=findDefPhi(xx,yy,pa)
     % Input: coordinate of points
     % Output: value of phi at points
     
-    valPhi = sqrt( (xx-0.25).^2 + yy.^2 ) - pa.r0;
+    valPhi = sqrt((xx-0.25).^2 + yy.^2) - pa.r0; % semi circle (no need to initialize)
     
+%     valPhi = pa.a^2*(xx-0.5).^2 + yy.^2/(pa.a^2) - pa.r0^2; % need to use mshdist to initilize to be a signed distance function
 end
 
 
@@ -140,6 +145,7 @@ function lam = findLamV(cp,hTCTs,CT,pa)
     
     if pa.useGP
         coef = 4*cp.lamH*cp.kk1*cp.kk2/(cp.kk1+cp.kk2);
+        
         lam = coef./hTCTs;              % belongs to hT
 %         lam = zeros(1,nCTs) + coef;   % not belong to hT
     else
@@ -147,6 +153,7 @@ function lam = findLamV(cp,hTCTs,CT,pa)
         lenAB(1,:) = ( (CT.iPs(1,2,:) - CT.iPs(1,1,:)).^2 + (CT.iPs(2,2,:) - CT.iPs(2,1,:)).^2 ) .^(0.5);
         coef = cp.lamH*cp.kk1*cp.kk2 .* lenAB...
             ./(cp.kk2*CT.areaChild(1,:) + cp.kk1*CT.areaChild(2,:));
+        
         lam = coef./hTCTs;              % belongs to hT
 %         lam = zeros(1,nCTs) + coef;   % not belong to hT
     end
