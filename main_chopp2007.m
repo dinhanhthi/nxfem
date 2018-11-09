@@ -70,9 +70,9 @@ plotContourChange = 0; % only plot the interface with time (hold on to see the t
 plotSolution = 1; % plot solution or not? (uh, vh)
 
 savePlot = 1; % wanna save plot or not?
-    testCase = '6'; % count the test and used to name the folder
+    testCase = '7'; % count the test and used to name the folder
     pathOption = '_A';
-    moreInfo = 'Test 6: Test lai ket qua thanh cong cua chopp 07 voi thoi gian nhieu hon.'; % write inside file txt
+    moreInfo = 'Test 7: The bad of choice lamH.'; % write inside file txt
 
 pa.smallCut = 0;            % ignore small-support basis (1=ignore,0=no)
 pa.tH = 10; % to find the small support using (20) or (21) in arnold 2008
@@ -101,17 +101,17 @@ useSUPG = 1; % if 1, need to make more settings
 %     delSD = 0;
 
 % Penalty parameters
-cpU.lamH = 1e6; % penalty coefficient for u (substrate)
-cpV.lamH = 1e8; % penalty coefficient for v (potential)
+cpU.lamH = 1e2; % penalty coefficient for u (substrate)
+cpV.lamH = 1e4; % penalty coefficient for v (potential)
 
 % choose the machine to run
 %-------------------------------------------------------------------------
 % options: thi, gia, lehoan, blouza, gaia, google, ghost
-% machine = 'google'; 
+machine = 'google'; 
 % machine = 'blouza';
 % machine = 'thi';
 % machine = 'ghost';
-machine = 'lehoan';
+% machine = 'lehoan';
 
 % only enable showPlot option on thi's machine
 if ~strcmp(machine,'thi')
