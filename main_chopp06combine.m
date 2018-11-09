@@ -67,9 +67,9 @@ model = model_chopp06combine;    % choose model. cf. file model_chopp2007.m
 
 %% NEED TO BE CHANGED EVERY TEST CASE
 savePlot = 1; % wanna save plot or not?
-    testCase = '1'; % count the test and used to name the folder
+    testCase = '2'; % count the test and used to name the folder
     pathOption = '_Start';
-    moreInfo = ''; % write inside file txt
+    moreInfo = 'Tang lamH to 2 unit for each. Chi dung SUPG'; % write inside file txt
 
 %%
 showPlot = 0; % wanna show plots?
@@ -90,7 +90,7 @@ useNewton = 1; % use Newton to solve nonlinear problems?
     itol = 1e-3;
     
 % ghost penalty
-pa.useGP = 1; % wanna use ghost penalty term?
+pa.useGP = 0; % wanna use ghost penalty term?
     pa.gam1 = 1e-6; % parameter for 1st term
     pa.gam2 = 1e-6 ; % parameter for 2nd term
 
@@ -107,8 +107,8 @@ useSUPG = 1; % if 1, need to make more settings
 
 % Penalty parameters
 %-------------------------------------------------------------------------
-cpU.lamH = 1e6; % penalty coefficient for u (substrate)
-cpV.lamH = 1e8; % penalty coefficient for v (potential)
+cpU.lamH = 1e8; % penalty coefficient for u (substrate)
+cpV.lamH = 1e10; % penalty coefficient for v (potential)
 
 % choose the machine to run
 %-------------------------------------------------------------------------
