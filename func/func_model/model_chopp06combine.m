@@ -34,7 +34,6 @@
 
 %% Setting up
 function fh = model_chopp06combine
-    fh.name = 'model_chopp06combine';
     fh.defFu = @findDefFu;      % RHS of equation of u
     fh.defFv = @findDefFv;      % RHS of equation of v
     fh.defPhi = @findDefPhi;    % interface
@@ -62,7 +61,6 @@ end
 function GeoDom = findDomain()
     xDomVal = [0 0.5 0.5 0];                % x values of points constructing Omega
     yDomVal = [0 0 0.5 0.5];                % corresponding y value
-%     yDomVal = [0 0 0.3 0.3]; % testing
     RectDom = [3,4,xDomVal,yDomVal]';   % rectangular domain "3" with "4" sides
     GeoDom = decsg(RectDom);
 end
@@ -140,6 +138,7 @@ function lam = findLamV(cp,hTCTs,CT,pa)
     
     if pa.useGP
         coef = 4*cp.lamH*cp.kk1*cp.kk2/(cp.kk1+cp.kk2);
+        
         lam = coef./hTCTs;              % belongs to hT
 %         lam = zeros(1,nCTs) + coef;   % not belong to hT
     else
@@ -147,6 +146,7 @@ function lam = findLamV(cp,hTCTs,CT,pa)
         lenAB(1,:) = ( (CT.iPs(1,2,:) - CT.iPs(1,1,:)).^2 + (CT.iPs(2,2,:) - CT.iPs(2,1,:)).^2 ) .^(0.5);
         coef = cp.lamH*cp.kk1*cp.kk2 .* lenAB...
             ./(cp.kk2*CT.areaChild(1,:) + cp.kk1*CT.areaChild(2,:));
+        
         lam = coef./hTCTs;              % belongs to hT
 %         lam = zeros(1,nCTs) + coef;   % not belong to hT
     end

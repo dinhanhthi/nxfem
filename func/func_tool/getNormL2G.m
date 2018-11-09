@@ -1,9 +1,8 @@
-function val = getNormL2GfhNX(err,tris,areaChildCTs,msh,cp)
+function val = getNormL2G(err,tris,areaChildCTs,msh,cp)
 % Find semi-norm ||k^{1/2}grad||_L2
 % if wanna take k=1, just modify cp before apply to getNormL2G
 % State: checked
 % Input: - information of NCTs and CTs
-%        - err in VhG
 % Output: matrix to be used in err = E*A*E'
 
 %-------------------------------------------------------------------------

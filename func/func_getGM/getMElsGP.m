@@ -13,11 +13,6 @@ function E = getMElsGP(msh,pa,gP,delT,coef)
 %        - delT (Arnold Book p.222) or something else? : 1xnTs
 %        - coef goest with Eij
 % Output: sparse matrix E
-% ----------------------------------------------------------
-% Update 26/10/18: The OLD file used to compute grad v on vertices of each
-%   triangle. We now use pdegrad to find grad v on the center of each
-%   triangle (this file), i.e. grad v is constant on whole triangle and discont at edge.
-% ----------------------------------------------------------
 
 Ts = msh.t;
 

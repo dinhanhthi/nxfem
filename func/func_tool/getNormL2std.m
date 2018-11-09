@@ -1,4 +1,4 @@
-function val = getNormL2fhSTD(msh,pa,fh)
+function val = getNormL2std(msh,pa,err)
 % Get the ||err_h||_L2 of a stdFEM solution
 % Note: it's diff from getNormL2nxfem which is for nxfem solution
 % State: - change fater rewrite to new getTriplePPNCTs & getTriplePPCTs
@@ -13,7 +13,7 @@ K = []; % K takes default value, 1
 mA = sparse(i,j,v);
 
 
-val = fh*mA*fh';
+val = err*mA*err';
 val = sqrt(val);
 
 

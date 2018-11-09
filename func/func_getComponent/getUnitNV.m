@@ -1,7 +1,7 @@
 function uNorVec = getUnitNV(pointA,pointB)
 % Find the unit normal vector at a point on AB
 % Input: Two endpoints A,B in that order with their coordinates (x,y)
-% Note that, (A,B) is different from (B,A), the order is very important!
+%  Note that, (A,B) is different from (B,A), the order is very important!
 % Output: unit normal vector to that segment, this vector is always on the
 %       left, that's why the order of A and B is very important
 

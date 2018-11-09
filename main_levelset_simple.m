@@ -10,7 +10,7 @@
 addpath(genpath('func')); % add all necessary functions
 
 % nseg_array = [37, 57, 77];
-nseg_array = 57;
+nseg_array = 27;
 % nseg_array = zeros(1,3); % get from ffpp 
 
 
@@ -46,7 +46,7 @@ showPlot = 1; % show plot or not?
 savePlot = 0; % wanna save plot or not?
     pathOption = '_GOOGLE';
     testCase = 'Using ff mesh + wSUPG + wtFMM + thesis (no limit num of use FMM)'; % note for info_and_errors.txt
-withMesh = false;
+withMesh = true;
 
 %% choose the machine to run
 % machine = 'google'; 
@@ -201,7 +201,7 @@ if showPlot
     tic; time=0;
     fprintf("Show plot of phi...");
     plotNXFEM(msh,pa,phi,iPs,nf,phi,'withMesh',withMesh,...
-                'title',titlePlot,'iC','b'); % phi
+                'title',titlePlot,'dim',2,'export',false); % phi
     nCTs = size(iPs,3);
     fprintf("%fs\n",toc-time);
 end
@@ -248,7 +248,7 @@ end
 %% errors (cf. page 224, Arnold book)
 phi0h = phi;
 if ~isempty(CTs)
-    normPhih0oGh0 = getNormL2oGSTD(msh,pa,CTs,CT,phi0h); % initial phi
+    normPhih0oGh0 = getNormL2oGstd(msh,pa,CTs,CT,phi0h); % initial phi
     normPhionGh0 = getNormL2foGh(msh,pa,CTs,iPs,model.defPhi); % ||phi^0||_L2(Gam_h^0)
 %     display(normPhionGh0);
 end
@@ -279,9 +279,6 @@ CFL = zeros(1,maxStep); % store CFL value
 disp("Starting loop...");
 %% loops
 for ns = 1:maxStep
-    disp('-----------------------------');
-    fprintf('Step= %d\n',ns);
-    
     %% update velo
     t = t+dt;
     
@@ -362,8 +359,7 @@ for ns = 1:maxStep
 
     
     
-    norm_gradphi = getNormL2GfhSTD(msh,phi); % ||gradPhi||_L2
-    fprintf('|1-norm_gradphi| = %f\n',abs(1-norm_gradphi));
+    norm_gradphi = getNormL2Gstd(msh,phi); % ||gradPhi||_L2
     %% mshdist
 %     if useFMM && abs(1-norm_gradphi) > alp_FMM && numUse <=1
     if useFMM && abs(1-norm_gradphi) > alp_FMM
@@ -390,18 +386,19 @@ for ns = 1:maxStep
     
     
     %% plot phi
+%     abc = waitforbuttonpress; % wait for click
+    titlePlot = strcat('t= ',num2str(t));
     if showPlot
-        titlePlot = strcat('t= ',num2str(t));
         disp("Plotting phi...");
         plotNXFEM(msh,pa,phi,iPs,nf,phi,'withMesh',withMesh,...
-                'title',titlePlot,'iC','b'); % phi
+                'title',titlePlot,'dim',2,'export',false); % phi
         nCTs = size(iPs,3);
     end
     
     
     
 %     %% ||grad phi||
-%     norm_gradphi = getNormL2GfhSTD(msh,phi)
+%     norm_gradphi = getNormL2Gstd(msh,phi)
     
     
     
@@ -440,12 +437,12 @@ end % for ns
 
 
 %% errors
-normPhihNoGhN = getNormL2oGSTD(msh,pa,CTs,CT,phi); % ||phi_h^N||_{L2(Gam_h^N)}
+normPhihNoGhN = getNormL2oGstd(msh,pa,CTs,CT,phi); % ||phi_h^N||_{L2(Gam_h^N)}
 err = phi - phi0h;
-normErrPhihN = getNormL2fhSTD(msh,pa,err); % ||phi_h^N-phi_h^0||_{L2(Omg)}
+normErrPhihN = getNormL2std(msh,pa,err); % ||phi_h^N-phi_h^0||_{L2(Omg)}
 normPhionGhN = getNormL2foGh(msh,pa,CTs,iPs,model.defPhi); % ||phi^0||_L2(Gam_h^N)
-normPhih0PhionOmg = getNormL2fhfSTD(msh,pa,phi0h,model.defPhi); % ||phi_h^0 - phi^0||_L2(Omg)
-normPhihNPhionOmg = getNormL2fhfSTD(msh,pa,phi,model.defPhi); % ||phi_h^N - phi^0||_L2(Omg)
+normPhih0PhionOmg = getNormL2fhf(msh,pa,phi0h,model.defPhi); % ||phi_h^0 - phi^0||_L2(Omg)
+normPhihNPhionOmg = getNormL2fhf(msh,pa,phi,model.defPhi); % ||phi_h^N - phi^0||_L2(Omg)
 
 
 

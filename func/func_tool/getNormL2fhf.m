@@ -1,13 +1,13 @@
-function val = getNormL2fhfSTD(msh,pa,fh,f)
-% Find ||fh-f||_L2(\Omg) in stdFEM
+function val = getNormL2fhf(msh,pa,fh,f)
+% Find ||fh-f||_L2(\Omg)
 % First used in finding errors of level set function
 % Can be used for finding error between discrete and continuous functions in stdFEM
 % Input: fh : stdFEM (1 x nPs)
 %        f: function handle (x,y,pa)
 
 
-norm_fh = getNormL2fhSTD(msh,pa,fh);
-norm_f = getNormL2fSTD(msh,pa,f);
+norm_fh = getNormL2std(msh,pa,fh);
+norm_f = getNormL2fstd(msh,pa,f);
 
 
 Ts = msh.t; points = msh.p;

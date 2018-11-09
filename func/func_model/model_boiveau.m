@@ -48,7 +48,7 @@ typeBC = 2; % 2: u=uex on whole boundary
 end
 
 %% right hand side
-function valF = findDefF(xx,yy,pa,sub)
+function valF = findDefF(xx,yy,sub,pa)
 % Define right hand side function f
 % Input: coordinate of points + indication subdomain
 % Output: value of phi at points
@@ -60,7 +60,7 @@ end
 end
 
 %% exact solution
-function exSol = findDefExSol(xx,yy,pa,sub)
+function exSol = findDefExSol(xx,yy,sub,pa)
 % Describe the exact solution
 % Input: coordinate of points + indication subdomain
 % Output: value of exact solution at points
@@ -81,17 +81,13 @@ end
 %% =======================================================================
 % KAPPA
 %=========================================================================
-function kap = findKap(cp,CT,pa)
+function kap = findKap(areaChildCTs,pa)
     % kapi : 1 x nCTs
-    
-    if pa.useGP
-        nCTs = size(CT.areaChild,2);
-        kap.kap1 = zeros(1,nCTs) + cp.kk2/(cp.kk1+cp.kk2);
-        kap.kap2 = zeros(1,nCTs) + cp.kk1/(cp.kk1+cp.kk2);
-    else
-        kap.kap1 = cp.kk1*CT.areaChild(2,:) ./ (cp.kk1*CT.areaChild(2,:) + cp.kk2*CT.areaChild(1,:));
-        kap.kap2 = cp.kk2*CT.areaChild(1,:) ./ (cp.kk1*CT.areaChild(2,:) + cp.kk2*CT.areaChild(1,:));
-    end
+    nCTs = size(areaChildCTs,2);
+%     kap.kap1 = zeros(1,nCTs) + pa.kk2/(pa.kk1+pa.kk2);
+%     kap.kap2 = zeros(1,nCTs) + pa.kk1/(pa.kk1+pa.kk2);
+    kap.kap1 = zeros(1,nCTs) + 0.5;
+    kap.kap2 = zeros(1,nCTs) + 0.5;
 end
 
 
@@ -99,20 +95,14 @@ end
 %% =======================================================================
 % LAMBDA (penalty term)
 %=========================================================================
-function lam = findLam(cp,hTCTs,CT,pa)
+% function lam = findLam(areaChildCTs,pa)
+%     % lam: 1 x nCTs
+%     nCTs = size(areaChildCTs,2);
+%     lam = zeros(1,nCTs) + 4*pa.lamH*pa.kk1*pa.kk2/(pa.kk1+pa.kk2);
+% end
+
+function lam = findLam(pa,hT)
     % lam: 1 x nCTs
-    nCTs = size(hTCTs, 2);
-    
-    if pa.useGP
-        coef = 4*cp.lamH*cp.kk1*cp.kk2/(cp.kk1+cp.kk2);
-        lam = coef./hTCTs;              % belongs to hT
-%         lam = zeros(1,nCTs) + coef;   % not belong to hT
-    else
-        lenAB = zeros(1,nCTs); % nCTs x 1
-        lenAB(1,:) = ( (CT.iPs(1,2,:) - CT.iPs(1,1,:)).^2 + (CT.iPs(2,2,:) - CT.iPs(2,1,:)).^2 ) .^(0.5);
-        coef = cp.lamH*cp.kk1*cp.kk2 .* lenAB...
-            ./(cp.kk2*CT.areaChild(1,:) + cp.kk1*CT.areaChild(2,:));
-        lam = coef./hTCTs;              % belongs to hT
-%         lam = zeros(1,nCTs) + coef;   % not belong to hT
-    end
+    coef = 4*pa.lamH*pa.kk1*pa.kk2/(pa.kk1+pa.kk2);
+    lam = coef./hT;
 end
