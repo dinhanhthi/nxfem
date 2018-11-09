@@ -1,4 +1,4 @@
-function val = getNormL2oGstd(msh,pa,CTs,CT,err)
+function val = getNormL2oGSTD(msh,pa,CTs,CT,err)
 % Find ||err_h||_{L^2(Gam_h)} for stdFEM err
 % First used in main_level_simple to find norm of signed distance function,
 %   cf. Arnold book p.224

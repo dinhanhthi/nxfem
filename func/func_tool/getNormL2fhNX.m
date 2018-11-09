@@ -1,4 +1,4 @@
-function vL2 = getNormL2nxfem(uh,tris,CT,msh,pa)
+function vL2 = getNormL2fhNX(uh,tris,CT,msh,pa)
 % Get the ||e||_L2 of a nxfem solution
 % State: - change fater rewrite to new getTriplePPNCTs & getTriplePPCTs
 %        - checked with the old method getMatrixL2.m

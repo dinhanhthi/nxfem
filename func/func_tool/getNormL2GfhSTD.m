@@ -1,4 +1,4 @@
-function val = getNormL2Gstd(msh,err)
+function val = getNormL2GfhSTD(msh,err)
 % Find semi-norm ||k^{1/2}grad||_L2 for stdFEM
 % Copy idea from getNormL2G
 % State:
