@@ -67,9 +67,9 @@ model = model_chopp06combine;    % choose model. cf. file model_chopp2007.m
 
 %% NEED TO BE CHANGED EVERY TEST CASE
 savePlot = 1; % wanna save plot or not?
-    testCase = '2'; % count the test and used to name the folder
+    testCase = '3'; % count the test and used to name the folder
     pathOption = '_Start';
-    moreInfo = 'Tang lamH to 2 unit for each. Chi dung SUPG'; % write inside file txt
+    moreInfo = 'Quay lai cai commit thanh cong.'; % write inside file txt
 
 %%
 showPlot = 0; % wanna show plots?
@@ -90,7 +90,7 @@ useNewton = 1; % use Newton to solve nonlinear problems?
     itol = 1e-3;
     
 % ghost penalty
-pa.useGP = 0; % wanna use ghost penalty term?
+pa.useGP = 1; % wanna use ghost penalty term?
     pa.gam1 = 1e-6; % parameter for 1st term
     pa.gam2 = 1e-6 ; % parameter for 2nd term
 
@@ -107,8 +107,8 @@ useSUPG = 1; % if 1, need to make more settings
 
 % Penalty parameters
 %-------------------------------------------------------------------------
-cpU.lamH = 1e8; % penalty coefficient for u (substrate)
-cpV.lamH = 1e10; % penalty coefficient for v (potential)
+cpU.lamH = 1e5; % penalty coefficient for u (substrate)
+cpV.lamH = 1e5; % penalty coefficient for v (potential)
 
 % choose the machine to run
 %-------------------------------------------------------------------------
@@ -146,6 +146,7 @@ useFixedDist = 1; % use fixed distance Dirichlet condition like in Chopp?
 %     pa.L = 0.05; % testing
 
 maxDay = 45; % using dt = dx/|u|
+CFL = 0.5;
 
 
 %% DOMAIN
@@ -734,7 +735,7 @@ while day < maxDay
     
     % dt
     maxGradV = max(abs(gvnew.x) + abs(gvnew.y));
-    dt = msh.hTmax/maxGradV;
+    dt = CFL*msh.hTmax/maxGradV;
     day = day+dt;
     fprintf('day: %f\n',day);
     
