@@ -311,7 +311,7 @@ while (difv > itol) && (step<imax)
         Fv = Fv - Av*vnew; % modification of F
         % LU factorization
         vnew(iNodes) = Av(iNodes,iNodes)\Fv(iNodes); % don't care nodes on boundary
-        % uh(iNodes) = gmres(Au(iNodes,iNodes),Fu(iNodes)); % GMRES factorization
+        % vnew(iNodes) = gmres(Av(iNodes,iNodes),Fv(iNodes)); % GMRES factorization
         
         del = vnew - vold;
         vold = vnew; % update for the next step
