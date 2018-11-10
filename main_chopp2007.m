@@ -670,7 +670,7 @@ if savePlot
    % Save parameters' info to file
 %     fileName = strcat(path_test_result,...
 %         '/parameters_',num2str(size(triangles,2)),'.txt');
-    fileID = fopen(fileName,'w');
+%     fileID = fopen(fileName,'w');
         fprintf(fileID,'\n');
         fprintf(fileID,'the last dt: %f,\n',dt);
         fprintf(fileID,'\n');

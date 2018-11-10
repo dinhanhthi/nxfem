@@ -107,7 +107,7 @@ useSUPG = 1; % if 1, need to make more settings
 
 % Penalty parameters
 %-------------------------------------------------------------------------
-cpU.lamH = 1e8; % penalty coefficient for u (substrate)
+cpU.lamH = 1e6; % penalty coefficient for u (substrate)
 cpV.lamH = 1e8; % penalty coefficient for v (potential)
 
 % choose the machine to run
@@ -136,10 +136,10 @@ pa.r0 = 0.03; % testing
 pa.muS1 = 8.54932; pa.muS2 = 0;
 pa.muP1 = 8.28785; pa.muP2 = 0;
 % pa.bcu3 = 8.3e-6; % boundary condition for u on \pt\Omg_3
-pa.bcu3 = 1e-4; % testing
+pa.bcu3 = 1e-2; % testing
 cpU.kk1 = 146.88; cpU.kk2 = 183.6; % diff coef for u
 cpV.kk1 = 1; cpV.kk2 = 1;    % diff coef for v
-pa.f = 0.5; % volume fraction of active biomass
+pa.f = 0.6; % volume fraction of active biomass
 pa.K0 = 5e-7;
 
 useFixedDist = 1; % use fixed distance Dirichlet condition like in Chopp?
@@ -294,10 +294,15 @@ if savePlot
         fprintf(fileID,'no. triangles: %d,\n',size(triangles,2));
         fprintf(fileID,'\n');
         fprintf(fileID,'number of days: %f,\n',maxDay);
+        fprintf(fileID,'__CFL: %f,\n',CFL);
         fprintf(fileID,'\n');
         fprintf(fileID,'Use FreeFem++ mesh: %d,\n',useFFmesh);
         fprintf(fileID,'Regular mesh: %d,\n',reguMesh);
+        fprintf(fileID,'\n');
         fprintf(fileID,'Use small-cut: %d,\n',pa.smallCut);
+        fprintf(fileID,'\n');
+        fprintf(fileID,'Newton?: %d,\n',useNewton);
+        fprintf(fileID,'__itol: %f,\n',itol);
         fprintf(fileID,'\n');
         fprintf(fileID,'Use FMM: %d,\n',useFMM);
         fprintf(fileID,'__al_FMM: %f,\n',alp_FMM);
@@ -312,7 +317,27 @@ if savePlot
         fprintf(fileID,'__gam1: %f,\n',pa.gam1);
         fprintf(fileID,'__gam2: %f,\n',pa.gam2);
         fprintf(fileID,'\n');
-    fclose(fileID); 
+        fprintf(fileID,'Panalty terms:\n');
+        fprintf(fileID,'__lamHu: %f,\n',cpU.lamH);
+        fprintf(fileID,'__lamHv: %f,\n',cpV.lamH);
+        fprintf(fileID,'\n');
+        fprintf(fileID,'Model parameters:\n');
+        fprintf(fileID,'__r0: %f,\n',pa.r0);
+        fprintf(fileID,'____distancing: %d,\n',pa.distancing);
+        fprintf(fileID,'__muS1: %f,\n',pa.muS1);
+        fprintf(fileID,'__muS2: %f,\n',pa.muS2);
+        fprintf(fileID,'__muP1: %f,\n',pa.muP1);
+        fprintf(fileID,'__muP2: %f,\n',pa.muP2);
+        fprintf(fileID,'__bcu3: %f,\n',pa.bcu3);
+        fprintf(fileID,'__cpU.k1: %f,\n',cpU.kk1);
+        fprintf(fileID,'__cpU.k2: %f,\n',cpU.kk2);
+        fprintf(fileID,'__cpV.k1: %f,\n',cpV.kk1);
+        fprintf(fileID,'__cpV.k1: %f,\n',cpV.kk1);
+        fprintf(fileID,'__f: %f,\n',pa.f);
+        fprintf(fileID,'__K0: %f,\n',pa.K0);
+        fprintf(fileID,'__useFixedDist: %d,\n',useFixedDist);
+        fprintf(fileID,'____pa.L: %f,\n',pa.L);
+%     fclose(fileID); 
 end
 
 
@@ -740,6 +765,15 @@ while day < maxDay
     day = day+dt;
     fprintf('day: %f\n',day);
     
+    if savePlot && (ns==1)
+            fprintf(fileID,'the first dt: %f,\n',dt);
+            fprintf(fileID,'\n');
+    end
+    
+    if dt > 10
+       break; 
+    end
+    
     
     % stiffness matrix for level set
     %----------------------------------------------------------------------
@@ -797,9 +831,9 @@ end % for ns
 %% save info file
 if savePlot
    % Save parameters' info to file
-    fileName = strcat(path_test_result,...
-        '/parameters_',num2str(size(triangles,2)),'.txt');
-    fileID = fopen(fileName,'w');
+%     fileName = strcat(path_test_result,...
+%         '/parameters_',num2str(size(triangles,2)),'.txt');
+%     fileID = fopen(fileName,'w');
         fprintf(fileID,'\n');
         fprintf(fileID,'the last dt: %f,\n',dt);
         fprintf(fileID,'\n');

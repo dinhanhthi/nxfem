@@ -1,4 +1,5 @@
 TesT 10: FIND a successful test with smaller initial interface + finer mesh,
+KET QUA: khong co thay doi gi theo thoi gian luon!!!!
 
 Machine: google,
 Model: model_chopp06combine,
