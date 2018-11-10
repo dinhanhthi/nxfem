@@ -63,6 +63,7 @@ pa.degN = 8; % Gaussian quadrature points in 2D (for non-polynomial functions)
 pa.tol = eps(1e3); % tolerance, 1e-14
 
 
+
 %% Model
 model = model_article1;
 GeoDom = model.domain(); % domain
@@ -91,12 +92,128 @@ useNewton = 0; % use Newton method for solving v?
 cpW.lamH = 1e11; % penalty coefficient for w
 cpV.lamH = 1e8; % penalty coefficient for v
 
+% ghost penalty
+pa.useGP = 0; % wanna use ghost penalty term?
+    pa.gam1 = 1e-6; % parameter for 1st term
+    pa.gam2 = 1e-6 ; % parameter for 2nd term
+
+
+
 %% Model's parameters
-cpW.kk1 = pa.alp1; cpW.kk2 = pa.alp2;
-cpV.kk1 = pa.bet1; cpV.kk2 = pa.bet2;
+cpW.kk1 = 1; cpW.kk2 = 100;
+cpV.kk1 = 0.5; cpV.kk2 = 100;
+% (cpV.kk2 doesn't take affect because v=0 in Omg2)
+pa.r0 = 0.6; % interface
+pa.lamSys = 1; % coef lam in system settings
 
 
 
+%% Dependent parameters
+if findCR == 1
+    showPlot = 0; % don't plot the solutions
+    numSeg = numSegCR;
+    disp('Find the convergence rate...');
+else
+    numSeg = numSegPlot;
+    disp('Only ONE step...');
+end
+nStep = size(numSeg,2);
+
+
+
+%% For finding CR
+hTarray = zeros(1,nStep);
+nDOFsArray = zeros(1,nStep);
+errArray = zeros(2,nStep);
+
+
+
+%% Foor loops: find the convergence rate if needed
+for z = 1:nStep
+    
+    disp('-----------------------------');
+    fprintf('nSeg = %d\n',numSeg(z));
+    
+    
+    %% Get mesh info
+    hMax = 2/numSeg(z);
+    if ~reguMesh
+        [points,edges,triangles] = initmesh(GeoDom,'hmax',hMax); % irregular
+    else
+        [points,edges,triangles] = poimesh(GeoDom,numSeg(z),numSeg(z)); % regular
+    end
+    msh.p = points; msh.t = triangles; msh.e = edges;
+    x = points(1,:); % x-coordinate of points
+    y = points(2,:); % y-coordinate of points
+    msh.hT = getDiam(msh); % 1 x number of triangles  (diameter (longest side) of each triangle)
+    msh.hTmax = max(msh.hT); % maximum of all diameters
+    
+    
+    %% Level set function
+    defPhi = model.defPhi; % function handle
+    phi = defPhi(x,y,pa); % 1 x number of points (row array)
+    phi(abs(phi)<pa.tol)=0; % find phi which are very small (~0) and set to 0
+    
+    
+    %% Get all triangles
+    tris = getTriangles(phi,msh,pa);
+    CTs=tris.CTs;
+    
+    
+    %% CT's info
+    CT = getInfoCTs(CTs,phi,msh,pa);
+    nodeCTs=CT.nodes; areaChildCTs=CT.areaChild; iPs=CT.iPs;
+    
+    
+    %% Small cut
+    if pa.smallCut
+        tic;time=0;
+        fprintf('Removing small cut triangles... ')
+        [tris,CT] = findSmallPhi_after(msh,pa,phi,tris,CT);
+%         clear CTs NCTs NCTs2 nodeCTs areaChildCTs iPs; % just in case
+        CTs=tris.CTs;
+        nodeCTs=CT.nodes; areaChildCTs=CT.areaChild;iPs=CT.iPs;
+        fprintf("%fs\n",toc-time);
+    end
+    
+    
+    %% Nodes
+    msh.nNew = nodeCTs.n; % number of new nodes (nodes around the interface)
+    msh.nStd = size(points,2); % number of standard nodes
+    msh.ndof = msh.nNew + msh.nStd; % number of dofs
+    msh.newNodes = getNewNodes(nodeCTs.all,msh.nStd); % vector contaning new numbering of nodes around interface, column
+    msh.node = getNodes(tris,nodeCTs,msh,phi,pa); % get all nodes
+    
+    
+    %% Boundary nodes
+    [iN,bN] = getibNodes(msh);
+    bNodes = bN.all; iNodes=iN.all;
+    
+    
+    %% Exact solution in stdFEM
+    % exSol_i = exSol(x_i)
+    % w
+    defExSol = model.defWex;
+    wExStd = exInStd(defExSol,msh,pa);
+    % u
+    defExSol = model.defUex;
+    uExStd = exInStd(defExSol,msh,pa);
+    % v
+    defExSol = model.defVex;
+    vExStd = exInStd(defExSol,msh,pa);
+    
+    
+    %% Exact solution in NXFEM
+    % wExNX_i = wExStd_i for i is node of mesh
+    % wExNX_k(i) = wExStd_i for i in msh.node.CT.all
+    % w
+    
+    % u
+    
+    % v
+    
+    
+end
 
 
 %% =======================================================================

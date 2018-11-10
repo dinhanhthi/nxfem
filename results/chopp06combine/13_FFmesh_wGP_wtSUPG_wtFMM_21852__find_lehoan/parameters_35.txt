@@ -1,4 +1,4 @@
-TesT 13: From 12, without any thing,
+TesT 13: From 12, only GP
 
 Machine: lehoan,
 Model: model_chopp06combine,

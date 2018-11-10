@@ -67,9 +67,9 @@ model = model_chopp06combine;    % choose model. cf. file model_chopp2007.m
 
 %% NEED TO BE CHANGED EVERY TEST CASE
 savePlot = 1; % wanna save plot or not?
-    testCase = '13'; % count the test and used to name the folder
+    testCase = '14'; % count the test and used to name the folder
     pathOption = '_find';
-    moreInfo = 'TesT 13: From 12, without any thing'; % write inside file txt
+    moreInfo = 'TesT 14: From 12, with all things'; % write inside file txt
 
 %%
 showPlot = 0; % wanna show plots?
@@ -95,13 +95,13 @@ pa.useGP = 1; % wanna use ghost penalty term?
     pa.gam2 = 1e-6 ; % parameter for 2nd term
 
 % Fast marching method
-useFMM = 0; % use fast marching method or not (mshdist)?
+useFMM = 1; % use fast marching method or not (mshdist)?
     numUseFMM = 0; % count the number of use of FMM
     alp_FMM = 0.1;
     stepUseFMM = 15; % use every 15 step (disable al_FMM method)
 
 % SUPG
-useSUPG = 0; % if 1, need to make more settings
+useSUPG = 1; % if 1, need to make more settings
     delEps = 1e-3;
     delSD = 0.5;
 
@@ -284,7 +284,7 @@ end
 
 if savePlot
    % Save parameters' info to file
-    fileName = strcat(path_test_result,'/parameters_',num2str(nSeg),'.txt');
+    fileName = strcat(path_test_result,'/',testCase,'_parameters_','.txt');
     fileID = fopen(fileName,'w');
         fprintf(fileID,'%s,\n',moreInfo);
         fprintf(fileID,'\n');
@@ -762,6 +762,7 @@ while day < maxDay
     % dt
     maxGradV = max(abs(gvnew.x) + abs(gvnew.y));
     dt = CFL*msh.hTmax/maxGradV;
+    fprintf('dt: %f\n', dt);
     day = day+dt;
     fprintf('day: %f\n',day);
     

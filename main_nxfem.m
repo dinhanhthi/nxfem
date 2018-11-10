@@ -140,7 +140,7 @@ for z = 1:nStep
         tic;time=0;
         fprintf('Removing small cut triangles... ')
         [tris,CT] = findSmallPhi_after(msh,pa,phi,tris,CT);
-        clear CTs NCTs NCTs2 nodeCTs areaChildCTs iPs; % just in case
+%         clear CTs NCTs NCTs2 nodeCTs areaChildCTs iPs; % just in case
         CTs=tris.CTs;
         nodeCTs=CT.nodes; areaChildCTs=CT.areaChild;iPs=CT.iPs;
         fprintf("%fs\n",toc-time);
