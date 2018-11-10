@@ -1,2 +1,0 @@
-Machine: ghost,
-Model: model_chopp06combine,

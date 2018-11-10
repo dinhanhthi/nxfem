@@ -67,9 +67,9 @@ model = model_chopp06combine;    % choose model. cf. file model_chopp2007.m
 
 %% NEED TO BE CHANGED EVERY TEST CASE
 savePlot = 1; % wanna save plot or not?
-    testCase = '4'; % count the test and used to name the folder
-    pathOption = '_Start';
-    moreInfo = 'Test4: Lan 3 giong y chang commit cu tru cai CFL va khong chac cho mesh, lan nay thu lai.'; % write inside file txt
+    testCase = '10'; % count the test and used to name the folder
+    pathOption = '_find';
+    moreInfo = 'TesT 10: FIND a successful test with smaller initial interface + finer mesh'; % write inside file txt
 
 %%
 showPlot = 0; % wanna show plots?
@@ -77,7 +77,7 @@ showPlot = 0; % wanna show plots?
 % for both showPlot & savePlot
 withMesh = false;
 plotGradv = 0; % plot gradient of v on cut triangles
-plotContourChange = 1; % only plot the interface with time (hold on to see the track)
+plotContourChange = 0; % only plot the interface with time (hold on to see the track)
 plotSolution = 1; % plot solution or not? (uh, vh)
     
 pa.smallCut = 0;  % ignore small-support basis (1=ignore,0=no)
@@ -90,7 +90,7 @@ useNewton = 1; % use Newton to solve nonlinear problems?
     itol = 1e-3;
     
 % ghost penalty
-pa.useGP = 1; % wanna use ghost penalty term?
+pa.useGP = 0; % wanna use ghost penalty term?
     pa.gam1 = 1e-6; % parameter for 1st term
     pa.gam2 = 1e-6 ; % parameter for 2nd term
 
@@ -107,17 +107,17 @@ useSUPG = 1; % if 1, need to make more settings
 
 % Penalty parameters
 %-------------------------------------------------------------------------
-cpU.lamH = 1e5; % penalty coefficient for u (substrate)
-cpV.lamH = 1e5; % penalty coefficient for v (potential)
+cpU.lamH = 1e8; % penalty coefficient for u (substrate)
+cpV.lamH = 1e8; % penalty coefficient for v (potential)
 
 % choose the machine to run
 %-------------------------------------------------------------------------
 % options: thi, gia, lehoan, blouza, gaia, google, ghost
-% machine = 'google'; 
+machine = 'google'; 
 % machine = 'blouza';
 % machine = 'thi';
 % machine = 'ghost';
-machine = 'lehoan';
+% machine = 'lehoan';
 
 
 % only enable showPlot option on thi's machine
@@ -130,12 +130,13 @@ end
 %% Model parameters
 %-------------------------------------------------------------------------
 % pa.r0 = 0.01;  % interface
-pa.r0 = 0.05; % testing
+% pa.r0 = 0.05; % testing
+pa.r0 = 0.03; % testing
     pa.distancing = 0; % make phi to be a signed distance function
 pa.muS1 = 8.54932; pa.muS2 = 0;
 pa.muP1 = 8.28785; pa.muP2 = 0;
-pa.bcu3 = 8.3e-6; % boundary condition for u on \pt\Omg_3
-% pa.bcu3 = 1e-2; % testing
+% pa.bcu3 = 8.3e-6; % boundary condition for u on \pt\Omg_3
+pa.bcu3 = 1e-4; % testing
 cpU.kk1 = 146.88; cpU.kk2 = 183.6; % diff coef for u
 cpV.kk1 = 1; cpV.kk2 = 1;    % diff coef for v
 pa.f = 0.5; % volume fraction of active biomass

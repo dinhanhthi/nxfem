@@ -188,7 +188,7 @@ switch machine
         path_phi = strcat(path_nxfem,'mshdist/');
         call_mshdist = strcat({'mshdist'},{' '},{path_phi},'phi'); % run in terminal
     case 'ghost'
-        path_nxfem = '/home/ghost/nxfem/'; 
+        path_nxfem = '/home/ghost/nxfem/';
         path_phi = strcat(path_nxfem,'mshdist/');
         call_mshdist = strcat({'mshdist'},{' '},{path_phi},'phi'); % run in terminal
     case 'gia'
