@@ -67,9 +67,9 @@ model = model_chopp06combine;    % choose model. cf. file model_chopp2007.m
 
 %% NEED TO BE CHANGED EVERY TEST CASE
 savePlot = 1; % wanna save plot or not?
-    testCase = '12'; % count the test and used to name the folder
+    testCase = '13'; % count the test and used to name the folder
     pathOption = '_find';
-    moreInfo = 'TesT 12: Tai sao khong nhuc nhich?'; % write inside file txt
+    moreInfo = 'TesT 13: From 12, without any thing'; % write inside file txt
 
 %%
 showPlot = 0; % wanna show plots?
@@ -101,7 +101,7 @@ useFMM = 0; % use fast marching method or not (mshdist)?
     stepUseFMM = 15; % use every 15 step (disable al_FMM method)
 
 % SUPG
-useSUPG = 1; % if 1, need to make more settings
+useSUPG = 0; % if 1, need to make more settings
     delEps = 1e-3;
     delSD = 0.5;
 
@@ -113,11 +113,11 @@ cpV.lamH = 1e8; % penalty coefficient for v (potential)
 % choose the machine to run
 %-------------------------------------------------------------------------
 % options: thi, gia, lehoan, blouza, gaia, google, ghost
-machine = 'google'; 
+% machine = 'google'; 
 % machine = 'blouza';
 % machine = 'thi';
 % machine = 'ghost';
-% machine = 'lehoan';
+machine = 'lehoan';
 
 
 % only enable showPlot option on thi's machine

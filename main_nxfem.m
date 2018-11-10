@@ -2,7 +2,9 @@
 % INTRODUCTION
 % =========================================================
 % NXFEM based on Hansbo's paper.
-% This file is used for both Sinha's models and Barrau's model
+% This file is used for many models have a very simple form
+%   -grad(kgrad u) = f
+%   with a given exact solution
 % =========================================================
 
 %% add path of functions
