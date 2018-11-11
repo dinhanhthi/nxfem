@@ -63,7 +63,7 @@ pa.tol = eps(1e3);          % tolerance, 1e-14
 %-------------------------------------------------------------------------
 model = model_chopp06combine;    % choose model. cf. file model_chopp2007.m
 
-showPlot = 0; % wanna show plots?
+showPlot = 1; % wanna show plots?
     withMesh = false;
     plotGradv = 0; % plot gradient of v on cut triangles
 
@@ -175,7 +175,7 @@ phi(abs(phi)<pa.tol)=0; % find phi which are very small (~0) and set to 0
 fprintf('Running on machine [%s]\n', machine);
 switch machine
     case 'thi'
-        path_nxfem = '/home/thi/Documents/nxfem/'; % thi's local machine
+        path_nxfem = '/home/thi/Documents/Github/nxfem/'; % thi's local machine
         path_phi = strcat(path_nxfem,'mshdist/');
         call_mshdist = strcat({'mshdist'},{' '},{path_phi},'phi'); % run in terminal
     case 'google'
@@ -573,7 +573,7 @@ while day < maxDay
         % save phi
         titlePlot = strcat('phi, day = ',num2str(round(day,2)));
         plotNXFEM(msh,pa,phi,iPs,nf,phi,'withMesh',withMesh,...
-                'title',titlePlot,'dim',2,'export',false); % phi
+                'title',titlePlot,'dim',2); % phi
         fileName = strcat(path_test_result,'/phi_',num2str(ns),'_day_',num2str(round(day,2)),'.png');
         % change size of images
         oldpaperunits = get(gcf,'PaperUnits');
