@@ -1,4 +1,4 @@
-TesT 13: From 12, only GP
+TesT 14: From 12, with all things,
 
 Machine: lehoan,
 Model: model_chopp06combine,
@@ -16,12 +16,12 @@ Use small-cut: 0,
 Newton?: 1,
 __itol: 0.001000,
 
-Use FMM: 0,
+Use FMM: 1,
 __al_FMM: 0.100000,
 __numUseFMM: 0,
 __numUseFMM: 15,
 
-useSUPG: 0,
+useSUPG: 1,
 __delEps: 0.001000,
 __delSD: 0.500000,
 
@@ -50,7 +50,4 @@ __K0: 0.000000,
 __useFixedDist: 1,
 ____pa.L: 0.075000,
 the first dt: 0.160083,
-
-
-the last dt: 227.413118,
 
