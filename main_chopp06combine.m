@@ -139,7 +139,7 @@ pa.bcu3 = 8.3e-6; % boundary condition for u on \pt\Omg_3
 % pa.bcu3 = 1e-1; % testing
 cpU.kk1 = 146.88; cpU.kk2 = 183.6; % diff coef for u
 cpV.kk1 = 1; cpV.kk2 = 1;    % diff coef for v
-pa.f = 0.6; % volume fraction of active biomass
+pa.f = 0.5; % volume fraction of active biomass
 pa.K0 = 5e-7;
 
 useFixedDist = 1; % use fixed distance Dirichlet condition like in Chopp?
