@@ -61,10 +61,10 @@ function fh = model_article1
     fh.domain = @findDomain; % domain setting
     fh.bcW = @findTypeBCw; % BCs for tw's equation
     fh.bcV = @findTypeBCv; % BCs for u's equation
-    fh.kapW = @findKapW; % kappa for w's equation
-    fh.kapV = @findKapV; % kappa for u's equation
-    fh.lamW = @findLamW; % lambda for w's equation
-    fh.lamV = @findLamV; % lambda for u's equation
+    fh.kapW = @findKap; % kappa for w's equation
+    fh.kapV = @findKap; % kappa for u's equation
+    fh.lamW = @findLam; % lambda for w's equation
+    fh.lamV = @findLam; % lambda for u's equation
 end
 
 
@@ -101,7 +101,7 @@ end
 %% =======================================================================
 % F
 %=========================================================================
-function valF = findDefFw(xx,yy,sub,pa)
+function valF = findDefFw(xx,yy,pa,sub)
     % Define right hand side function f
     % Input: coordinate of points + indication subdomain
     % Output: value of phi at points
@@ -113,7 +113,7 @@ function valF = findDefFw(xx,yy,sub,pa)
     end
 end
 %-------------------------------------------------------------------------
-function valF = findDefFv(xx,yy,sub,pa)
+function valF = findDefFv(xx,yy,pa,sub)
     % Define right hand side function fu
     % Input: coordinate of points + indication subdomain
     % Output: value of F at points
@@ -137,17 +137,17 @@ end
 %% =======================================================================
 % EXACT SOLUTIONS
 %=========================================================================
-function exSol = findDefWex(xx,yy,sub,pa)
+function exSol = findDefWex(xx,yy,pa,sub)
     % Describe the exact solution of w
     % Input: coordinate of points + indication subdomain
     % Output: value of exact solution at points
     
     % uex
-    uex1 = findDefUex(xx,yy,1,pa);
-    uex2 = findDefUex(xx,yy,2,pa);
+    uex1 = findDefUex(xx,yy,pa,1);
+    uex2 = findDefUex(xx,yy,pa,2);
     % vex
-    vex1 = findDefVex(xx,yy,1,pa);
-    vex2 = findDefVex(xx,yy,2,pa);
+    vex1 = findDefVex(xx,yy,pa,1);
+    vex2 = findDefVex(xx,yy,pa,2);
     if sub==1 % in Omg1s
         exSol = uex1 + pa.bet1/(pa.lamSys*pa.alp1)*vex1;
     else % in Omg2
@@ -155,7 +155,7 @@ function exSol = findDefWex(xx,yy,sub,pa)
     end
 end
 %-------------------------------------------------------------------------
-function exSol = findDefUex(xx,yy,sub,pa)
+function exSol = findDefUex(xx,yy,pa,sub)
     % Describe the exact solution of u
     % Input: coordinate of points + indication subdomain
     % Output: value of exact solution at points
@@ -168,7 +168,7 @@ function exSol = findDefUex(xx,yy,sub,pa)
     end
 end
 %-------------------------------------------------------------------------
-function exSol = findDefVex(xx,yy,sub,pa)
+function exSol = findDefVex(xx,yy,pa,sub)
     % Describe the exact solution of v
     % Input: coordinate of points + indication subdomain
     % Output: value of exact solution at points
@@ -198,44 +198,37 @@ end
 %% =======================================================================
 % KAPPA
 %=========================================================================
-function kap = findKapW(areaChildCTs,pa)
-    % for seeking w
+function kap = findKap(cp,CT,pa)
     % kapi : 1 x nCTs
-    nCTs = size(areaChildCTs,2);
-    kap.kap1 = zeros(1,nCTs) + pa.alp2/(pa.alp1+pa.alp2);
-    kap.kap2 = zeros(1,nCTs) + pa.alp1/(pa.alp1+pa.alp2);
-end
-%-------------------------------------------------------------------------
-function kap = findKapV(areaChildCTs,pa)
-    % for seeking u
-    % kapi : 1 x nCTs
-    nCTs = size(areaChildCTs,2);
-    kap.kap1 = zeros(1,nCTs) + pa.bet2/(pa.bet1+pa.bet2);
-    kap.kap2 = zeros(1,nCTs) + pa.bet1/(pa.bet1+pa.bet2);
+    
+    if pa.useGP
+        nCTs = size(CT.areaChild,2);
+        kap.kap1 = zeros(1,nCTs) + cp.kk2/(cp.kk1+cp.kk2);
+        kap.kap2 = zeros(1,nCTs) + cp.kk1/(cp.kk1+cp.kk2);
+    else
+        kap.kap1 = cp.kk1*CT.areaChild(2,:) ./ (cp.kk1*CT.areaChild(2,:) + cp.kk2*CT.areaChild(1,:));
+        kap.kap2 = cp.kk2*CT.areaChild(1,:) ./ (cp.kk1*CT.areaChild(2,:) + cp.kk2*CT.areaChild(1,:));
+    end
 end
 
 
 %% =======================================================================
 % LAMBDA (penalty term)
 %=========================================================================
-function lam = findLamW(cpW,hT,CTs,pa)
+function lam = findLam(cp,hTCTs,CT,pa)
     % lam: 1 x nCTs
+    nCTs = size(hTCTs, 2);
     
-%     hTCT = hT(CTs(5,:));
-%     coef = 4*pa.lamHw*cpW.kk1*cpW.kk2/(cpW.kk1+cpW.kk2);
-%     lam = coef./hTCT;
-
-    nCTs = size(CTs,2);
-    lam = zeros(1,nCTs) + 4*pa.lamHw*cpW.kk1*cpW.kk2/(cpW.kk1+cpW.kk2);
-end
-%-------------------------------------------------------------------------
-function lam = findLamV(cpV,hT,CTs,pa)
-    % lam: 1 x nCTs
-    
-%     hTCT = hT(CTs(5,:));
-%     coef = 4*pa.lamHv*cpV.kk1*cpV.kk2/(cpV.kk1+cpV.kk2);
-%     lam = coef./hTCT;
-
-    nCTs = size(CTs,2);
-    lam = zeros(1,nCTs) + 4*pa.lamHv*cpV.kk1*cpV.kk2/(cpV.kk1+cpV.kk2);
+    if pa.useGP
+        coef = 4*cp.lamH*cp.kk1*cp.kk2/(cp.kk1+cp.kk2);
+        lam = coef./hTCTs;              % belongs to hT
+%         lam = zeros(1,nCTs) + coef;   % not belong to hT
+    else
+        lenAB = zeros(1,nCTs); % nCTs x 1
+        lenAB(1,:) = ( (CT.iPs(1,2,:) - CT.iPs(1,1,:)).^2 + (CT.iPs(2,2,:) - CT.iPs(2,1,:)).^2 ) .^(0.5);
+        coef = cp.lamH*cp.kk1*cp.kk2 .* lenAB...
+            ./(cp.kk2*CT.areaChild(1,:) + cp.kk1*CT.areaChild(2,:));
+        lam = coef./hTCTs;              % belongs to hT
+%         lam = zeros(1,nCTs) + coef;   % not belong to hT
+    end
 end
