@@ -65,7 +65,7 @@ model = model_chopp06combine;    % choose model. cf. file model_chopp2007.m
 
 showPlot = 0; % wanna show plots?
     withMesh = false;
-    plotGradv = 1; % plot gradient of v on cut triangles
+    plotGradv = 0; % plot gradient of v on cut triangles
 
 savePlot = 1; % wanna save plot or not?
     pathOption = '_test5_day';
