@@ -67,9 +67,9 @@ model = model_chopp06combine;    % choose model. cf. file model_chopp2007.m
 
 %% NEED TO BE CHANGED EVERY TEST CASE
 savePlot = 1; % wanna save plot or not?
-    testCase = '16'; % count the test and used to name the folder
+    testCase = '17'; % count the test and used to name the folder
     pathOption = '_find';
-    moreInfo = 'Test 16: again for 12'; % write inside file txt
+    moreInfo = 'Test 17: like 17 bcu3 tang len e-1, f 0.5'; % write inside file txt
 
 %%
 showPlot = 0; % wanna show plots?
@@ -113,11 +113,11 @@ cpV.lamH = 1e10; % penalty coefficient for v (potential)
 % choose the machine to run
 %-------------------------------------------------------------------------
 % options: thi, gia, lehoan, blouza, gaia, google, ghost
-machine = 'google'; 
+% machine = 'google'; 
 % machine = 'blouza';
 % machine = 'thi';
 % machine = 'ghost';
-% machine = 'lehoan';
+machine = 'lehoan';
 
 
 % only enable showPlot option on thi's machine

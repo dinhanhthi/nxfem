@@ -1,0 +1,53 @@
+Test 17: like 17 bcu3 tang len e-1, f 0.5,
+
+Machine: lehoan,
+Model: model_chopp06combine,
+hTmax: 0.0176776695,
+no. triangles: 21852,
+
+number of days: 45.000000,
+__CFL: 1.000000,
+
+Use FreeFem++ mesh: 1,
+Regular mesh: 1,
+
+Use small-cut: 0,
+
+Newton?: 1,
+__itol: 0.001000,
+
+Use FMM: 0,
+__al_FMM: 0.100000,
+__numUseFMM: 0,
+__numUseFMM: 30,
+
+useSUPG: 1,
+__delEps: 0.001000,
+__delSD: 0.500000,
+
+use Ghost penalty: 0,
+__gam1: 0.000001,
+__gam2: 0.000001,
+
+Panalty terms:
+__lamHu: 100000000.000000,
+__lamHv: 10000000000.000000,
+
+Model parameters:
+__r0: 0.040000,
+____distancing: 0,
+__muS1: 8.549320,
+__muS2: 0.000000,
+__muP1: 8.287850,
+__muP2: 0.000000,
+__bcu3: 0.000008,
+__cpU.k1: 146.880000,
+__cpU.k2: 183.600000,
+__cpV.k1: 1.000000,
+__cpV.k1: 1.000000,
+__f: 0.500000,
+__K0: 0.000000,
+__useFixedDist: 1,
+____pa.L: 0.075000,
+the first dt: 0.413258,
+
