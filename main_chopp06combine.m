@@ -173,7 +173,7 @@ phi(abs(phi)<pa.tol)=0; % find phi which are very small (~0) and set to 0
 fprintf('Running on machine [%s]\n', machine);
 switch machine
     case 'thi'
-        path_nxfem = '/home/thi/Dropbox/git/nxfem/'; % thi's local machine
+        path_nxfem = '/home/thi/Documents/Github/nxfem/'; % thi's local machine
         path_phi = strcat(path_nxfem,'mshdist/');
         call_mshdist = strcat({'mshdist'},{' '},{path_phi},'phi'); % run in terminal
     case 'google'
