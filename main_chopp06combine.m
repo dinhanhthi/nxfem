@@ -64,7 +64,7 @@ pa.tol = eps(1e3);          % tolerance, 1e-14
 model = model_chopp06combine;    % choose model. cf. file model_chopp2007.m
 
 showPlot = 0; % wanna show plots?
-    withMesh = true;
+    withMesh = false;
     plotGradv = 1; % plot gradient of v on cut triangles
 
 savePlot = 1; % wanna save plot or not?
