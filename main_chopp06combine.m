@@ -66,13 +66,13 @@ pa.tol = eps(1e3); % tolerance, 1e-14
 model = model_chopp06combine;    % choose model. cf. file model_chopp2007.m
 
 %% NEED TO BE CHANGED EVERY TEST CASE
-savePlot = 0; % wanna save plot or not?
+savePlot = 1; % wanna save plot or not?
     testCase = '18'; % count the test and used to name the folder
     pathOption = 'newphi';
     moreInfo = 'Test 18: new phi'; % write inside file txt
 
 %%
-showPlot = 1; % wanna show plots?
+showPlot = 0; % wanna show plots?
 
 % for both showPlot & savePlot
 withMesh = false;
