@@ -68,7 +68,7 @@ showPlot = 0; % wanna show plots?
     plotGradv = 1; % plot gradient of v on cut triangles
 
 savePlot = 1; % wanna save plot or not?
-    pathOption = '_test5_lehoan';
+    pathOption = '_test5_day';
     
 pa.smallCut = 0;  % ignore small-support basis (1=ignore,0=no)
     pa.tH = 10; % to find the small support using (20) or (21) in arnold 2008
@@ -104,7 +104,7 @@ cpV.lamH = 1e5; % penalty coefficient for v (potential)
 % options: thi, gia, lehoan, blouza, gaia, google, ghost
 % machine = 'google'; 
 % machine = 'blouza';
-%machine = 'thi';
+% machine = 'thi';
 % machine = 'ghost';
 machine = 'lehoan';
 
@@ -113,6 +113,8 @@ if ~strcmp(machine,'thi')
     showPlot = 0;
 end
 
+maxDay = 45;
+CFL = 1;
 
 
 %% Model parameters
@@ -173,7 +175,7 @@ phi(abs(phi)<pa.tol)=0; % find phi which are very small (~0) and set to 0
 fprintf('Running on machine [%s]\n', machine);
 switch machine
     case 'thi'
-        path_nxfem = '/home/thi/Dropbox/git/nxfem/'; % thi's local machine
+        path_nxfem = '/home/thi/Documents/nxfem/'; % thi's local machine
         path_phi = strcat(path_nxfem,'mshdist/');
         call_mshdist = strcat({'mshdist'},{' '},{path_phi},'phi'); % run in terminal
     case 'google'
@@ -249,7 +251,7 @@ if savePlot
     else
         path_useGP = '_wtGP';
     end
-    path_test_result = strcat(path_nxfem,'results/chopp06combine/',...
+    path_test_result = strcat(path_nxfem,'results/chopp06combine/20_',...
                         path_machine,path_regu,path_useFF,path_useGP,...
                             path_useSUPG,path_useFMM,pathOption);
     path_test_remove = strcat({'rm -r'},{' '},{path_test_result}); % in case of duplicated folder
@@ -267,12 +269,15 @@ end
 %=========================================================================
 % pA = model.pa;
 % pA = pA();
-maxStep = 50; % using dt = dx/|u|
+% maxStep = 50; % using dt = dx/|u|
 voldSTD = zeros(msh.nStd,1); % initial vh for velocity grad v
+
+day=0;
 
 disp('Starting the loop...');
 %% loop
-for ns = 1:maxStep
+% for ns = 1:maxStep
+while day < maxDay
     disp('-----------------------------');
     fprintf('Step= %d\n',ns);
     nf = 0; % reset every loop to be sure uh, vh plotted on the same figure
@@ -564,10 +569,10 @@ for ns = 1:maxStep
         fprintf("Saving plots... ");
         f=figure('visible','off');
         % save phi
-        titlePlot = strcat('phi, step = ',num2str(ns));
+        titlePlot = strcat('phi, day = ',num2str(round(day,2)));
         plotNXFEM(msh,pa,phi,iPs,nf,phi,'withMesh',withMesh,...
                 'title',titlePlot,'dim',2,'export',false); % phi
-        fileName = strcat(path_test_result,'/phi_','_','step_',num2str(ns),'.png');
+        fileName = strcat(path_test_result,'/phi_',num2str(ns),'_day_',num2str(round(day,2)),'.png');
         % change size of images
         oldpaperunits = get(gcf,'PaperUnits');
         oldpaperpos = get(gcf,'PaperPosition');
@@ -579,21 +584,19 @@ for ns = 1:maxStep
         
         % uh
         f=figure('visible','off');
-        titlePlot = strcat('uh, step = ',num2str(ns));
+        titlePlot = strcat('uh, day = ',num2str(round(day,2)));
         plotNXFEM(msh,pa,phi,iPs,nf,unewSTD,'withMesh',withMesh,...
                         'title',titlePlot); % uh
-        fileName = strcat(path_test_result,'/uh_',num2str(0),...
-                        '_','step_',num2str(ns),'.png');
+        fileName = strcat(path_test_result,'/uh_',num2str(ns),'_day_',num2str(round(day,2)),'.png');
         print(fileName,'-dpng','-r0');
         close(f);
         
         % vh
         f=figure('visible','off');
-        titlePlot = strcat('vh, step = ',num2str(ns));
+        titlePlot = strcat('vh, day = ',num2str(round(day,2)));
         plotNXFEM(msh,pa,phi,iPs,nf,vnewSTD,'withMesh',withMesh,...
                         'title',titlePlot); % vh
-        fileName = strcat(path_test_result,'/vh_',num2str(0),...
-                        '_','step_',num2str(ns),'.png');
+        fileName = strcat(path_test_result,'/vh_',num2str(ns),'_day_',num2str(round(day,2)),'.png');
         print(fileName,'-dpng','-r0');
         close(f);
         
@@ -621,7 +624,13 @@ for ns = 1:maxStep
     % dt
     maxGradV = max(abs(gvnew.x) + abs(gvnew.y));
     dt = msh.hTmax/maxGradV;
+    fprintf('dt: %f\n', dt);
+    day = day+dt;
+    fprintf('day: %f\n',day);
     
+    if dt > 10
+       break; 
+    end
     
     % stiffness matrix for level set
     %----------------------------------------------------------------------
@@ -707,8 +716,10 @@ if savePlot
 end
 
 
+%% CLEAN UP
 % Fix conflict in git
 system('rm -r mshdist/phi.mesh');
+close all; % close all figures in this test
 
 
 function delT = getDellsT(msh,gP,eps,SD)
