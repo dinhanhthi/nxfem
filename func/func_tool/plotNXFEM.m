@@ -78,27 +78,28 @@ if resu.withMesh
     hold on
     pdemesh(points,edges,triangles,'NodeLabels',resu.nodeLabel,...
                 'ElementLabels',resu.eleLabel);
-    if resu.withGamh % plot with Gam_h or not
-        
-        % plot intersections
-        nCTs = size(iPs,3);
-        for it=1:nCTs
-            plot(iPs(1,:,it),iPs(2,:,it),'-r','LineWidth',1);
-            hold on
-        end
-        
-        % plot segments Gh conciding to mesh's edges
-        segment = getMeshSegmentOnGh(msh,pa,phi);
-        for it=1:size(segment,2)
-            plot(points(1,segment(:,it)),points(2,segment(:,it)),'-r','LineWidth',1);
-            hold on
-        end
-        
-        hold off
-    end
     if (resu.export) && (~strcmp(resu.title,'no title'))
         print(strcat('results\',resu.title),'-dpng'); % export to file
     end
+    hold off
+end
+
+if resu.withGamh % plot with Gam_h or not
+        hold on
+    % plot intersections
+    nCTs = size(iPs,3);
+    for it=1:nCTs
+        plot(iPs(1,:,it),iPs(2,:,it),'-b','LineWidth',1);
+        hold on
+    end
+
+    % plot segments Gh conciding to mesh's edges
+    segment = getMeshSegmentOnGh(msh,pa,phi);
+    for it=1:size(segment,2)
+        plot(points(1,segment(:,it)),points(2,segment(:,it)),'-b','LineWidth',1);
+        hold on
+    end
+
     hold off
 end
 
