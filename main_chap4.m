@@ -52,6 +52,7 @@
 
 %% add path of functions
 addpath(genpath('func')); % add all necessary functions
+clear ; close all; % Initialization
 
 
 
@@ -71,15 +72,17 @@ GeoDom = model.domain(); % domain
 
 
 %% SETTINGS
-findCR = 1; % wanna find the CR?
+findCR = 0; % wanna find the CR?
     %     numSegCR = [16, 32, 64, 128]; % only works with findCR=1
     numSegCR = [36, 56, 86, 126];
-    showPlotCR = 1; % show plot of convergence (for findCR=1)
-    
-numSegPlot = 51; % only for plotting, findCR=0
+    numSegPlot = 37; % only for plotting, findCR=0
 savePlot = 0; % 1 = export figures to files (and without plotting them)
-showPlot = 1; % wanna plot or not the solution? (JUST FOR savePlot=0)
+    testCase = '1';
+    pathOption = '';
+    moreInfo = 'Test 1: First test'; % write inside file txt
+showPlot = 1; % wanna plot or not the solution?
     nf = 0; % counter of figures (plot each plot in a separated figure)
+    withMesh = false; % plot with mesh?
     
 pa.smallCut = 0; % ignore small-support basis (1=ignore,0=no)
     pa.tH = 1e2; % to find the small support using (20) or (21) in arnold 2008
@@ -91,11 +94,11 @@ useNewton = 0; % use Newton method for solving v?
     imax = 50; % number of iterative
 
 % Penalty (goes with \int [][])
-cpW.lamH = 1e11; % penalty coefficient for w
+cpW.lamH = 1e8; % penalty coefficient for w
 cpV.lamH = 1e8; % penalty coefficient for v
 
 % ghost penalty
-pa.useGP = 0; % wanna use ghost penalty term?
+pa.useGP = 1; % wanna use ghost penalty term?
     pa.gam1 = 1e-6; % parameter for 1st term
     pa.gam2 = 1e-6 ; % parameter for 2nd term
 
@@ -110,9 +113,44 @@ pa.lamSys = 1; % coef lam in system settings
 
 
 
+%% choose the machine to run
+% options: thi, gia, lehoan, blouza, gaia, google, ghost
+% machine = 'google'; 
+% machine = 'blouza';
+machine = 'thi';
+% machine = 'ghost';
+% machine = 'lehoan';
+
+% only enable showPlot option on thi's machine
+if ~strcmp(machine,'thi')
+    showPlot = 0;
+end
+
+
+
+%% create command to run mshdist outside matlab
+fprintf('Running on machine [%s]\n', machine);
+switch machine
+    case 'thi'
+        path_nxfem = '/home/thi/Dropbox/git/nxfem/'; % thi's local machine
+    case 'google'
+        path_nxfem = '/home/thi/nxfem/';
+    case 'ghost'
+        path_nxfem = '/home/ghost/nxfem/'; 
+    case 'gia'
+        path_nxfem = '/home/gia/nxfem/'; % gia's local machine
+    case 'lehoan'
+        path_nxfem = '/home/lehoan/git/nxfem/'; % lehoan's local machine
+    case 'blouza'
+        path_nxfem = '/users/home/blouza/thi/nxfem/'; % blouza's local machine
+    case 'gaia' % CHECK LATER!!!!
+        path_nxfem = '/users/dinh/nxfem/'; % only on gaia machine
+end
+
+
+
 %% Dependent parameters
 if findCR == 1
-    showPlot = 0; % don't plot the solutions
     numSeg = numSegCR;
     disp('Find the convergence rate...');
 else
@@ -123,10 +161,36 @@ nStep = size(numSeg,2);
 
 
 
+%% if SAVE PLOT
+% Create a folder to save the plots
+if savePlot
+    disp("Creating folder to save plots...");
+    path_machine = machine;
+    if reguMesh && (~useFFmesh)
+       path_regu = 'regu_';
+    elseif ~useFFmesh
+        path_regu = 'irregu_';
+    else
+        path_regu = '';
+    end
+    path_test_result = strcat(path_nxfem,'results/chap4/',...
+                testCase,'_',path_regu,'_',pathOption,'_',path_machine);
+    path_test_remove = strcat({'rm -r'},{' '},{path_test_result}); % in case of duplicated folder
+    path_test_remove = cell2mat(path_test_remove);
+    system(path_test_remove);
+    path_test_create = strcat({'mkdir'},{' '},{path_test_result}); % crfeate a new folder
+    path_test_create = cell2mat(path_test_create);
+    system(path_test_create);
+end
+
+
+
 %% For finding CR
 hTarray = zeros(1,nStep);
 nDOFsArray = zeros(1,nStep);
-errArray = zeros(2,nStep);
+wL2array = zeros(1,nStep);
+vL2array = zeros(1,nStep);
+uL2array = zeros(1,nStep);
 
 
 
@@ -193,25 +257,25 @@ for z = 1:nStep
     bNodes = bN.all; iNodes=iN.all;
     
     
-    disp('Exact solutions...');
     %% Exact solution in stdFEM
+    disp('Exact solutions...');
     % w
-    defExSol = model.defWex;
-    wExStd = exInStd(defExSol,msh,pa);
+    defExSolw = model.defWex; % function handle
+    wExSTD = exInStd(defExSolw,msh,pa);
     % u
-    defExSol = model.defUex;
-    uExStd = exInStd(defExSol,msh,pa);
+    defExSolu = model.defUex; % function handle
+    uExSTD = exInStd(defExSolu,msh,pa);
     % v
-    defExSol = model.defVex;
-    vExStd = exInStd(defExSol,msh,pa);
+    defExSolv = model.defVex; % function handle
+    vExSTD = exInStd(defExSolv,msh,pa);
     
     
     %% Exact solution in NXFEM
-    wExNX = interSTD2NX(wExStd,msh); % column array
+    wExNX = interSTD2NX(wExSTD,msh); % column array
     % u
-    uExNX = interSTD2NX(uExStd,msh); % column array
+    uExNX = interSTD2NX(uExSTD,msh); % column array
     % v
-    vExNX = interSTD2NX(vExStd,msh); % column array
+    vExNX = interSTD2NX(vExSTD,msh); % column array
     
     
     %% Control paramaters
@@ -311,7 +375,6 @@ for z = 1:nStep
         difu = delL2/Uip1L2; % |del|_L2/|u_i+1|_L2
         fprintf('___difu: %0.18f\n',difu);
     end
-    
     vhNX = vold;
     
     
@@ -321,10 +384,142 @@ for z = 1:nStep
                     pa.bet2/(pa.lamSys*pa.alp2),msh);
                 
     
+    
+    %% Solution NX in STD (for plotting)
+    whSTD = interNX2STD(whNX,msh);
+    uhSTD = interNX2STD(uhNX,msh);
+    vhSTD = interNX2STD(vhNX,msh);
+                
+                
                 
     %% ERRORS
+    fprintf('Get errors...');
+    wL2 = getNormL2uhuexNX(msh,pa,tris,CT,uhNX,defExSolw,defPhi);
+    vL2 = getNormL2uhuexNX(msh,pa,tris,CT,vhNX,defExSolv,defPhi);
+    uL2 = getNormL2uhuexNX(msh,pa,tris,CT,uhNX,defExSolu,defPhi);
     
+    
+    
+    %% For finding CR
+    hTarray(z) = msh.hTmax;
+    nDOFsArray(z) = msh.ndof; 
+    wL2array(z) = wL2;
+    vL2array(z) = vL2;
+    uL2array(z) = uL2;
 end
+
+
+
+%% Display CR or plotting
+if nStep>1
+    %% find CR
+    disp('Find the CR...');
+    tmp = polyfit(log(hTarray),log(wL2array),1);
+    orderL2w = tmp(1);
+    
+    tmp = polyfit(log(hTarray),log(vL2array),1);
+    orderL2v = tmp(1);
+    
+    tmp = polyfit(log(hTarray),log(uL2array),1);
+    orderL2u = tmp(1);
+    
+    
+    %% Save figure of CR
+    if savePlot
+        disp('Saving plot of CR...');
+        
+        %% Save figure of CR
+        nf = nf+1;
+        f = figure(nf);
+        set(f, 'Visible', 'off');
+        plot(log(hTarray),log(wL2array),'-r.',...
+            log(hTarray),log(uL2array),'-b.',...
+            log(hTarray),log(vL2array),'-m.');
+        legend('w','u','v');
+        xlabel('log(h)'); 
+        ylabel('log(L2 error)');
+        fileName = strcat(path_test_result,'/CR_',testCase,'.png');
+        % change size of images
+        f.PaperUnits = 'inches';
+        f.PaperPosition = [0 0 8 6];
+        print(fileName,'-dpng','-r0');
+        if ~plotContourChange
+            close(f);
+        end
+        
+        
+        %% save errors as file
+        % see file results\main_nxfem\errors.txt
+        cr = zeros(3,nStep);
+        for i=2:nStep
+           cr(1,i) = log(wL2array(i)/wL2array(i-1))/log(hTarray(i)/hTarray(i-1)); % w
+           cr(2,i) = log(uL2array(i)/uL2array(i-1))/log(hTarray(i)/hTarray(i-1)); % u
+           cr(3,i) = log(vL2array(i)/vL2array(i-1))/log(hTarray(i)/hTarray(i-1)); % v
+        end
+        errFileMat = [hTarray;wL2array;cr(1,:);uL2array;cr(2,:);vL2array;cr(3,:)];
+        fileName = strcat(path_test_result,'/err_',testCase,'.txt');
+        fileID = fopen(fileName,'w');
+        fprintf(fileID,'%7s %12s %6s %12s %6s\n','h','L2','CR','ENorm','CR');
+        fprintf(fileID,'%6.5f & %12.8f & %6.2f & %12.8f & %6.2f \n',errFileMat);
+        fclose(fileID);
+    end
+else % just for plotting, don't wanna find CR
+    
+    if savePlot
+        
+        % w
+        nf=nf+1;
+        g=figure(nf);
+        set(g, 'Visible', 'off');
+        plotNXFEM(msh,pa,phi,iPs,nf,whSTD,'withMesh',withMesh,...
+                            'title','wh','show',true); % wh
+        fileName = strcat(path_test_result,'/',testCase,'_wh_','.png');
+        g.PaperUnits = 'inches';
+        g.PaperPosition = [0 0 8 6];
+        print(fileName,'-dpng','-r0');
+        close(g);
+        
+        % u
+        nf=nf+1;
+        g=figure(nf);
+        set(g, 'Visible', 'off');
+        plotNXFEM(msh,pa,phi,iPs,nf,uhSTD,'withMesh',withMesh,...
+                            'title','uh','show',true); % wh
+        fileName = strcat(path_test_result,'/',testCase,'_uh_','.png');
+        g.PaperUnits = 'inches';
+        g.PaperPosition = [0 0 8 6];
+        print(fileName,'-dpng','-r0');
+        close(g);
+        
+        % v
+        nf=nf+1;
+        g=figure(nf);
+        set(g, 'Visible', 'off');
+        plotNXFEM(msh,pa,phi,iPs,nf,vhSTD,'withMesh',withMesh,...
+                            'title','vh','show',true); % wh
+        fileName = strcat(path_test_result,'/',testCase,'_vh_','.png');
+        g.PaperUnits = 'inches';
+        g.PaperPosition = [0 0 8 6];
+        print(fileName,'-dpng','-r0');
+        close(g);
+    end
+    
+    if showPlot
+        nf = plotNXFEM(msh,pa,phi,iPs,nf,whSTD,'withMesh',false,'title','wh','dim',3); % wh
+        nf = plotNXFEM(msh,pa,phi,iPs,nf,wExSTD,'withMesh',false,'title','wex','dim',3); % wex
+        nf = plotNXFEM(msh,pa,phi,iPs,nf,uhSTD,'withMesh',false,'title','uh','dim',3); % uh
+        nf = plotNXFEM(msh,pa,phi,iPs,nf,uExSTD,'withMesh',false,'title','uex','dim',3); % uex
+        nf = plotNXFEM(msh,pa,phi,iPs,nf,vhSTD,'withMesh',false,'title','vh','dim',3); % vh
+        nf = plotNXFEM(msh,pa,phi,iPs,nf,vExSTD,'withMesh',false,'title','vex','dim',3); % vex
+    end
+end
+
+close all; % close all figures in this test
+
+
+
+
+
 
 
 

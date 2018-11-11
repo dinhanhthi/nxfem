@@ -67,9 +67,9 @@ model = model_chopp06combine;    % choose model. cf. file model_chopp2007.m
 
 %% NEED TO BE CHANGED EVERY TEST CASE
 savePlot = 1; % wanna save plot or not?
-    testCase = '15'; % count the test and used to name the folder
+    testCase = '16'; % count the test and used to name the folder
     pathOption = '_find';
-    moreInfo = 'Test 15: From 12 & 14, FMM to 30'; % write inside file txt
+    moreInfo = 'Test 16: again for 12'; % write inside file txt
 
 %%
 showPlot = 0; % wanna show plots?
@@ -90,12 +90,12 @@ useNewton = 1; % use Newton to solve nonlinear problems?
     itol = 1e-3;
     
 % ghost penalty
-pa.useGP = 1; % wanna use ghost penalty term?
+pa.useGP = 0; % wanna use ghost penalty term?
     pa.gam1 = 1e-6; % parameter for 1st term
     pa.gam2 = 1e-6 ; % parameter for 2nd term
 
 % Fast marching method
-useFMM = 1; % use fast marching method or not (mshdist)?
+useFMM = 0; % use fast marching method or not (mshdist)?
     numUseFMM = 0; % count the number of use of FMM
     alp_FMM = 0.1;
     stepUseFMM = 30; % use every 15 step (disable al_FMM method)
@@ -107,17 +107,17 @@ useSUPG = 1; % if 1, need to make more settings
 
 % Penalty parameters
 %-------------------------------------------------------------------------
-cpU.lamH = 1e6; % penalty coefficient for u (substrate)
-cpV.lamH = 1e8; % penalty coefficient for v (potential)
+cpU.lamH = 1e8; % penalty coefficient for u (substrate)
+cpV.lamH = 1e10; % penalty coefficient for v (potential)
 
 % choose the machine to run
 %-------------------------------------------------------------------------
 % options: thi, gia, lehoan, blouza, gaia, google, ghost
-% machine = 'google'; 
+machine = 'google'; 
 % machine = 'blouza';
 % machine = 'thi';
 % machine = 'ghost';
-machine = 'lehoan';
+% machine = 'lehoan';
 
 
 % only enable showPlot option on thi's machine
@@ -135,8 +135,8 @@ pa.r0 = 0.04; % testing
     pa.distancing = 0; % make phi to be a signed distance function
 pa.muS1 = 8.54932; pa.muS2 = 0;
 pa.muP1 = 8.28785; pa.muP2 = 0;
-% pa.bcu3 = 8.3e-6; % boundary condition for u on \pt\Omg_3
-pa.bcu3 = 1e-1; % testing
+pa.bcu3 = 8.3e-6; % boundary condition for u on \pt\Omg_3
+% pa.bcu3 = 1e-1; % testing
 cpU.kk1 = 146.88; cpU.kk2 = 183.6; % diff coef for u
 cpV.kk1 = 1; cpV.kk2 = 1;    % diff coef for v
 pa.f = 0.6; % volume fraction of active biomass
