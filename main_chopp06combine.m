@@ -68,7 +68,7 @@ showPlot = 1; % wanna show plots?
     plotGradv = 0; % plot gradient of v on cut triangles
 
 savePlot = 1; % wanna save plot or not?
-    pathOption = '_test5_day';
+    pathOption = '_test5_day_again';
     
 pa.smallCut = 0;  % ignore small-support basis (1=ignore,0=no)
     pa.tH = 10; % to find the small support using (20) or (21) in arnold 2008
