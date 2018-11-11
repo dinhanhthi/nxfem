@@ -274,6 +274,8 @@ voldSTD = zeros(msh.nStd,1); % initial vh for velocity grad v
 
 day=0;
 
+ns=0;
+
 disp('Starting the loop...');
 %% loop
 % for ns = 1:maxStep
@@ -281,7 +283,7 @@ while day < maxDay
     disp('-----------------------------');
     fprintf('Step= %d\n',ns);
     nf = 0; % reset every loop to be sure uh, vh plotted on the same figure
-    
+    ns=ns+1;
     %% =======================================================================
     % GET INFORMATION OF TRIANGLES
     % The same for both equations of u and v
