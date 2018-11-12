@@ -113,16 +113,16 @@ function valF = findDefFw(xx,yy,pa,sub)
     end
 end
 %-------------------------------------------------------------------------
-function valF = findDefFv(xx,yy,pa,sub)
+function valF = findDefFv(xx,yy,pa,sub,defG)
     % Define right hand side function fu
     % Input: coordinate of points + indication subdomain
     % Output: value of F at points
     
     rr2 = xx.^2 + yy.^2; % r^2
     % uex
-    uex1 = findDefUex(xx,yy,1,pa);
+    uex1 = findDefUex(xx,yy,pa,1);
     % vex
-    vex1 = findDefVex(xx,yy,1,pa);
+    vex1 = findDefVex(xx,yy,pa,1);
     % g(u)
     guex1 = defG(uex1,1); 
     if sub==1 % in Omg1s
@@ -199,6 +199,7 @@ end
 % KAPPA
 %=========================================================================
 function kap = findKap(cp,CT,pa)
+    % for seeking u and v
     % kapi : 1 x nCTs
     
     if pa.useGP

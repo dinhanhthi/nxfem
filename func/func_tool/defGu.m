@@ -11,13 +11,13 @@ end
 %% Definition
 
 function val = defChange(u,pa) % changeable g(u)
-%     val = u.^2; % main_sys_linda
-    val = u./(pa.K0 + u); % chopp06combine
+    val = u.^2; % main_sys_linda, main_chap4
+    % val = u./(pa.K0 + u); % chopp06combine
 end
 
 function val = defDiffChange(u,pa) % derivative of g(u) changeable
-%     val = 2*u; % main_sys_linda
-    val = pa.K0/(pa.K0+u).^2; % chopp06combine
+    val = 2*u; % main_sys_linda, main_chap4
+    % val = pa.K0/(pa.K0+u).^2; % chopp06combine
 end
 
 function val = defG1(u,pa) % *ug'(u)-g(u)
