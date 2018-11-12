@@ -75,7 +75,7 @@ savePlot = 1; % wanna save plot or not?
 showPlot = 0; % wanna show plots?
 
 % for both showPlot & savePlot
-withMesh = false;
+withMesh = false; 
 plotGradv = 0; % plot gradient of v on cut triangles
 plotContourChange = 0; % only plot the interface with time (hold on to see the track)
 plotSolution = 1; % plot solution or not? (uh, vh)
