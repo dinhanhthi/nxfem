@@ -67,12 +67,12 @@ model = model_chopp06combine;    % choose model. cf. file model_chopp2007.m
 
 %% NEED TO BE CHANGED EVERY TEST CASE
 savePlot = 1; % wanna save plot or not?
-    testCase = '22'; % count the test and used to name the folder
-    pathOption = '_find';
-    moreInfo = 'TesT 22: find best for 06'; % write inside file txt
+    testCase = '21'; % count the test and used to name the folder
+    pathOption = '_NEWPHI';
+    moreInfo = 'TesT 21: find best for new phi'; % write inside file txt
 
 %%
-showPlot = 0; % wanna show plots?
+showPlot = 1; % wanna show plots?
 
 % for both showPlot & savePlot
 withMesh = false;
@@ -113,9 +113,9 @@ cpV.lamH = 1e8; % penalty coefficient for v (potential)
 % choose the machine to run
 %-------------------------------------------------------------------------
 % options: thi, gia, lehoan, blouza, gaia, google, ghost
-machine = 'google'; 
+% machine = 'google'; 
 % machine = 'blouza';
-% machine = 'thi';
+machine = 'thi';
 % machine = 'ghost';
 % machine = 'lehoan';
 
@@ -136,7 +136,7 @@ pa.r0 = 0.03; % testing
 % Phi noise
     pa.phiNoise = 0.01; % diff phi
     pa.phiHeight = 0.1;
-    pa.distancing = 0; % make phi to be a signed distance function
+    pa.distancing = 1; % make phi to be a signed distance function
     
 pa.muS1 = 8.54932; pa.muS2 = 0;
 pa.muP1 = 8.28785; pa.muP2 = 0;
@@ -196,7 +196,7 @@ phi(abs(phi)<pa.tol)=0; % find phi which are very small (~0) and set to 0
 fprintf('Running on machine [%s]\n', machine);
 switch machine
     case 'thi'
-        path_nxfem = '/home/thi/Dropbox/git/nxfem/'; % thi's local machine
+        path_nxfem = '/home/thi/Documents/nxfem/'; % thi's local machine
         path_phi = strcat(path_nxfem,'mshdist/');
         call_mshdist = strcat({'mshdist'},{' '},{path_phi},'phi'); % run in terminal
     case 'google'
@@ -245,7 +245,7 @@ end
 %% if SAVE PLOT
 % Create a folder to save the plots
 if savePlot
-    disp("Creating folder to save plots...");
+    disp('Creating folder to save plots...');
     path_machine = machine;
     if reguMesh && (~useFFmesh)
        path_regu = 'regu_';
@@ -538,7 +538,7 @@ while day < maxDay
             Adel = getGMgPP(msh,pa,cpU,tris,CT,phi,uoldEach,defG.dchange,coef);
             
             % F(u)
-            coef.omg1 = pa.f*pa.muS1; coef.omg2 = pa.f*pa.muS2;
+            coef.kk1 = pa.f*pa.muS1; coef.kk2 = pa.f*pa.muS2;
             Au = getGMgPP(msh,pa,cpU,tris,CT,phi,uoldEach,defG.change,coef);
             Fdel = Au*uold;
             
@@ -682,7 +682,7 @@ while day < maxDay
     %% SAVE PLOT
     if savePlot
         tic;time=0;
-        fprintf("Saving plots... ");
+        fprintf('Saving plots... ');
         
         % phi
         nf=nf+1; 

@@ -110,9 +110,12 @@ function valPhi=findDefPhi(xx,yy,pa)
     % Input: coordinate of points
     % Output: value of phi at points
     
-    valPhi = sqrt((xx-0.25).^2 + yy.^2) - pa.r0; % semi circle (no need to initialize)
-    
-%     valPhi = pa.a^2*(xx-0.5).^2 + yy.^2/(pa.a^2) - pa.r0^2; % need to use mshdist to initilize to be a signed distance function
+    if ~pa.phiNew
+%     valPhi = sqrt((xx-0.25).^2 + yy.^2) - pa.r0; % semi circle (no need to initialize)
+    %     valPhi = pa.a^2*(xx-0.5).^2 + yy.^2/(pa.a^2) - pa.r0^2; % need to use mshdist to initilize to be a signed distance function
+    else
+        valPhi = (yy-pa.phiHeight) + pa.phiNoise*cos(4*pi*xx/0.5); % need to initialize
+    end
 end
 
 

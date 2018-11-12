@@ -110,8 +110,8 @@ function valPhi=findDefPhi(xx,yy,pa)
     % Input: coordinate of points
     % Output: value of phi at points
     
-    valPhi = sqrt( (xx-0.25).^2 + yy.^2 ) - pa.r0;
-    % valPhi = (yy-pa.phiHeight) + pa.phiNoise*cos(4*pi*xx/0.5);
+%     valPhi = sqrt( (xx-0.25).^2 + yy.^2 ) - pa.r0;
+    valPhi = (yy-pa.phiHeight) + pa.phiNoise*cos(4*pi*xx/0.5);
 
 end
 

@@ -12,7 +12,7 @@ tmp = setdiff(1:numel(eq0idx3),tmp);
 dupPointInTri = eq0idx3(tmp); % idx of triangle containing segment of Gamh (column array)
 segment = zeros(2,numel(dupPointInTri));
 for i=1:numel(dupPointInTri)
-    segment(:,i) = msh.t(abs(phiTris(:,dupPointInTri(i)))<0,dupPointInTri(i));
+    segment(:,i) = msh.t(abs(phiTris(:,dupPointInTri(i)))<pa.tol,dupPointInTri(i));
 end
 segment = sort(segment);
 segment = unique(segment','rows');
