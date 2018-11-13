@@ -1,0 +1,11 @@
+real m = 1.;
+real L = 0.5;
+border g1(t=m*L,0) {x=0; y=t; label=1;}; //Gamma 1
+border g2(t=m,0) {x=t;y=m*L; label=2;}; //Gamma 2
+border g3(t=0,m*L) {x=m; y=t; label=3;}; //Gamma 3
+border g4(t=m/4,3*m/4) {x=t;y=0; label=2;}; //Gamma 4
+border g5(t=0,m/4) {x=t;y=0; label=2;}; //Gamma 5
+border g6(t=3*m/4,m) {x=t;y=0; label=2;}; //Gamma 6
+border g7(t=0,pi) {x=m/4*cos(t)+m/2;y=m/3*L*sin(t); label=4;}; //Gamma 7
+int nf=10;
+plot(g1(nf) + g2(nf) + g3(nf) + g4(nf) + g5(nf) + g6(nf) + g7(nf));
