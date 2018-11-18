@@ -67,9 +67,9 @@ model = model_chopp06combine;    % choose model. cf. file model_chopp2007.m
 
 %% NEED TO BE CHANGED EVERY TEST CASE
 savePlot = 1; % wanna save plot or not?
-    testCase = '21'; % count the test and used to name the folder
-    pathOption = '_find06';
-    moreInfo = 'TesT 21: find best for chopp06'; % write inside file txt
+    testCase = '24'; % count the test and used to name the folder
+    pathOption = '_Rchopp06';
+    moreInfo = 'TesT 24: find best for chopp06 ([R]restart)'; % write inside file txt
 
 %%
 showPlot = 0; % wanna show plots?
@@ -90,7 +90,7 @@ useNewton = 1; % use Newton to solve nonlinear problems?
     itol = 1e-3;
     
 % ghost penalty
-pa.useGP = 1; % wanna use ghost penalty term?
+pa.useGP = 0; % wanna use ghost penalty term?
     pa.gam1 = 1e-6; % parameter for 1st term
     pa.gam2 = 1e-6 ; % parameter for 2nd term
 
@@ -113,11 +113,11 @@ cpV.lamH = 1e10; % penalty coefficient for v (potential)
 % choose the machine to run
 %-------------------------------------------------------------------------
 % options: thi, gia, lehoan, blouza, gaia, google, ghost
-% machine = 'google'; 
+machine = 'google'; 
 % machine = 'blouza';
 % machine = 'thi';
 % machine = 'ghost';
-machine = 'lehoan';
+% machine = 'lehoan';
 
 
 % only enable showPlot option on thi's machine
@@ -129,9 +129,9 @@ end
 
 %% Model parameters
 %-------------------------------------------------------------------------
-pa.phiNew = 0;
+pa.phiNew = 0; % using diff phi from semi circle!
 if ~pa.phiNew
-    pa.distancing = 0;
+    pa.distancing = 0; % no  need to initialize
 %     pa.r0 = 0.01;  % interface
     pa.r0 = 0.05; % testing
 %     pa.a = 1; % aspect ratio (p.49 Chopp 07 xfem)
@@ -143,16 +143,16 @@ end
     
 pa.muS1 = 8.54932; pa.muS2 = 0;
 pa.muP1 = 8.28785; pa.muP2 = 0;
-% pa.bcu3 = 8.3e-6; % boundary condition for u on \pt\Omg_3
-pa.bcu3 = 1e1; % testing
+pa.bcu3 = 8.3e-6; % boundary condition for u on \pt\Omg_3
+% pa.bcu3 = 1e1; % testing
 cpU.kk1 = 146.88; cpU.kk2 = 183.6; % diff coef for u
 cpV.kk1 = 1; cpV.kk2 = 1;    % diff coef for v
 pa.f = 0.5; % volume fraction of active biomass
 pa.K0 = 5e-7;
 
 useFixedDist = 1; % use fixed distance Dirichlet condition like in Chopp?
-%     pa.L = 0.1; % fixed-distance of top-most Dirichlet condition
-    pa.L = 0.05; % testing
+    pa.L = 0.1; % fixed-distance of top-most Dirichlet condition
+%     pa.L = 0.05; % testing
 
 maxDay = 45; % using dt = dx/|u|
 CFL = 1;

@@ -12,6 +12,7 @@
 % ------------------------------------------------------------------------
 % UPDATE 10/11/18: come back after a very long time, edit from 2 old files
 % main_article1.m and main_article1_each.m to only 1 file like main_nxfem.
+% RESULT DIFFERENT FROM THE PAST, NEED TO CHECK IT AGAIN LATER!!!!!
 % ------------------------------------------------------------------------
 
 

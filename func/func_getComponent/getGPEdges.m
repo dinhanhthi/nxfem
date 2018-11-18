@@ -12,6 +12,7 @@ function [eGP,idxNBTris] = getGPEdges(tris,phi,msh,pa)
 %               in line 3 (1,2 or 3)
 %           + lines 8-9: the order of 2 endpoints in the triangle indicated
 %               in line 4 (1,2 or 3)
+%         - idxNBTris: neighbor triangles of CTs
 
 triangles=msh.t;
 
