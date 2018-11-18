@@ -5,6 +5,8 @@
 % This file is used for many models have a very simple form
 %   -grad(kgrad u) = f
 %   with a given exact solution
+% NOTE (13/11/18):  - REWRITE FROM main & main_eachStep
+%                   - CONVERGENCE RATE IS VERY BAD!!!!!
 % =========================================================
 
 %% add path of functions
@@ -30,7 +32,8 @@ switch mdl
         pa.xi = 1.0; % DON'T CHANGE!!!
     case 2 % barrau_x (p.44) STRAIGHT LINE [-1,1]x[-1,1]
         model=model_barrau_x; % file barrau_x.m
-        cp.kk1 = 1; cp.kk2 = 1000; % for barrau case
+%         cp.kk1 = 1; cp.kk2 = 1000; % for barrau case
+        cp.kk1 = 1; cp.kk2 = 1; % testing
         pa.xi = 0.31; % only used for barrau's model, between (-1,1)
     case 3 % barrau_r (p.47) PART OF CIRCLE [0,1]x[0,1]
         model=model_barrau_r; % file barrau_r.m
@@ -54,29 +57,29 @@ switch mdl
         pa.xi=0.3;
 end
 GeoDom = model.domain(); % domain
-pa.kk1 = cp.kk1; pa.kk2 = cp.kk2; % just for defF
+pa.kk1 = cp.kk1; pa.kk2 = cp.kk2; % just for defF & defEx
 
 
 
 %% SETTINGS
 findCR = 1; % wanna find convergence rate? 1 or 0
-%     numSegCR = [16, 32, 64, 128]; % only works with findCR=1
-    numSegCR = [36, 56, 86, 126];
+%     numSegCR = [32, 64, 128, 256]; % only works with findCR=1
+    numSegCR = [32, 62, 94, 128];
     showPlotCR = 1; % show plot of convergence (for findCR=1)
 numSegPlot = 51; % only for plotting, findCR=0
 savePlot = 0; % 1 = export figures to files (and without plotting them)
     showPlot = 1; % wanna plot or not the solution? (JUST FOR savePlot=0)
     nf = 0; % counter of figures (plot each plot in a separated figure)
-pa.smallCut = 0; % ignore small-support basis (1=ignore,0=no)
-    pa.tH = 100; % to find the small support using (20) or (21) in arnold 2008
-reguMesh = 1; % regular or irregular mesh?
+pa.smallCut = 1; % ignore small-support basis (1=ignore,0=no)
+    pa.tH = 10; % to find the small support using (20) or (21) in arnold 2008
+reguMesh = 0; % regular or irregular mesh?
     
-cp.lamH = 1e4; % penalty coefficient
+cp.lamH = 1e8; % penalty coefficient
 
 % ghost penalty
-pa.useGP = 1; % wanna use ghost penalty term?
+pa.useGP = 0; % wanna use ghost penalty term?
     pa.gam1 = 1e-9; % parameter for 1st term
-    pa.gam2 = 1e-9; % parameter for 2nd term
+    pa.gam2 = 1e-5; % parameter for 2nd term
 
     
     
@@ -230,23 +233,24 @@ for z = 1:nStep
     L2h = getNormL2fhNX(eU,tris,CT,msh,pa);
     fprintf("%fs\n",toc-time);
     
-    % IMPORTANT (LATER): Need to write functions compute uex (function
+    % IMPORTANT (LATER): Need to write functions computing uex (function
     %   handle) and uh, not eU as below!!!!!
 %     fprintf('__L2Gh... ');tic;time=0;
-%     L2G = getNormL2GfhNX(eU,tris,areaChildCTs,msh,cp); % ||kgrad||_L2
-%     jumU = getNormJump1p2(eU,CTs,iPs,msh,pa);
-%     avegnU = getNormAveGn(eU,CTs,iPs,msh,cp); % ||{kgran w}||_{-1/2}
-%     ENorm = L2G^2 + jumU^2+ avegnU^2;
-%     ENorm = sqrt(ENorm);
-%     fprintf("%fs\n",toc-time);
+    fprintf('__L2Gh & ENorm... ');tic;time=0;
+    L2G = getNormL2GfhNX(eU,tris,areaChildCTs,msh,cp); % ||kgrad||_L2
+    jumU = getNormJump1p2(eU,CTs,iPs,msh,pa);
+    avegnU = getNormAveGn(eU,CTs,iPs,msh,cp); % ||{kgran w}||_{-1/2}
+    ENorm = L2G^2 + jumU^2+ avegnU^2;
+    ENorm = sqrt(ENorm);
+    fprintf("%fs\n",toc-time);
     
     
     %% For finding CR
     hTarray(z) = msh.hTmax;
     nDOFsArray(z) = msh.ndof; % including new nodes
     errArray(1,z) = L2;
-%     errArray(2,z) = ENorm;
-    errArray(2,z) = L2h;
+    errArray(2,z) = ENorm;
+%     errArray(2,z) = L2h;
 end
 
 
@@ -306,9 +310,9 @@ if nStep>1
     fprintf('regular: %d,\t', reguMesh);
     fprintf('max numSeg: %0.0f,\t', numSeg(nStep));
     fprintf('max DOFs: %0.0f\n', nDOFsArray(nStep));
-    fprintf('L2 order: %0.15f\n',order.L2);
-%     fprintf('ENorm order: %0.15f\n',order.ENorm);
-    fprintf('L2h order: %0.15f\n',order.ENorm);
+    fprintf('L2 order: %f\n',order.L2);
+    fprintf('ENorm order: %f\n',order.ENorm);
+%     fprintf('L2h order: %0.15f\n',order.ENorm);
     
 else % Just for plotting, don't wanna fine CR
     

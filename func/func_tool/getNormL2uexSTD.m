@@ -32,7 +32,7 @@ for t = 1:nTs
     tmp = 0;
     for k = 1:nwt
         [xk,yk] = getCoorSTD(pt(:,k),v1,v2,v3);
-        if defPhi(xk,yk,pa)<0 % in Omg1
+        if abs(defPhi(xk,yk,pa))<pa.tol % in Omg1
             sub=1;
         else % in Omg2
             sub=2;
