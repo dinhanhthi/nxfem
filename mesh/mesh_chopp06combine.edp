@@ -23,5 +23,5 @@ func f = 1 + ((y-1.5)^2)*(x<bound) + (1 + (y-2)^2)*(x>=bound & x<=x1-bound) + 1 
 
 Th = splitmesh(Th, f);
 plot(Th, wait=1);
-savemesh(Th,"mesh_chopp06phinew.msh");
-// savemesh(Th,"mesh_chopp06combine.msh");
+// savemesh(Th,"mesh_chopp06phinew.msh");
+savemesh(Th,"mesh_chopp06combine.msh");
