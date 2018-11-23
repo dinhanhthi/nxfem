@@ -39,7 +39,7 @@ L = repmat(cp.lambda,4,1); % lambda: 1xnCTs
 % Term int_Omg coef*g(uold)*phi*phi
 %-------------------------------------------------------------------------
 sol.u = uold;
-func.h = @(x,y,pa,sub) (sub==1)*coef.omg1 + (sub==2)*coef.omg2;
+func.h = @(x,y,pa,sub) (sub==1)*coef.kk1 + (sub==2)*coef.kk2;
 func.gu = defG;
 K = getPf(msh,pa,tris,CT,sol,func);
 [igPP1,jgPP1,vgPP1] = getTriplePPNCTs(msh,pa,NCTs1,K.NC1); % NCTs1

@@ -1,5 +1,4 @@
-function Av = getGMvAANewton(tris,phi,vold,wS,CT,msh,pa,cpV,cpW)
-% NEED TO MODIFY LATER, FOLLOW getGMgPP.m AND getGMuNewton.m
+function Av = getGMvAANewton(msh,pa,tris,CT,phi,wvEach,voldEach,cpV,defG)
 % Find the global stiffness matrix for delta 
 % (we use notation u instead of delta in this case) for:
 % bet*gradgrad - {}[] - []{} + lam*{}{} + lam*kap1*kap2[][]
@@ -8,10 +7,32 @@ function Av = getGMvAANewton(tris,phi,vold,wS,CT,msh,pa,cpV,cpW)
 % Related file: main_article1.m, note 6 (2/3 quyen)
 % Status: 
 % This function built from the shape of bilinear form
-% Input: - triangles on not cut triangles
-%        - information about cut triangles
-%	 	 - nodesOmg2GamCTs : to get new nodes in CTs2
+% Input: - wvEach.omg1, .omg2, .ct1, ct.2 (all are in stdFEM)
+%           (wv = w-bet/(alp*lam)v)
+%        - voldEach.omg1, .omg2, .ct1, ct.2 (all are in stdFEM)
+%        - defG.change: g(u)
+%        - defG.dchange: g'(u)
 % Output: global stiffness matrix Av
+
+    function L = getLv(cpV)
+        % Get L in int_Gam L*phi*phi
+        % L in this case: lam*{}{} + lam*kap1*kap2*[][]
+        % Related file: getGMvAA.m, getTriplePPoG.m
+        % Input:
+        % Output: matrix L: 4 x nCTs
+        %           row 1: Aij
+        %           row 2: Akikj
+        %           row 3: Akij
+        %           row 4: Aikj
+        kap1 = cpV.kap1; kap2 = cpV.kap2;
+        lambda = cpV.lambda;
+        nCTs = size(lambda,2);
+        L = zeros(4,nCTs);
+        L(1,:) = lambda.*kap1;
+        L(2,:) = lambda.*kap2;
+        % L(3,:) = 0 from zeros
+        % L(4,:) = 0 from zeros
+    end
 
 CTs=tris.CTs; NCTs1=tris.NCTs1; NCTs2=tris.NCTs2;
 aChild=CT.areaChild; iPs=CT.iPs; uN=CT.uN;
@@ -41,10 +62,12 @@ L = getLv(cp); % 4 x nCTs
 [iPP,jPP,vPP1,vPP2,vPP3,vPP4] = getTriplePPoG(CTs,iPs,msh,pa,L);
 
 %-------------------------------------------------------------------------
-% Term -int_Omg lamSys*g(wS-bet/(alp*lamSys)*vold)*phi*phi
+% Term - int_Omg lamSys*g(wv)*phi*phi
 %-------------------------------------------------------------------------
-typeG = 1; % cf. defG.m
-K1 = getKv(tris,CT,vold,wS,msh,pa,cpW,cpV,typeG);
+sol.u = wvEach;
+func.h = @(x,y,pa,sub) (sub==1)*pa.lamSys + (sub==2)*pa.lamSys;
+func.gu = defG.change;
+K1 = getPf(msh,pa,tris,CT,sol,func);
 [igPP1,jgPP1,vgPP1] = getTriplePPNCTs(NCTs1,msh,pa,K1.NC1); % NCTs1
 [igPP2,jgPP2,vgPP2] = getTriplePPNCTs(NCTs2,msh,pa,K1.NC2); % NCTs2
 [igPPc,jgPPc,vgPPc1,vgPPc2] = getTriplePPCTs(CTs,CT,msh,pa,K1); % CTs
@@ -63,8 +86,12 @@ vGGc1 = [vGGc1;vgPPc1]; vGGc2 = [vGGc2;vgPPc2];
 %-------------------------------------------------------------------------
 % Term +int_Omg bet/alp*g'*vold*phi*phi
 %-------------------------------------------------------------------------
-typeG = 3; % g(u)=g'(u), cf. defG.m
-K2 = getKvgp(tris,CT,vold,wS,msh,pa,cpW,cpV,typeG);
+sol2.u = voldEach;
+func2.gu = @(u,pa) u;
+sol2.w = wvEach;
+func2.fw = defG.dchange;
+func2.h = @(x,y,pa,sub) (sub==1)*pa.bet1/pa.alp1 + (sub==2)*pa.bet2/pa.alp2;
+K2 = getPf(msh,pa,tris,CT,sol2,func2);
 [iwgPP1,jwgPP1,vwgPP1] = getTriplePPNCTs(NCTs1,msh,pa,K2.NC1); % NCTs1
 [iwgPP2,jwgPP2,vwgPP2] = getTriplePPNCTs(NCTs2,msh,pa,K2.NC2); % NCTs2
 [iwgPPc,jwgPPc,vwgPPc1,vwgPPc2] = getTriplePPCTs(CTs,CT,msh,pa,K2); % CTs

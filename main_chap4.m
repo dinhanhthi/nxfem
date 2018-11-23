@@ -68,7 +68,7 @@ pa.tol = eps(1e3); % tolerance, 1e-14
 %% Model
 model = model_article1;
 GeoDom = model.domain(); % domain
-
+defG = defGu; % def of gu, cf. defGu.m
 
 
 %% SETTINGS
@@ -90,7 +90,7 @@ pa.smallCut = 0; % ignore small-support basis (1=ignore,0=no)
 reguMesh = 1; % regular or irregular mesh?
 
 useNewton = 0; % use Newton method for solving v?
-    itol = 1e-6;
+    itol = 1e-3;
     imax = 50; % number of iterative
 
 % Penalty (goes with \int [][])
@@ -107,6 +107,10 @@ pa.useGP = 1; % wanna use ghost penalty term?
 %% Model's parameters
 cpW.kk1 = 1; cpW.kk2 = 100;
 cpV.kk1 = 0.5; cpV.kk2 = 100;
+% just for findDef?ex
+pa.alp1 = cpW.kk1; pa.alp2 = cpW.kk2;
+pa.bet1 = cpV.kk2; pa.bet2 = cpV.kk2;
+
 % (cpV.kk2 doesn't take affect because v=0 in Omg2)
 pa.r0 = 0.6; % interface
 pa.lamSys = 1; % coef lam in system settings
@@ -132,7 +136,7 @@ end
 fprintf('Running on machine [%s]\n', machine);
 switch machine
     case 'thi'
-        path_nxfem = '/home/thi/Dropbox/git/nxfem/'; % thi's local machine
+        path_nxfem = '/home/thi/Documents/nxfem/'; % thi's local machine
     case 'google'
         path_nxfem = '/home/thi/nxfem/';
     case 'ghost'
@@ -295,7 +299,7 @@ for z = 1:nStep
     Aw = getGMGG(tris,phi,CT,msh,pa,cpW);
     
     defFw = model.defFw;
-    Fw = getLf(tris,CT,msh,pa,defFw);
+    Fw = getLf(msh,pa,tris,CT,defFw);
     
     whNX = zeros(msh.ndof,1); % column-array
     typeBC = model.bcW(); % get type of BCs
@@ -317,12 +321,13 @@ for z = 1:nStep
     fprintf('Solving v... ');tic;time=0;
     
     % initial v
+    vold = zeros(msh.ndof,1); % initial solution of v
     difu = 100; % initial, harmless
     step = 0;
-    defFv = model.defFv;
+    defFvGu = model.defFv; % (x,y,pa,sub,defG)
+    defFv = @(xx,yy,pa,sub) defFvGu(xx,yy,pa,sub,defG.change);
     typeBC = model.bcV(); % get type of BCs
-    defG = defGu;
-    wS = getUold(whNX,msh); % w in each subdomain
+    wEach = getWsep(whNX,msh,1,1); % w in each subdomain
     
     if ~useNewton
         fprintf('Normal fixed point method)\n');
@@ -332,10 +337,24 @@ for z = 1:nStep
     
     while (difu > itol) && (step<imax)
         step = step+1;
-        voldEach = getUold(vold,msh);
+        
+        % bet/(alp*lam)v
+        voldEach = getWsep(vold,msh,pa.bet1/(pa.alp1*pa.lamSys),...
+                            pa.bet2/(pa.alp2*pa.lamSys));
+                        
+        % w-bet/(alp*lam)v
+        wvEach.omg1 = wEach.omg1 - voldEach.omg1;
+        wvEach.omg2 = wEach.omg2 - voldEach.omg2;
+        wvEach.ct1 = wEach.ct1 - voldEach.ct1;
+        wvEach.ct2 = wEach.ct2 - voldEach.ct2;
+                        
         if ~useNewton % don't use Newton
-            Av = getGMvAA(tris,phi,voldEach,wS,CT,msh,pa,cpV,cpW);
-            Fv = getLf(tris,CT,msh,pa,defFv);
+            
+            % -grad*grad - lam*g(wold-bet/(alp*lam)vold)*v*phi
+            coef.kk1 = pa.lamSys; coef.kk2 = pa.lamSys;
+            Av = getGMvAA(msh,pa,tris,CT,phi,wvEach,cpV,defG.change);
+                       
+            Fv = getLf(msh,pa,tris,CT,defFv);
             
             vnew = zeros(msh.ndof,1); % zero initial uh for each step
             switch typeBC
@@ -346,17 +365,20 @@ for z = 1:nStep
             end
             
             Fv = Fv - Av*vnew; % modification of F
-            vnew(iNodes) = Av(iNodes,iNodes)\Fv(iNodes); % don't care nodes on boundary
-            % vnew(iNodes) = gmres(Av(iNodes,iNodes),Fv(iNodes)); % GMRES factorization
+            vnew(iNodes) = Av(iNodes,iNodes)\Fv(iNodes);
+            % vnew(iNodes) = gmres(Av(iNodes,iNodes),Fv(iNodes)); 
             
             del = vnew - vold;
             vold = vnew;
         else
             % DF(u)
-            Adel = getGMvAANewton(tris,phi,voldEach,wS,CT,msh,pa,cpV,cpW);
+            Adel = getGMvAANewton(msh,pa,tris,CT,phi,wvEach,voldEach,cpV,defG);
+           
+            
             % F(u)
-            Av = getGMvAA(tris,phi,voldEach,wS,CT,msh,pa,cpV,cpW); % like Av in normal iterative method
-            Fv = getLf(tris,CT,msh,pa,defFv); % like Fu in normal iterative method
+            Av = getGMvAA(msh,pa,tris,CT,phi,wvEach,cpV,defG.change); % like Av in normal iterative method
+            getGMvAA(tris,phi,voldEach,wEach,CT,msh,pa,cpV,cpW); 
+            Fv = getLf(msh,pa,tris,CT,defFv); % like Fu in normal iterative method
             Fdel = Av*vold - Fv;
             
             del = zeros(msh.ndof,1); % column-array

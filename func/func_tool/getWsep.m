@@ -11,6 +11,7 @@ function wS = getWsep(tw,msh,k1,k2)
 %         - u in standard fem for NCTs2 (don't care at nodes in Omg1)
 %         - u in standard fem for CTs1 (only consider nodes in CTs region)
 %         - u in standard fem for CTs2 (only consider nodes in CTs region)
+%       (all are in stdFEM size)
 
 %-------------------------------------------------------------------------
 wS.omg1 = sparse(msh.nStd,1); % column

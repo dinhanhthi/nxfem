@@ -1,0 +1,39 @@
+Test 23: find best newphi.,
+
+Machine: google,
+Model: model_chopp2007,
+hTmax: 0.0088388348,
+no. triangles: 16780,
+
+number of days: 45.000000,
+
+Use FreeFem++ mesh: 1,
+Regular mesh: 0,
+Use small-cut: 0,
+
+Use FMM: 1,
+__al_FMM: 0.100000,
+__numUseFMM: 0,
+__numUseFMM: 15,
+
+useSUPG: 1,
+__delEps: 0.001000,
+__delSD: 0.500000,
+
+use Ghost penalty: 0,
+__gam1: 0.000001,
+__gam2: 0.000001,
+
+Panalty terms:
+__lamHu: 1000000.000000,
+__lamHv: 100000000.000000,
+
+Model parameters:
+__phiHeight: 0.100000,
+__phiNoise: 0.010000,
+__bet1: 1000000.000000,
+__bet2: 0.000000,
+__mu1: 3600000.000000,
+__mu2: 0.000000,
+__bcu3: 0.001000,
+

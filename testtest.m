@@ -18,7 +18,7 @@ pa.tol = eps(1e3); % tolerance, 1e-14
 model = model_chopp06combine;    % choose model. cf. file model_chopp2007.m
 
 %% NEED TO BE CHANGED EVERY TEST CASE
-savePlot = 1; % wanna save plot or not?
+savePlot = 0; % wanna save plot or not?
     testCase = '16'; % count the test and used to name the folder
     pathOption = '_find';
     moreInfo = 'Test 16: again for 12'; % write inside file txt

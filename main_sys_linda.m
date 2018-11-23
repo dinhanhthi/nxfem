@@ -316,7 +316,7 @@ while (difu > itol) && (step<imax)
         
         % global matrix
         % ----------------------------------------------------------------- 
-        coef.omg1 = -cpU.kk1; coef.omg2 = -cpU.kk2;
+        coef.kk1 = -cpU.kk1; coef.kk2 = -cpU.kk2;
         Au = getGMgPP(msh,pa,cpU,tris,CT,phi,uoldEach,defG.change,coef);
         
         
