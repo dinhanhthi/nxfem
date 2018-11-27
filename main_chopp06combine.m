@@ -67,9 +67,9 @@ model = model_chopp06combine;    % choose model. cf. file model_chopp2007.m
 
 %% NEED TO BE CHANGED EVERY TEST CASE
 savePlot = 1; % wanna save plot or not?
-    testCase = '1'; % count the test and used to name the folder
+    testCase = '2'; % count the test and used to name the folder
     pathOption = '_findGood';
-    moreInfo = 'TesT 1: find best for chopp06 ([R]restart)'; % write inside file txt
+    moreInfo = 'TesT 2: find best for chopp06 ([R]restart). Like test 1 but use DNodes, dynamic Dirichlet.'; % write inside file txt
 
 %%
 showPlot = 0; % wanna show plots?
@@ -150,7 +150,7 @@ cpV.kk1 = 1; cpV.kk2 = 1;    % diff coef for v
 pa.f = 0.5; % volume fraction of active biomass
 pa.K0 = 5e-7;
 
-useFixedDist = 0; % use fixed distance Dirichlet condition like in Chopp?
+useFixedDist = 1; % use fixed distance Dirichlet condition like in Chopp?
     pa.L = 0.1; % fixed-distance of top-most Dirichlet condition
 %     pa.L = 0.05; % testing
 
@@ -803,6 +803,7 @@ while day < maxDay
     dt = CFL*msh.hTmax/maxGradV;
     day = day+dt;
     fprintf('day: %f\n',day);
+    fprintf('dt: %f\n',dt);
     
     if savePlot && (ns==1)
         fprintf(fileID,'the first dt: %f,\n',dt);
