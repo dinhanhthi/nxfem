@@ -130,8 +130,8 @@ function kap = findKapV(cp,CT,pa)
         kap.kap1 = zeros(1,nCTs) + cp.kk2/(cp.kk1+cp.kk2);
         kap.kap2 = zeros(1,nCTs) + cp.kk1/(cp.kk1+cp.kk2);
     else
-        kap.kap1 = cp.kk1*CT.areaChild(2,:) ./ (cp.kk1*CT.areaChild(2,:) + cp.kk2*CT.areaChild(1,:));
-        kap.kap2 = cp.kk2*CT.areaChild(1,:) ./ (cp.kk1*CT.areaChild(2,:) + cp.kk2*CT.areaChild(1,:));
+        kap.kap1 = cp.kk2*CT.areaChild(1,:) ./ (cp.kk1*CT.areaChild(2,:) + cp.kk2*CT.areaChild(1,:));
+        kap.kap2 = cp.kk1*CT.areaChild(2,:) ./ (cp.kk1*CT.areaChild(2,:) + cp.kk2*CT.areaChild(1,:));
     end
 end
 

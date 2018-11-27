@@ -24,7 +24,7 @@ pa.tol = eps(1e3); % tolerance, 1e-14
 
 
 %% model 
-mdl = 2; 
+mdl = 1; 
 switch mdl
     case 1 % sinha (cf. model_sinha.m)
         model=model_sinha; % file sinha.m
@@ -37,7 +37,7 @@ switch mdl
         pa.xi = 0.31; % only used for barrau's model, between (-1,1)
     case 3 % barrau_r (p.47) PART OF CIRCLE [0,1]x[0,1]
         model=model_barrau_r; % file barrau_r.m
-        cp.kk1 = 1; cp.kk2 = 1000; % for barrau case
+        cp.kk1 = 1; cp.kk2 = 100; % for barrau case
         pa.xi = 0.75; % only used for barrau's model, between (0,1)
     case 4 % barrau_c (p.113) CIRCLE INSIDE DOMAIN [-1,1]x[-1,1]
         model=model_barrau_c;
@@ -62,23 +62,24 @@ pa.kk1 = cp.kk1; pa.kk2 = cp.kk2; % just for defF & defEx
 
 
 %% SETTINGS
-findCR = 1; % wanna find convergence rate? 1 or 0
+findCR = 0; % wanna find convergence rate? 1 or 0
 %     numSegCR = [32, 64, 128, 256]; % only works with findCR=1
-    numSegCR = [32, 62, 94, 128];
-    showPlotCR = 1; % show plot of convergence (for findCR=1)
-numSegPlot = 51; % only for plotting, findCR=0
+%     numSegCR = [32, 62, 94, 128];
+    numSegCR = [16,32,64];
+    showPlotCR = 0; % show plot of convergence (for findCR=1)
+numSegPlot = 57; % only for plotting, findCR=0
 savePlot = 0; % 1 = export figures to files (and without plotting them)
-    showPlot = 1; % wanna plot or not the solution? (JUST FOR savePlot=0)
+    showPlot = 0; % wanna plot or not the solution? (JUST FOR savePlot=0)
     nf = 0; % counter of figures (plot each plot in a separated figure)
-pa.smallCut = 1; % ignore small-support basis (1=ignore,0=no)
+pa.smallCut = 0; % ignore small-support basis (1=ignore,0=no)
     pa.tH = 10; % to find the small support using (20) or (21) in arnold 2008
-reguMesh = 0; % regular or irregular mesh?
+reguMesh = 1; % regular or irregular mesh?
     
-cp.lamH = 1e8; % penalty coefficient
+cp.lamH = 1e5; % penalty coefficient
 
 % ghost penalty
 pa.useGP = 0; % wanna use ghost penalty term?
-    pa.gam1 = 1e-9; % parameter for 1st term
+    pa.gam1 = 1e-5; % parameter for 1st term
     pa.gam2 = 1e-5; % parameter for 2nd term
 
     
@@ -225,7 +226,8 @@ for z = 1:nStep
     eU = uhNX - uExNX; % wex-wh
     
     fprintf('__L2... ');tic;time=0;
-    L2 = getNormL2uhuexNX(msh,pa,tris,CT,uhNX,defExSol,defPhi);
+%     L2 = getNormL2uhuexNX(msh,pa,tris,CT,uhNX,defExSol,defPhi);
+    L2 = getNormL2fhNX(eU,tris,CT,msh,pa);
     fprintf("%fs\n",toc-time);
     
     % L2h: testing

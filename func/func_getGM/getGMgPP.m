@@ -5,7 +5,7 @@ function Au = getGMgPP(msh,pa,cp,tris,CT,phi,uold,defG,coef)
 % Status: - checked with the old inputParser
 %         - (old) tested like the getGMgPP before change to getK
 % Input: - uold.omg1, .omg2, .ct1, ct.2 (all are in stdFEM)
-%		 - g(u) function handle
+%		 - degG: g(u,pa) function handle, cf. defGu
 %        - coef: coef.omg1, coef.omg2 in each case of omg (should include sign)
 % Output: global stiffness matrix Au
 

@@ -35,7 +35,8 @@ P = getPf(msh,pa,tris,CT,sol,func);
 % get P
 sol.u = uold; % from getWsep, uold here already includes coef
 func.gu = defGu;
-func.h = @(x,y,pa,sub) findDefH(x,y,pa,sub,coef1,coef2);
+% func.h = @(x,y,pa,sub) findDefH(x,y,pa,sub,coef1,coef2);
+func.h = @(x,y,pa,sub) (sub==1)*coef1 + (sub==2)*coef2;
 P = getPf(msh,pa,tris,CT,sol,func);
 % get indices
 [ig1,fg1] = getfPhiNCTs(msh,pa,NCTs1,P.NC1); % NCTs1
@@ -78,12 +79,12 @@ ii = [ii;ic]; ff = [ff;fc2];
 RHS = accumarray(ii,ff); % column array
 
 
-    function val = findDefH(xx,yy,pa,sub,c1,c2)
-       if sub==1
-           val = c1;
-       else
-           val = c2;
-       end
-    end
+%     function val = findDefH(xx,yy,pa,sub,c1,c2)
+%        if sub==1
+%            val = c1;
+%        else
+%            val = c2;
+%        end
+%     end
 
 end
