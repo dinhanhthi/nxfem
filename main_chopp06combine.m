@@ -71,9 +71,9 @@ model = model_chopp06combine;    % choose model. cf. file model_chopp2007.m
 
 %% NEED TO BE CHANGED EVERY TEST CASE
 savePlot = 1; % wanna save plot or not?
-    testCase = '4'; % count the test and used to name the folder
+    testCase = '5'; % count the test and used to name the folder
     pathOption = '_findGood';
-    moreInfo = 'TesT 4: find best for chopp06 ([R]restart). Like test 3 but decrease bcu3.'; % write inside file txt
+    moreInfo = 'TesT 5: find best for chopp06 ([R]restart). Like test 4 but decrease bcu3.'; % write inside file txt
 
 %%
 showPlot = 0; % wanna show plots?
@@ -156,7 +156,7 @@ end
 pa.muS1 = 8.54932; pa.muS2 = 0;
 pa.muP1 = 8.28785; pa.muP2 = 0;
 % pa.bcu3 = 8.3e-6; % boundary condition for u on \pt\Omg_3
-pa.bcu3 = 1e-3; % testing
+pa.bcu3 = 5e-4; % testing
 cpU.kk1 = 146.88; cpU.kk2 = 183.6; % diff coef for u
 cpV.kk1 = 1; cpV.kk2 = 1;    % diff coef for v
 pa.f = 0.5; % volume fraction of active biomass
