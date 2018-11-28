@@ -72,7 +72,7 @@ model = model_chopp06combine;    % choose model. cf. file model_chopp2007.m
 %% NEED TO BE CHANGED EVERY TEST CASE
 savePlot = 1; % wanna save plot or not?
     testCase = '6'; % count the test and used to name the folder
-    pathOption = '_findGood';
+    pathOption = 'findGood';
     moreInfo = 'TesT 6: find best for chopp06 ([R]restart). Like test 5 but after fix dt change suddenly.'; % write inside file txt
 
 %%
@@ -117,10 +117,10 @@ cpV.lamH = 1e10; % penalty coefficient for v (potential)
 % choose the machine to run
 %-------------------------------------------------------------------------
 % options: thi, gia, lehoan, blouza, gaia, google, ghost
-% machine = 'google'; 
+machine = 'google'; 
 % machine = 'blouza';
 % machine = 'thi';
-machine = 'ghost';
+% machine = 'ghost';
 % machine = 'lehoan';
 
 
@@ -156,7 +156,7 @@ end
 pa.muS1 = 8.54932; pa.muS2 = 0;
 pa.muP1 = 8.28785; pa.muP2 = 0;
 % pa.bcu3 = 8.3e-6; % boundary condition for u on \pt\Omg_3
-pa.bcu3 = 5e-4; % testing
+pa.bcu3 = 1e-4; % testing
 cpU.kk1 = 146.88; cpU.kk2 = 183.6; % diff coef for u
 cpV.kk1 = 1; cpV.kk2 = 1;    % diff coef for v
 pa.f = 0.5; % volume fraction of active biomass
@@ -827,10 +827,12 @@ while day < maxDay
     
     
     if savePlot && (ns==1)
-        fprintf(fileID,'the first dt: %f,\n',dt);
+        fprintf(fileID,'The first dt: %f,\n',dt);
         fprintf(fileID,'\n');
     end
-    fprintf('The first dt: %f\n',dt);
+    if ns==1
+        fprintf('The first dt: %f\n',dt);
+    end
     
     
     % stiffness matrix for level set
