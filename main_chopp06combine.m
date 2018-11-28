@@ -823,7 +823,6 @@ while day < maxDay
     day = day+dt;
     fprintf('day: %f\n',day);
     fprintf('dt: %f\n',dt);
-    break
     
     
     
