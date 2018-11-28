@@ -156,7 +156,7 @@ end
 pa.muS1 = 8.54932; pa.muS2 = 0;
 pa.muP1 = 8.28785; pa.muP2 = 0;
 % pa.bcu3 = 8.3e-6; % boundary condition for u on \pt\Omg_3
-pa.bcu3 = 1e-4; % testing
+pa.bcu3 = 1e-5; % testing
 cpU.kk1 = 146.88; cpU.kk2 = 183.6; % diff coef for u
 cpV.kk1 = 1; cpV.kk2 = 1;    % diff coef for v
 pa.f = 0.5; % volume fraction of active biomass
