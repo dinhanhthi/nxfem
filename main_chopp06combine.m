@@ -117,10 +117,10 @@ cpV.lamH = 1e10; % penalty coefficient for v (potential)
 % choose the machine to run
 %-------------------------------------------------------------------------
 % options: thi, gia, lehoan, blouza, gaia, google, ghost
-machine = 'google'; 
+% machine = 'google'; 
 % machine = 'blouza';
 % machine = 'thi';
-% machine = 'ghost';
+machine = 'ghost';
 % machine = 'lehoan';
 
 
@@ -823,7 +823,6 @@ while day < maxDay
     day = day+dt;
     fprintf('day: %f\n',day);
     fprintf('dt: %f\n',dt);
-    break
     
     
     
