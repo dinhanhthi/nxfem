@@ -71,9 +71,9 @@ model = model_chopp06combine;    % choose model. cf. file model_chopp2007.m
 
 %% NEED TO BE CHANGED EVERY TEST CASE
 savePlot = 1; % wanna save plot or not?
-    testCase = '18-1'; % count the test and used to name the folder
-    pathOption = 'findGood';
-    moreInfo = 'TesT 18-1: find best for chopp06 ([R]restart). Slave shape test. Giong test 12 but noise<0. noise bigger, dt bigger'; % write inside file txt
+    testCase = '21'; % count the test and used to name the folder
+    pathOption = 'BOTTOM';
+    moreInfo = 'TesT 21: find best for chopp06 ([R]restart). Slave shape test. bottom'; % write inside file txt
 
 %%
 showPlot = 0; % wanna show plots?
@@ -436,8 +436,8 @@ while day < maxDay
     %-------------------------------------------------------------------------
     [iN,bN] = getibNodes(msh);
     bNodes = bN.all;
-    b3Nodes = bN.e3; % node on \pt\Omg_3 (top)
-    
+   % b3Nodes = bN.e3; % node on \pt\Omg_3 (top)
+    b3Nodes = bN.e1; % bottom
     
     
     %% top-most Dirichlet nodes
