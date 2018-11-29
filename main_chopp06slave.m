@@ -71,9 +71,9 @@ model = model_chopp06combine;    % choose model. cf. file model_chopp2007.m
 
 %% NEED TO BE CHANGED EVERY TEST CASE
 savePlot = 1; % wanna save plot or not?
-    testCase = '18'; % count the test and used to name the folder
+    testCase = '18-1'; % count the test and used to name the folder
     pathOption = 'findGood';
-    moreInfo = 'TesT 18: find best for chopp06 ([R]restart). Slave shape test. Giong test 12 but noise<0'; % write inside file txt
+    moreInfo = 'TesT 18-1: find best for chopp06 ([R]restart). Slave shape test. Giong test 12 but noise<0. noise bigger, dt bigger'; % write inside file txt
 
 %%
 showPlot = 0; % wanna show plots?
@@ -150,7 +150,7 @@ if ~pa.phiNew % use semi circle
     pa.r0 = 0.05; % testing
 %     pa.a = 1; % aspect ratio (p.49 Chopp 07 xfem)
 else % usual in chopp06 and Carlos Conca
-    pa.phiNoise = -0.01; % diff phi
+    pa.phiNoise = -0.03; % diff phi
     pa.phiHeight = 0.1;
     pa.distancing = 1; % make phi to be a signed distance function
 end
@@ -158,7 +158,7 @@ end
 pa.muS1 = 8.54932; pa.muS2 = 0;
 pa.muP1 = 8.28785; pa.muP2 = 0;
 %pa.bcu3 = 8.3e-6; % boundary condition for u on \pt\Omg_3
-pa.bcu3 = 1e-3; % testing
+pa.bcu3 = 1e-5; % testing
 cpU.kk1 = 146.88; cpU.kk2 = 183.6; % diff coef for u
 cpV.kk1 = 1; cpV.kk2 = 1;    % diff coef for v
 pa.f = 0.5; % volume fraction of active biomass

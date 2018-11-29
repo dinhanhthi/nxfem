@@ -1,0 +1,54 @@
+TesT 18-1: find best for chopp06 ([R]restart). Slave shape test. Giong test 12 but noise<0. noise bigger, dt bigger,
+
+Machine: google,
+Model: model_chopp06combine,
+hTmax: 0.0104949618,
+no. triangles: 19068,
+
+number of days: 45.000000,
+__CFL: 1.000000,
+
+Use FreeFem++ mesh: 1,
+Regular mesh: 1,
+
+Use small-cut: 1,
+
+Newton?: 1,
+__itol: 0.000100,
+
+Use FMM: 0,
+__al_FMM: 0.900000,
+__numUseFMM: 0,
+__numUseFMM: 15,
+
+useSUPG: 1,
+__delEps: 0.001000,
+__delSD: 0.500000,
+
+use Ghost penalty: 0,
+__gam1: 0.000001,
+__gam2: 0.000001,
+
+Panalty terms:
+__lamHu: 100000000.000000,
+__lamHv: 10000000000.000000,
+
+Model parameters:
+__phiHeight: 0.100000,
+__phiNoise: -0.030000,
+____distancing: 1,
+__muS1: 8.549320,
+__muS2: 0.000000,
+__muP1: 8.287850,
+__muP2: 0.000000,
+__bcu3: 0.000010,
+__cpU.k1: 146.880000,
+__cpU.k2: 183.600000,
+__cpV.k1: 1.000000,
+__cpV.k1: 1.000000,
+__f: 0.500000,
+__K0: 0.000000,
+__useFixedDist: 1,
+____pa.L: 0.100000,
+The first dt: 0.660972,
+
