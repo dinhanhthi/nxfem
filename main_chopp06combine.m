@@ -71,9 +71,9 @@ model = model_chopp06combine;    % choose model. cf. file model_chopp2007.m
 
 %% NEED TO BE CHANGED EVERY TEST CASE
 savePlot = 1; % wanna save plot or not?
-    testCase = '15-2'; % count the test and used to name the folder
+    testCase = '15-2a'; % count the test and used to name the folder
     pathOption = 'findGood';
-    moreInfo = 'TesT 15-2: find best for chopp06 ([R]restart). Slave shape test. Giong test 12 but much noise!'; % write inside file txt
+    moreInfo = 'TesT 15-2: find best for chopp06 ([R]restart). Slave shape test. Giong test 17 but back to noise 0.01 giong 12 de test corrupt tai 0.18 hay 0.15'; % write inside file txt
 
 %%
 showPlot = 0; % wanna show plots?
@@ -99,9 +99,9 @@ pa.useGP = 1; % wanna use ghost penalty term?
     pa.gam2 = 1e-6 ; % parameter for 2nd term
 
 % Fast marching method
-useFMM = 0; % use fast marching method or not (mshdist)?
+useFMM = 1; % use fast marching method or not (mshdist)?
     numUseFMM = 0; % count the number of use of FMM
-    alp_FMM = 0.1;
+    alp_FMM = 0.9;
     stepUseFMM = 15; % use every 15 step (disable al_FMM method)
 
 % SUPG
@@ -880,8 +880,8 @@ while day < maxDay
     fprintf('|1-norm_gradphi| = %f\n',abs(1-norm_gradphi));
     
 %     if useFMM && abs(1-norm_gradphi) > alp_FMM && numUse <=1
-%     if useFMM && abs(1-norm_gradphi) > alp_FMM
-    if useFMM && (mod(ns,stepUseFMM)==0) % every stepUseFMM step
+     if useFMM && abs(1-norm_gradphi) > alp_FMM
+%    if useFMM && (mod(ns,stepUseFMM)==0) % every stepUseFMM step
         disp('Starting to use FMM...');
         mshdist_w_sol(msh,phi,path_phi,'phi'); % export to phi.sol
         system(call_mshdist); % run 'mshdist file/to/phi' (redistancing)
