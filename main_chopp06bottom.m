@@ -71,9 +71,9 @@ model = model_chopp06combine;    % choose model. cf. file model_chopp2007.m
 
 %% NEED TO BE CHANGED EVERY TEST CASE
 savePlot = 1; % wanna save plot or not?
-    testCase = '20'; % count the test and used to name the folder
-    pathOption = 'BOTTOM';
-    moreInfo = 'TesT 20: find best for chopp06 ([R]restart). BOTTOM BC.'; % write inside file txt
+    testCase = '24'; % count the test and used to name the folder
+    pathOption = 'LEFT';
+    moreInfo = 'TesT 24: find best for chopp06 ([R]restart). LEFT BC.'; % write inside file txt
 
 %%
 showPlot = 0; % wanna show plots?
@@ -437,7 +437,7 @@ while day < maxDay
     [iN,bN] = getibNodes(msh);
     bNodes = bN.all;
 %     b3Nodes = bN.e3; % node on \pt\Omg_3 (top)
-    b3Nodes = bN.e1; % \pt\Omg_1 (bottom)
+    b3Nodes = bN.e4; % \pt\Omg_1 (bottom)
     
     
     
