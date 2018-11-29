@@ -124,7 +124,7 @@ function lam = findLamV(cp,hTCTs,CT,pa)
         lenAB(1,:) = ( (CT.iPs(1,2,:) - CT.iPs(1,1,:)).^2 + (CT.iPs(2,2,:) - CT.iPs(2,1,:)).^2 ) .^(0.5);
         coef = cp.lamH*cp.kk1*cp.kk2 .* lenAB...
             ./(cp.kk2*CT.areaChild(1,:) + cp.kk1*CT.areaChild(2,:));
-        lam = coef./hTCTs;              % belongs to hT
-%         lam = zeros(1,nCTs) + coef;   % not belong to hT
+%         lam = coef./hTCTs;              % belongs to hT
+        lam = zeros(1,nCTs) + coef;   % not belong to hT
     end
 end

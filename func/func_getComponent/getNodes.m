@@ -2,6 +2,7 @@ function nodes = getNodes(tris,nodeCTs,msh,phi,pa)
 % get all necessary nodes of the mesh
 % Input:
 % Output: structure var contains all nodes (std nodes)
+%         ALL NODES ARE STD NODES!!!!!
 
 
 %% NORMAL NODES
