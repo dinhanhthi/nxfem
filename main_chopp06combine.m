@@ -61,7 +61,7 @@ pa.tol = eps(1e3); % tolerance, 1e-14
 
 
 
-JUST_TEST = 1; % only for testing on thi's machine!
+JUST_TEST = 0; % only for testing on thi's machine!
 
 
 
@@ -71,9 +71,9 @@ model = model_chopp06combine;    % choose model. cf. file model_chopp2007.m
 
 %% NEED TO BE CHANGED EVERY TEST CASE
 savePlot = 1; % wanna save plot or not?
-    testCase = '6'; % count the test and used to name the folder
+    testCase = '10'; % count the test and used to name the folder
     pathOption = 'findGood';
-    moreInfo = 'TesT 6: find best for chopp06 ([R]restart). Like test 5 but after fix dt change suddenly.'; % write inside file txt
+    moreInfo = 'TesT 10: find best for chopp06 ([R]restart). After changing to FreeNodes.'; % write inside file txt
 
 %%
 showPlot = 0; % wanna show plots?
@@ -157,14 +157,14 @@ end
     
 pa.muS1 = 8.54932; pa.muS2 = 0;
 pa.muP1 = 8.28785; pa.muP2 = 0;
-% pa.bcu3 = 8.3e-6; % boundary condition for u on \pt\Omg_3
-pa.bcu3 = 1e-5; % testing
+pa.bcu3 = 8.3e-6; % boundary condition for u on \pt\Omg_3
+%pa.bcu3 = 1e-5; % testing
 cpU.kk1 = 146.88; cpU.kk2 = 183.6; % diff coef for u
 cpV.kk1 = 1; cpV.kk2 = 1;    % diff coef for v
 pa.f = 0.5; % volume fraction of active biomass
 pa.K0 = 5e-7;
 
-useFixedDist = 0; % use fixed distance Dirichlet condition like in Chopp?
+useFixedDist = 1; % use fixed distance Dirichlet condition like in Chopp?
     pa.L = 0.1; % fixed-distance of top-most Dirichlet condition
 %     pa.L = 0.05; % testing
 
