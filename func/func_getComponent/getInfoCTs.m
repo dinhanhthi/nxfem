@@ -11,6 +11,7 @@ function CT = getInfoCTs(CTs,phi,msh,pa)
 %           - areaChild: 2 Omg x nCT
 %           - iPs: 2 coordinates x 2 cut points x nCT
 %           - uN: 2 coordinates x nCT
+% ALL NODES ARE STD NODES!!!!
 
 
 %% ========================================================

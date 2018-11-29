@@ -3,6 +3,7 @@ function [iN,bN] = getibNodes(msh)
 % Input:
 % Output: inner nodes (iN), boundary nodes (bN) (all in row arrays)
 %           (including the new nodes)
+% DIFFERENT FROM getNodes or CT.nodes, NODES IN THIS FILE CONTAIN THE NEWNODES TOO!!!!
 
 newNodes = msh.newNodes; edges = msh.e;
 nodeCTs = msh.node.CT.all;
