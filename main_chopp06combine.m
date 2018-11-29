@@ -71,9 +71,9 @@ model = model_chopp06combine;    % choose model. cf. file model_chopp2007.m
 
 %% NEED TO BE CHANGED EVERY TEST CASE
 savePlot = 1; % wanna save plot or not?
-    testCase = '12'; % count the test and used to name the folder
+    testCase = '15'; % count the test and used to name the folder
     pathOption = 'findGood';
-    moreInfo = 'TesT 12: find best for chopp06 ([R]restart). Slave shape test'; % write inside file txt
+    moreInfo = 'TesT 15: find best for chopp06 ([R]restart). Slave shape test. Giong test 12 but make dt be bigger!'; % write inside file txt
 
 %%
 showPlot = 0; % wanna show plots?
@@ -94,7 +94,7 @@ useNewton = 1; % use Newton to solve nonlinear problems?
     itol = 1e-4;
     
 % ghost penalty
-pa.useGP = 0; % wanna use ghost penalty term?
+pa.useGP = 1; % wanna use ghost penalty term?
     pa.gam1 = 1e-6; % parameter for 1st term
     pa.gam2 = 1e-6 ; % parameter for 2nd term
 
@@ -157,8 +157,8 @@ end
     
 pa.muS1 = 8.54932; pa.muS2 = 0;
 pa.muP1 = 8.28785; pa.muP2 = 0;
-% pa.bcu3 = 8.3e-6; % boundary condition for u on \pt\Omg_3
-pa.bcu3 = 1e-3; % testing
+pa.bcu3 = 8.3e-6; % boundary condition for u on \pt\Omg_3
+%pa.bcu3 = 1e-6; % testing
 cpU.kk1 = 146.88; cpU.kk2 = 183.6; % diff coef for u
 cpV.kk1 = 1; cpV.kk2 = 1;    % diff coef for v
 pa.f = 0.5; % volume fraction of active biomass
