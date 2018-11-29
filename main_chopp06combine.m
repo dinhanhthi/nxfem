@@ -61,7 +61,7 @@ pa.tol = eps(1e3); % tolerance, 1e-14
 
 
 
-JUST_TEST = 1; % only for testing on thi's machine!
+JUST_TEST = 0; % only for testing on thi's machine!
 
 
 
@@ -71,9 +71,9 @@ model = model_chopp06combine;    % choose model. cf. file model_chopp2007.m
 
 %% NEED TO BE CHANGED EVERY TEST CASE
 savePlot = 1; % wanna save plot or not?
-    testCase = '6'; % count the test and used to name the folder
+    testCase = '12'; % count the test and used to name the folder
     pathOption = 'findGood';
-    moreInfo = 'TesT 6: find best for chopp06 ([R]restart). Like test 5 but after fix dt change suddenly.'; % write inside file txt
+    moreInfo = 'TesT 12: find best for chopp06 ([R]restart). Slave shape test'; % write inside file txt
 
 %%
 showPlot = 0; % wanna show plots?
@@ -117,11 +117,11 @@ cpV.lamH = 1e10; % penalty coefficient for v (potential)
 % choose the machine to run
 %-------------------------------------------------------------------------
 % options: thi, gia, lehoan, blouza, gaia, google, ghost
-machine = 'google'; 
+% machine = 'google'; 
 % machine = 'blouza';
 % machine = 'thi';
 % machine = 'ghost';
-% machine = 'lehoan';
+machine = 'lehoan';
 
 
 if JUST_TEST
