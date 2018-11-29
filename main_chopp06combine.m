@@ -71,9 +71,9 @@ model = model_chopp06combine;    % choose model. cf. file model_chopp2007.m
 
 %% NEED TO BE CHANGED EVERY TEST CASE
 savePlot = 1; % wanna save plot or not?
-    testCase = '15-1'; % count the test and used to name the folder
+    testCase = '15-2'; % count the test and used to name the folder
     pathOption = 'findGood';
-    moreInfo = 'TesT 15-1: find best for chopp06 ([R]restart). Slave shape test. Giong test 12 but make dt be bigger!'; % write inside file txt
+    moreInfo = 'TesT 15-2: find best for chopp06 ([R]restart). Slave shape test. Giong test 12 but much noise!'; % write inside file txt
 
 %%
 showPlot = 0; % wanna show plots?
@@ -94,7 +94,7 @@ useNewton = 1; % use Newton to solve nonlinear problems?
     itol = 1e-4;
     
 % ghost penalty
-pa.useGP = 0; % wanna use ghost penalty term?
+pa.useGP = 1; % wanna use ghost penalty term?
     pa.gam1 = 1e-6; % parameter for 1st term
     pa.gam2 = 1e-6 ; % parameter for 2nd term
 
@@ -150,7 +150,7 @@ if ~pa.phiNew % use semi circle
     pa.r0 = 0.05; % testing
 %     pa.a = 1; % aspect ratio (p.49 Chopp 07 xfem)
 else % usual in chopp06 and Carlos Conca
-    pa.phiNoise = 0.01; % diff phi
+    pa.phiNoise = 0.02; % diff phi
     pa.phiHeight = 0.1;
     pa.distancing = 1; % make phi to be a signed distance function
 end
