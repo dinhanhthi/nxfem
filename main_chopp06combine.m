@@ -71,9 +71,9 @@ model = model_chopp06combine;    % choose model. cf. file model_chopp2007.m
 
 %% NEED TO BE CHANGED EVERY TEST CASE
 savePlot = 1; % wanna save plot or not?
-    testCase = '14'; % count the test and used to name the folder
+    testCase = '17'; % count the test and used to name the folder
     pathOption = 'findGood';
-    moreInfo = 'TesT 14: find best for chopp06 ([R]restart). After changing to FreeNodes.'; % write inside file txt
+    moreInfo = 'TesT 17: find best for chopp06 ([R]restart). After changing to FreeNodes.'; % write inside file txt
 
 %%
 showPlot = 0; % wanna show plots?
@@ -111,8 +111,8 @@ useSUPG = 1; % if 1, need to make more settings
 
 % Penalty parameters
 %-------------------------------------------------------------------------
-cpU.lamH = 1e10; % penalty coefficient for u (substrate)
-cpV.lamH = 1e12; % penalty coefficient for v (potential)
+cpU.lamH = 1e6; % penalty coefficient for u (substrate)
+cpV.lamH = 1e8; % penalty coefficient for v (potential)
 
 % choose the machine to run
 %-------------------------------------------------------------------------
@@ -146,8 +146,8 @@ end
 pa.phiNew = 0; % using diff phi from semi circle!
 if ~pa.phiNew % use semi circle
     pa.distancing = 0; % no  need to initialize
-     pa.r0 = 0.01;  % interface (like in Chopp's)
-%    pa.r0 = 0.03; % testing
+%     pa.r0 = 0.01;  % interface (like in Chopp's)
+    pa.r0 = 0.05; % testing
 %     pa.a = 1; % aspect ratio (p.49 Chopp 07 xfem)
 else % usual in chopp06 and Carlos Conca
     pa.phiNoise = 0.01; % diff phi
@@ -157,8 +157,8 @@ end
     
 pa.muS1 = 8.54932; pa.muS2 = 0;
 pa.muP1 = 8.28785; pa.muP2 = 0;
-pa.bcu3 = 8.3e-6; % boundary condition for u on \pt\Omg_3
-%pa.bcu3 = 1e-3; % testing
+%pa.bcu3 = 8.3e-6; % boundary condition for u on \pt\Omg_3
+pa.bcu3 = 1e-3; % testing
 cpU.kk1 = 146.88; cpU.kk2 = 183.6; % diff coef for u
 cpV.kk1 = 1; cpV.kk2 = 1;    % diff coef for v
 pa.f = 0.5; % volume fraction of active biomass
