@@ -48,7 +48,5 @@ __cpV.k1: 1.000000,
 __cpV.k1: 1.000000,
 __f: 0.500000,
 __K0: 0.000000,
-__useFixedDist: 1,
+__useFixedDist: 0,
 ____pa.L: 0.100000,
-The first dt: 0.677800,
-

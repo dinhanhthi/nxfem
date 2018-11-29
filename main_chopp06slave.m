@@ -164,7 +164,7 @@ cpV.kk1 = 1; cpV.kk2 = 1;    % diff coef for v
 pa.f = 0.5; % volume fraction of active biomass
 pa.K0 = 5e-7;
 
-useFixedDist = 1; % use fixed distance Dirichlet condition like in Chopp?
+useFixedDist = 0; % use fixed distance Dirichlet condition like in Chopp?
     pa.L = 0.1; % fixed-distance of top-most Dirichlet condition
 %     pa.L = 0.05; % testing
 
