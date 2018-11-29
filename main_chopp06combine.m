@@ -126,7 +126,7 @@ machine = 'google';
 
 if JUST_TEST
     savePlot = 0;
-    useFFmesh = 0;
+    useFFmesh = 1;
     machine = 'thi';
     showPlot = 1;
     plotSolution = 1;
@@ -143,7 +143,7 @@ end
 
 %% Model parameters
 %-------------------------------------------------------------------------
-pa.phiNew = 0; % using diff phi from semi circle!
+pa.phiNew = 1; % using diff phi from semi circle!
 if ~pa.phiNew % use semi circle
     pa.distancing = 0; % no  need to initialize
 %     pa.r0 = 0.01;  % interface (like in Chopp's)
@@ -193,7 +193,7 @@ else % using freefem nesh
    if ~pa.phiNew
         [points,edges,triangles] = ffreadmesh('./mesh/mesh_chopp06combine.msh');
     else
-        [points,edges,triangles] = ffreadmesh('./mesh/mesh_chopp06phinew.msh');
+        [points,edges,triangles] = ffreadmesh('./mesh/mesh_chopp06_new.msh');
     end
 end
 
