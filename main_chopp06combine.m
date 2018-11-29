@@ -94,7 +94,7 @@ useNewton = 1; % use Newton to solve nonlinear problems?
     itol = 1e-4;
     
 % ghost penalty
-pa.useGP = 1; % wanna use ghost penalty term?
+pa.useGP = 0; % wanna use ghost penalty term?
     pa.gam1 = 1e-6; % parameter for 1st term
     pa.gam2 = 1e-6 ; % parameter for 2nd term
 
